@@ -370,7 +370,7 @@ export default function AbonnementView({
 
                 <div className="p-6 space-y-5 flex flex-col flex-1">
                   {/* En-tête */}
-                  <div className={isActive || plan.highlight ? "pt-4" : ""}>
+                  <div className="pt-4">
                     <h3 className="text-lg font-bold text-gray-900">
                       Plan {plan.name}
                     </h3>
