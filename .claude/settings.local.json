@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(~/Downloads/supabase-nextjs/supabase/migrations/001_create_profiles_with_role.sql:*)",
+      "Bash(export PATH=\"/usr/local/bin:$PATH\")",
+      "Bash(node --version)",
+      "Bash(node /usr/local/bin/npm install react-hook-form zod @hookform/resolvers)",
+      "Bash(node /usr/local/bin/npm install react-hook-form zod @hookform/resolvers --prefix ~/Downloads/supabase-nextjs)",
+      "Bash(node /usr/local/bin/npm install react-hook-form@7.55.0 zod @hookform/resolvers --prefix ~/Downloads/supabase-nextjs --legacy-peer-deps)"
+    ]
+  }
+}

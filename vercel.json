@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/notifications/rappels",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/notifications/demande-avis",
+      "schedule": "0 * * * *"
+    }
+  ]
+}

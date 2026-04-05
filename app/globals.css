@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+  }
+
+  /* Font variable définie par next/font/google */
+  :root {
+    --font-inter: "Inter", system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    @apply bg-white text-gray-900 antialiased;
+    font-family: var(--font-inter, system-ui, sans-serif);
+  }
+
+  /* Améliore la fluidité du scroll — bénéfique pour INP/FID */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Évite les sauts de layout lors du chargement des images (CLS) */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Utilitaire pour les squelettes de chargement */
+  .animate-skeleton {
+    @apply animate-pulse bg-gray-200 rounded;
+  }
+
+  /* Focus visible amélioré — accessibilité + score Lighthouse */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2;
+  }
+}

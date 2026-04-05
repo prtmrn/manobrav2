@@ -1,0 +1,258 @@
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  sendEmailConfirmationClient,
+  sendEmailNotifartisan,
+} from "@/lib/brevo";
+
+// ─── Schema Zod ───────────────────────────────────────────────────────────────
+
+// Regex pour validation heure HH:MM ou HH:MM:SS
+const heureRegex = /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/;
+// Regex pour date ISO YYYY-MM-DD
+const dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+
+const ConfirmSchema = z.object({
+  artisanId: z.string().uuid({ message: "artisanId doit être un UUID valide." }),
+  serviceId: z.string().uuid({ message: "serviceId doit être un UUID valide." }),
+  date: z.string().regex(dateRegex, { message: "date doit être au format YYYY-MM-DD." }),
+  heureDebut: z.string().regex(heureRegex, { message: "heureDebut doit être au format HH:MM." }),
+  heureFin: z.string().regex(heureRegex, { message: "heureFin doit être au format HH:MM." }),
+  adresse: z.string().min(1, "L'adresse est obligatoire.").max(500, "Adresse trop longue.").trim(),
+  montantTotal: z
+    .number({ error: "montantTotal doit être un nombre." })
+    .finite({ message: "montantTotal doit être un nombre fini." })
+    .nonnegative({ message: "montantTotal ne peut pas être négatif." })
+    .max(100_000, { message: "montantTotal dépasse le maximum autorisé." })
+    .nullable()
+    .optional(),
+  paymentIntentId: z
+    .string()
+    .startsWith("pi_", { message: "paymentIntentId invalide." })
+    .optional(),
+});
+
+// ─── POST /api/reservations/confirm ──────────────────────────────────────────
+
+export async function POST(request: Request) {
+  const supabase = await createClient();
+
+  // ── 1. Authentification ──────────────────────────────────────────────────
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
+  }
+
+  // ── 2. Vérification du rôle client ───────────────────────────────────────
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const typedProfile = profile as { role: string } | null;
+  if (!typedProfile || typedProfile.role !== "client") {
+    return NextResponse.json(
+      { error: "Seuls les clients peuvent créer une réservation." },
+      { status: 403 }
+    );
+  }
+
+  // ── 3. Validation Zod ────────────────────────────────────────────────────
+  let rawBody: unknown;
+  try {
+    rawBody = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Body JSON invalide." }, { status: 400 });
+  }
+
+  const parsed = ConfirmSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message ?? "Données invalides." },
+      { status: 422 }
+    );
+  }
+
+  const {
+    artisanId,
+    serviceId,
+    date,
+    heureDebut,
+    heureFin,
+    adresse,
+    montantTotal,
+    paymentIntentId,
+  } = parsed.data;
+
+  // ── 4. Vérifier que heureDebut < heureFin ────────────────────────────────
+  if (heureDebut >= heureFin) {
+    return NextResponse.json(
+      { error: "heureFin doit être postérieure à heureDebut." },
+      { status: 422 }
+    );
+  }
+
+  // ── 5. Vérifier que le artisan est actif ──────────────────────────────
+  const { data: prestaCheck } = await supabase
+    .from("profiles_artisans")
+    .select("actif")
+    .eq("id", artisanId)
+    .maybeSingle();
+
+  const prestaRow = prestaCheck as { actif: boolean } | null;
+  if (!prestaRow || !prestaRow.actif) {
+    return NextResponse.json(
+      { error: "artisan introuvable ou inactif." },
+      { status: 404 }
+    );
+  }
+
+  // ── 6. Calcul des commissions ─────────────────────────────────────────────
+  const mt = montantTotal ?? null;
+  const commissionPlateforme =
+    mt != null ? Math.round(mt * 0.1 * 100) / 100 : null;
+  const montantartisan =
+    mt != null ? Math.round(mt * 0.9 * 100) / 100 : null;
+
+  // ── 7. Insertion de la réservation (RLS : client_id = auth.uid()) ────────
+  const { data: reservation, error: insertError } = await supabase
+    .from("reservations")
+    // @ts-expect-error – @supabase/ssr@0.5.x / supabase-js@2.98.x generic mismatch
+    .insert({
+      client_id: user.id,
+      artisan_id: artisanId,
+      service_id: serviceId,
+      date,
+      heure_debut: heureDebut,
+      heure_fin: heureFin,
+      statut: "en_attente",
+      adresse_intervention: adresse,
+      montant_total: mt,
+      commission_plateforme: commissionPlateforme,
+      montant_artisan: montantartisan,
+      stripe_payment_intent_id: paymentIntentId ?? null,
+    })
+    .select("id")
+    .single();
+
+  if (insertError) {
+    const code = insertError.code;
+    const message =
+      code === "23514"
+        ? "Créneau invalide (contrainte horaire)."
+        : code === "23503"
+        ? "artisan ou service introuvable."
+        : insertError.message;
+
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
+
+  const reservationId = (reservation as { id: string }).id;
+
+  // ── 8. Récupération des données pour les emails (admin client) ────────────
+  const admin = createAdminClient();
+
+  const [
+    clientProfileRes,
+    artisanProfileRes,
+    serviceRes,
+    clientAuthRes,
+    artisanAuthRes,
+  ] = await Promise.all([
+    admin
+      .from("profiles_clients")
+      .select("nom, prenom")
+      .eq("id", user.id)
+      .maybeSingle(),
+    admin
+      .from("profiles_artisans")
+      .select("nom, prenom, metier")
+      .eq("id", artisanId)
+      .maybeSingle(),
+    admin
+      .from("services")
+      .select("titre")
+      .eq("id", serviceId)
+      .maybeSingle(),
+    admin.auth.admin.getUserById(user.id),
+    admin.auth.admin.getUserById(artisanId),
+  ]);
+
+  const clientProfile = clientProfileRes.data as {
+    nom: string | null;
+    prenom: string | null;
+  } | null;
+  const artisanProfile = artisanProfileRes.data as {
+    nom: string | null;
+    prenom: string | null;
+    metier: string | null;
+  } | null;
+  const service = serviceRes.data as { titre: string } | null;
+
+  const clientEmail = clientAuthRes.data.user?.email ?? "";
+  const artisanEmail = artisanAuthRes.data.user?.email ?? "";
+
+  const clientPrenom = clientProfile?.prenom ?? clientEmail.split("@")[0] ?? "Client";
+  const clientNomComplet =
+    `${clientProfile?.prenom ?? ""} ${clientProfile?.nom ?? ""}`.trim() ||
+    clientEmail;
+
+  const artisanPrenom =
+    artisanProfile?.prenom ?? artisanEmail.split("@")[0] ?? "artisan";
+  const artisanNomComplet =
+    `${artisanProfile?.prenom ?? ""} ${artisanProfile?.nom ?? ""}`.trim() ||
+    artisanEmail;
+
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    (process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000");
+
+  // ── 9. Envoi des emails (non bloquant) ────────────────────────────────────
+  const emailData = {
+    reservationId,
+    serviceTitre: service?.titre ?? "Prestation",
+    date,
+    heureDebut,
+    heureFin,
+    adresse: adresse || null,
+    montantTotal: mt,
+    siteUrl,
+  };
+
+  Promise.allSettled([
+    clientEmail
+      ? sendEmailConfirmationClient({
+          ...emailData,
+          clientEmail,
+          clientPrenom,
+          artisanNomComplet,
+          artisanMetier: artisanProfile?.metier ?? "artisan",
+        })
+      : Promise.resolve(),
+    artisanEmail
+      ? sendEmailNotifartisan({
+          ...emailData,
+          artisanEmail,
+          artisanPrenom,
+          clientNomComplet,
+        })
+      : Promise.resolve(),
+  ]).then((results) => {
+    results.forEach((r) => {
+      if (r.status === "rejected") {
+        console.error("[Email] Erreur envoi :", r.reason);
+      }
+    });
+  });
+
+  // ── 10. Réponse ────────────────────────────────────────────────────────────
+  return NextResponse.json({ reservationId }, { status: 201 });
+}
