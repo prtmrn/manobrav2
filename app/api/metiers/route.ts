@@ -9,7 +9,6 @@ export async function GET() {
   const metiers = METIER_LIST.map((key) => ({
     value: key,
     label: METIER_CONFIG[key].label,
-    emoji: METIER_CONFIG[key].emoji,
     color: METIER_CONFIG[key].color,
   }));
 
