@@ -228,7 +228,7 @@ export default function DashboardShell({
               <span className="text-white text-sm font-bold leading-none">S</span>
             </div>
             <span className="hidden sm:block font-semibold text-gray-900 text-sm tracking-tight">
-              ServicePro
+              Manobra
             </span>
           </Link>
 
