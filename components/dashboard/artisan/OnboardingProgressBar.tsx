@@ -131,9 +131,19 @@ export default function OnboardingProgressBar({ status }: OnboardingProgressBarP
   const [dismissed, setDismissed] = useState(false);
 
   // Calculer le nombre d'étapes complétées
-  const completedCount = STEPS.filter((s) => s.isComplete(status)).length;
+  const [paymentSkipped, setPaymentSkipped] = useState(false);
+
+  useEffect(() => {
+    const skipped = localStorage.getItem("manobra_payment_skipped") === "true";
+    setPaymentSkipped(skipped);
+  }, []);
+
+  // Override stripeConnected si skippé
+  const effectiveStatus = { ...status, stripeConnected: status.stripeConnected || paymentSkipped };
+
+  const completedCount = STEPS.filter((s) => s.isComplete(effectiveStatus)).length;
   const progressPercent = (completedCount / STEPS.length) * 100;
-  const isComplete = completedCount === STEPS.length;
+  const isComplete = STEPS.filter((s) => s.isComplete(effectiveStatus)).length === STEPS.length;
 
   // Ne rien afficher si complété ET dismissed, ou si on dismiss volontairement
   if (dismissed) return null;
@@ -194,7 +204,7 @@ export default function OnboardingProgressBar({ status }: OnboardingProgressBarP
   }
 
   // ── Trouver la prochaine étape non complétée ────────────────────────────
-  const nextStep = STEPS.find((s) => !s.isComplete(status));
+  const nextStep = STEPS.find((s) => !s.isComplete(effectiveStatus));
 
   // ── Barre de progression ────────────────────────────────────────────────
   return (
@@ -235,21 +245,24 @@ export default function OnboardingProgressBar({ status }: OnboardingProgressBarP
         {/* Desktop : stepper horizontal */}
         <div className="hidden sm:flex items-start gap-2 mb-5">
           {STEPS.map((step, i) => {
-            const done = step.isComplete(status);
-            const isNext = !done && STEPS.slice(0, i).every((s) => s.isComplete(status));
+            const done = step.isComplete(effectiveStatus);
+            const isNext = !done && STEPS.slice(0, i).every((s) => s.isComplete(effectiveStatus));
+            const isSkipped = step.skippable && paymentSkipped && !status.stripeConnected;
             return (
               <div key={step.id} className="flex items-center gap-2 flex-1 min-w-0">
                 <div className="flex flex-col items-center flex-1 min-w-0">
                   {/* Pastille */}
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center
                                    flex-shrink-0 transition-all ${
-                    done
+                    isSkipped
+                      ? "bg-gray-100 text-gray-400 ring-2 ring-gray-200"
+                      : done
                       ? "bg-brand-600 text-white ring-4 ring-brand-50"
                       : isNext
                       ? "bg-brand-50 text-brand-600 ring-4 ring-brand-50 ring-offset-0"
                       : "bg-gray-50 text-gray-300 ring-2 ring-gray-100"
                   }`}>
-                    {done ? <CheckIcon /> : (
+                    {isSkipped ? <span className="text-xs font-bold">···</span> : done ? <CheckIcon /> : (
                       <span className="text-xs font-bold">{step.id}</span>
                     )}
                   </div>
@@ -274,7 +287,7 @@ export default function OnboardingProgressBar({ status }: OnboardingProgressBarP
         {/* Mobile : liste verticale compacte */}
         <div className="flex flex-col gap-2 sm:hidden mb-4">
           {STEPS.map((step) => {
-            const done = step.isComplete(status);
+            const done = step.isComplete(effectiveStatus);
             return (
               <div key={step.id}
                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors ${
@@ -282,9 +295,12 @@ export default function OnboardingProgressBar({ status }: OnboardingProgressBarP
                    }`}>
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center
                                  flex-shrink-0 ${
-                  done ? "bg-brand-600 text-white" : "bg-white text-gray-300 border border-gray-200"
+                  isSkipped ? "bg-gray-100 text-gray-400 border border-gray-200"
+                  : done ? "bg-brand-600 text-white" : "bg-white text-gray-300 border border-gray-200"
                 }`}>
-                  {done
+                  {isSkipped
+                    ? <span className="text-[10px] font-bold">···</span>
+                    : done
                     ? <CheckIcon />
                     : <span className="text-[10px] font-bold text-gray-400">{step.id}</span>
                   }
@@ -326,12 +342,15 @@ export default function OnboardingProgressBar({ status }: OnboardingProgressBarP
             </div>
             <div className="flex items-center gap-3 flex-shrink-0">
               {nextStep.skippable && (
-                <Link
-                  href="/dashboard/artisan"
+                <button
+                  onClick={() => {
+                    localStorage.setItem("manobra_payment_skipped", "true");
+                    setPaymentSkipped(true);
+                  }}
                   className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2 whitespace-nowrap"
                 >
                   Passer cette étape
-                </Link>
+                </button>
               )}
               <Link
                 href={nextStep.actionHref}
