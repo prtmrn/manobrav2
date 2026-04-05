@@ -33,6 +33,17 @@ export default function RegisterForm() {
       return;
     }
 
+    // Mise à jour du rôle si artisan (le trigger crée toujours 'client' par défaut)
+    if (role === "artisan") {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from("profiles")
+          .update({ role: "artisan" })
+          .eq("id", user.id);
+      }
+    }
+
     setSuccess(true);
     setLoading(false);
   }
@@ -40,7 +51,7 @@ export default function RegisterForm() {
   if (success) {
     return (
       <div className="bg-green-50 border border-green-200 rounded-2xl p-8 text-center space-y-2">
-        <p className="text-2xl">📧</p>
+        
         <p className="font-semibold text-green-800">Vérifiez vos emails !</p>
         <p className="text-sm text-green-700">
           Un lien de confirmation a été envoyé à{" "}
@@ -118,7 +129,7 @@ export default function RegisterForm() {
               onChange={() => setRole("client")}
               className="sr-only"
             />
-            <span className="text-2xl">🛒</span>
+            
             <span className="text-sm font-semibold text-gray-800">Client</span>
             <span className="text-xs text-gray-500 text-center">
               Je recherche des services
@@ -142,8 +153,8 @@ export default function RegisterForm() {
               onChange={() => setRole("artisan")}
               className="sr-only"
             />
-            <span className="text-2xl">💼</span>
-            <span className="text-sm font-semibold text-gray-800">artisan</span>
+            
+            <span className="text-sm font-semibold text-gray-800">Artisan</span>
             <span className="text-xs text-gray-500 text-center">
               Je propose des services
             </span>
