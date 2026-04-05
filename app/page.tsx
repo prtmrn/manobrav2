@@ -450,7 +450,6 @@ export default async function HomePage() {
                       className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl shadow-sm transition-transform group-hover:scale-110 duration-200"
                       style={{ backgroundColor: config.color + "18" }}
                     >
-                      {config.emoji}
                     </div>
                     <span className="text-sm font-semibold text-gray-800 text-center">
                       {config.label}
