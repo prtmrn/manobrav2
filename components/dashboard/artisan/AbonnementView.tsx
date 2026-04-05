@@ -334,7 +334,7 @@ export default function AbonnementView({
         <h2 className="text-base font-semibold text-gray-900 mb-3">
           {planActif === "aucun" ? "Choisissez votre plan" : "Nos formules"}
         </h2>
-        <div className="grid sm:grid-cols-2 gap-4 items-stretch">
+        <div className="grid sm:grid-cols-2 gap-4">
           {PLANS.map((plan) => {
             const isActive = planActif === plan.id;
             const isLoading = loadingPlan === plan.id;
@@ -343,7 +343,7 @@ export default function AbonnementView({
             return (
               <div
                 key={plan.id}
-                className={`relative bg-white rounded-2xl border-2 overflow-hidden transition-shadow flex flex-col ${
+                className={`relative bg-white rounded-2xl border-2 overflow-hidden transition-shadow ${
                   plan.highlight
                     ? "border-violet-500 shadow-lg shadow-violet-100"
                     : "border-gray-200"
@@ -368,7 +368,7 @@ export default function AbonnementView({
                   </div>
                 )}
 
-                <div className="p-6 space-y-5 flex flex-col flex-1">
+                <div className="p-6 space-y-5">
                   {/* En-tête */}
                   <div className={isActive || plan.highlight ? "pt-4" : ""}>
                     <h3 className="text-lg font-bold text-gray-900">
@@ -386,7 +386,7 @@ export default function AbonnementView({
                   </div>
 
                   {/* Features */}
-                  <ul className="space-y-2.5 flex-1">
+                  <ul className="space-y-2.5">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-center gap-2.5 text-sm text-gray-600">
                         <CheckIcon
@@ -398,7 +398,6 @@ export default function AbonnementView({
                   </ul>
 
                   {/* Bouton */}
-                  <div className="mt-auto pt-2">
                   {isActive ? (
                     <button
                       disabled
