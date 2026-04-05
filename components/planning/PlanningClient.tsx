@@ -691,7 +691,7 @@ export default function PlanningClient({
         )
       );
       setModalJour(null);
-      showToast("Créneau ajouté ✓", "success");
+      showToast("Créneau ajouté", "success");
     }
     setModalLoading(false);
   }
@@ -740,7 +740,7 @@ export default function PlanningClient({
       );
       setIndispoForm({ dateDebut: "", dateFin: "", motif: "" });
       setShowIndispoForm(false);
-      showToast("Indisponibilité enregistrée ✓", "success");
+      showToast("Indisponibilité enregistrée", "success");
     }
     setIndispoLoading(false);
   }
@@ -773,7 +773,7 @@ export default function PlanningClient({
               : "bg-red-50 text-red-800 border-red-200"
           }`}
         >
-          <span>{toast.type === "success" ? "✓" : "✕"}</span>
+          
           {toast.msg}
         </div>
       )}
@@ -813,7 +813,7 @@ export default function PlanningClient({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           {
-            icon: "⏱️",
+            icon: "",
             label: "Cette semaine",
             value:
               totalHeuresSemaine === 0
@@ -832,7 +832,7 @@ export default function PlanningClient({
             textColor: "text-blue-700",
           },
           {
-            icon: "🛠️",
+            icon: "",
             label: "Créneaux total",
             value: dispos.length,
             sub: "sur la semaine type",
@@ -902,7 +902,7 @@ export default function PlanningClient({
 
         {/* Note récurrence */}
         <div className="flex items-start gap-2 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2 mb-4 text-xs text-blue-700">
-          <span className="text-sm flex-shrink-0">ℹ️</span>
+          
           <span>
             Le planning hebdomadaire est <strong>récurrent</strong> : les créneaux
             s&apos;appliquent toutes les semaines. Utilisez les indisponibilités pour
@@ -937,7 +937,7 @@ export default function PlanningClient({
         {/* Empty state global */}
         {dispos.length === 0 && (
           <div className="text-center py-8 mt-4 border-t border-gray-50">
-            <div className="text-4xl mb-2">📭</div>
+            
             <p className="text-sm font-semibold text-gray-600 mb-1">
               Aucune disponibilité renseignée
             </p>
