@@ -410,6 +410,7 @@ export default function SearchFilters({
         <div className="flex flex-wrap gap-2 mt-3">
           {metier && (
             <FilterChip
+              label={metier}
               onRemove={() => {
                 setMetier("");
                 applyFilters({ metier: "" });
