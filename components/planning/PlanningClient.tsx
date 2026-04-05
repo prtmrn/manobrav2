@@ -466,7 +466,7 @@ function IndispoCard({
   return (
     <div className="flex items-start gap-3 bg-orange-50 border border-orange-200 rounded-xl p-4">
       <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <span className="text-lg">🌴</span>
+        
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-bold text-orange-900">
@@ -824,7 +824,7 @@ export default function PlanningClient({
             textColor: "text-brand-700",
           },
           {
-            icon: "📅",
+            icon: "",
             label: "Jours actifs",
             value: joursActifs,
             sub: "jours / 7",
@@ -840,7 +840,7 @@ export default function PlanningClient({
             textColor: "text-purple-700",
           },
           {
-            icon: "🌴",
+            icon: "",
             label: "Congés / indispos",
             value: indispos.length,
             sub: "à venir",
@@ -869,7 +869,7 @@ export default function PlanningClient({
         {/* Header section */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-            <span className="text-xl">📅</span>
+            
             Disponibilités hebdomadaires
           </h2>
           {/* Navigation semaine */}
@@ -952,7 +952,7 @@ export default function PlanningClient({
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-            <span className="text-xl">🌴</span>
+            
             Congés &amp; indisponibilités
             {indispos.length > 0 && (
               <span className="text-xs font-semibold bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">
@@ -1073,7 +1073,7 @@ export default function PlanningClient({
         {/* Liste des indisponibilités */}
         {indispos.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-4xl mb-2">✅</div>
+            
             <p className="text-sm font-semibold text-gray-600 mb-1">
               Aucune indisponibilité planifiée
             </p>
