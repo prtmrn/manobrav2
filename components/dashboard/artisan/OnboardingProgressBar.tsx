@@ -33,6 +33,7 @@ interface StepConfig {
   description: string;
   actionLabel: string;
   actionHref: string;
+  skippable?: boolean;
   icon: React.ReactNode;
   isComplete: (s: OnboardingStatus) => boolean;
 }
@@ -98,6 +99,7 @@ const STEPS: StepConfig[] = [
     description: "Configurez vos paiements pour recevoir vos revenus.",
     actionLabel: "Configurer les paiements",
     actionHref: "/dashboard/artisan/paiements",
+    skippable: true,
     icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -322,17 +324,27 @@ export default function OnboardingProgressBar({ status }: OnboardingProgressBarP
                 </p>
               </div>
             </div>
-            <Link
-              href={nextStep.actionHref}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5
-                         rounded-xl bg-brand-600 text-white text-sm font-semibold
-                         hover:bg-brand-700 transition-colors shadow-sm flex-shrink-0 whitespace-nowrap"
-            >
-              {nextStep.actionLabel}
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
+            <div className="flex items-center gap-3 flex-shrink-0">
+              {nextStep.skippable && (
+                <Link
+                  href="/dashboard/artisan"
+                  className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2 whitespace-nowrap"
+                >
+                  Passer cette étape
+                </Link>
+              )}
+              <Link
+                href={nextStep.actionHref}
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5
+                           rounded-xl bg-brand-600 text-white text-sm font-semibold
+                           hover:bg-brand-700 transition-colors shadow-sm whitespace-nowrap"
+              >
+                {nextStep.actionLabel}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
           </div>
         )}
       </div>
