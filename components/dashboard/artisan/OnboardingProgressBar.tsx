@@ -288,6 +288,7 @@ export default function OnboardingProgressBar({ status }: OnboardingProgressBarP
         <div className="flex flex-col gap-2 sm:hidden mb-4">
           {STEPS.map((step) => {
             const done = step.isComplete(effectiveStatus);
+            const isSkipped = step.skippable && paymentSkipped && !status.stripeConnected;
             return (
               <div key={step.id}
                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors ${
