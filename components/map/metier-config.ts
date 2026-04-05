@@ -1,19 +1,19 @@
 export type MetierConfig = {
   color: string;
-  emoji: string;
   label: string;
 };
 
 // Colors and emoji per métier — used for map markers
 export const METIER_CONFIG: Record<string, MetierConfig> = {
-  Plombier:       { color: "#3B82F6", emoji: "🔧", label: "Plombier" },
-  Électricien:    { color: "#F59E0B", emoji: "⚡", label: "Électricien" },
-  Menuisier:      { color: "#92400E", emoji: "🪚", label: "Menuisier" },
-  Peintre:        { color: "#8B5CF6", emoji: "🎨", label: "Peintre" },
-  Ménage:         { color: "#14B8A6", emoji: "🧹", label: "Ménage" },
-  Jardinage:      { color: "#22C55E", emoji: "🌿", label: "Jardinage" },
-  Déménagement:   { color: "#F97316", emoji: "📦", label: "Déménagement" },
-  Autre:          { color: "#6B7280", emoji: "⚒️", label: "Autre" },
+  Serrurier:      { color: "#1E40AF", label: "Serrurier" },
+  Plombier:       { color: "#3B82F6", label: "Plombier" },
+  Chauffagiste:   { color: "#EF4444", label: "Chauffagiste" },
+  Électricien:    { color: "#F59E0B", label: "Électricien" },
+  Vitrier:        { color: "#06B6D4", label: "Vitrier" },
+  Ramoneur:       { color: "#1C1917", label: "Ramoneur" },
+  Frigoriste:     { color: "#0EA5E9", label: "Frigoriste" },
+  Dépanneur:      { color: "#F97316", label: "Dépanneur" },
+  Autre:          { color: "#6B7280", label: "Autre" },
 };
 
 export const METIER_LIST = Object.keys(METIER_CONFIG) as (keyof typeof METIER_CONFIG)[];

@@ -15,13 +15,14 @@ export type Json =
 export type UserRole = "client" | "artisan";
 
 export type Metier =
+  | "Serrurier"
   | "Plombier"
+  | "Chauffagiste"
   | "Électricien"
-  | "Menuisier"
-  | "Peintre"
-  | "Ménage"
-  | "Jardinage"
-  | "Déménagement"
+  | "Vitrier"
+  | "Ramoneur"
+  | "Frigoriste"
+  | "Dépanneur"
   | "Autre";
 
 export type ReservationStatut =

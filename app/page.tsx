@@ -11,7 +11,7 @@ export const revalidate = 86400;
 // ─── SEO : Metadata ───────────────────────────────────────────────────────────
 export const metadata: Metadata = {
   title:
-    "Manobra — Artisans qualifiés à domicile | Plombier, Électricien, Peintre",
+    "Manobra — Artisans qualifiés à domicile | Serrurier, Plombier, Électricien",
   description:
     "Trouvez des artisans et artisans vérifiés près de chez vous : plombier, " +
     "électricien, peintre, ménage, jardinage à Paris, Lyon, Marseille, Bordeaux, " +
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     title: "Manobra — Artisans qualifiés à domicile",
     description:
       "Trouvez des professionnels vérifiés près de chez vous et réservez en ligne. " +
-      "Plombier, électricien, peintre, ménage et plus encore.",
+      "Serrurier, plombier, électricien, chauffagiste et plus encore.",
     images: [
       {
         url: "/og-image.png",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     title: "Manobra — Artisans & artisans à domicile",
     description:
       "Trouvez des professionnels vérifiés et réservez en ligne. " +
-      "Plombier, électricien, peintre…",
+      "Serrurier, plombier, électricien…",
     images: ["/og-image.png"],
   },
   alternates: {
@@ -223,7 +223,7 @@ const FALLBACK_AVIS: AvisWithartisan[] = [
     artisan_id: "",
     artisan_nom: "Bernard",
     artisan_prenom: "Clara",
-    artisan_metier: "Ménage",
+    artisan_metier: "Chauffagiste",
     artisan_photo_url: null,
   },
 ];
@@ -357,7 +357,7 @@ export default async function HomePage() {
 
             {/* Sous-titre */}
             <p className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed text-balance">
-              Plombier, électricien, peintre, ménage, jardinage…{" "}
+              Serrurier, plombier, électricien, chauffagiste, vitrier…{" "}
               <strong className="text-gray-700 font-semibold">des professionnels vérifiés</strong>{" "}
               près de chez vous. Réservez en ligne, payez en sécurité.
             </p>
