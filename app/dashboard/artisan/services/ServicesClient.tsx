@@ -39,6 +39,7 @@ export default function ServicesClient({ userId, services: initial }: Props) {
     const supabase = createClient();
     const { data, error: err } = await supabase
       .from("services")
+      // @ts-ignore Supabase generated types
       .insert({
         artisan_id: userId,
         titre: form.titre.trim(),
