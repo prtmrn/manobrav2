@@ -93,11 +93,11 @@ const STEPS: StepConfig[] = [
   },
   {
     id: 4,
-    label: "Connecter Stripe",
+    label: "Paiements",
     shortLabel: "Paiements",
-    description: "Activez les paiements pour recevoir vos revenus.",
-    actionLabel: "Connecter Stripe",
-    actionHref: "/api/stripe/connect/onboard",
+    description: "Configurez vos paiements pour recevoir vos revenus.",
+    actionLabel: "Configurer les paiements",
+    actionHref: "/dashboard/artisan/paiements",
     icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
