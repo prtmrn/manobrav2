@@ -39,6 +39,7 @@ export default function RegisterForm() {
       if (user) {
         await supabase
           .from("profiles")
+          // @ts-ignore Supabase generated types
           .update({ role: "artisan" })
           .eq("id", user.id);
       }
