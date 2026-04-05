@@ -176,7 +176,6 @@ export default function SearchFilters({
             <option value="">Tous les métiers</option>
             {METIER_LIST.map((m) => (
               <option key={m} value={m}>
-                {METIER_CONFIG[m].emoji} {METIER_CONFIG[m].label}
               </option>
             ))}
           </select>
@@ -265,7 +264,6 @@ export default function SearchFilters({
                 <option value="">Tous les métiers</option>
                 {METIER_LIST.map((m) => (
                   <option key={m} value={m}>
-                    {METIER_CONFIG[m].emoji} {METIER_CONFIG[m].label}
                   </option>
                 ))}
               </select>
@@ -412,7 +410,6 @@ export default function SearchFilters({
         <div className="flex flex-wrap gap-2 mt-3">
           {metier && (
             <FilterChip
-              label={`${METIER_CONFIG[metier]?.emoji ?? ""} ${metier}`}
               onRemove={() => {
                 setMetier("");
                 applyFilters({ metier: "" });

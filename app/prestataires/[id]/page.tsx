@@ -497,7 +497,6 @@ export default async function artisanPage({ params }: PageProps) {
                       color: config.color,
                     }}
                   >
-                    <span>{config.emoji}</span>
                     <span>{artisan.metier ?? "artisan"}</span>
                   </div>
                 </div>
@@ -702,7 +701,6 @@ export default async function artisanPage({ params }: PageProps) {
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Métier</dt>
                     <dd className="font-medium text-gray-800 flex items-center gap-1">
-                      <span>{config.emoji}</span>
                       {artisan.metier}
                     </dd>
                   </div>

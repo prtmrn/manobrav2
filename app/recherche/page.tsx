@@ -438,7 +438,6 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                             className="w-full h-full flex items-center justify-center text-5xl"
                             style={{ backgroundColor: config.color + "20" }}
                           >
-                            <span>{config.emoji}</span>
                           </div>
                         )}
 
@@ -477,7 +476,6 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                           className="text-xs font-medium flex items-center gap-1 mb-2"
                           style={{ color: config.color }}
                         >
-                          <span>{config.emoji}</span>
                           <span>{p.metier ?? "Non spécifié"}</span>
                         </p>
 

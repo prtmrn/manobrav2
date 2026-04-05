@@ -43,7 +43,6 @@ export default function MiniMap({ lat, lng, metier, label }: MiniMapProps) {
             }}
             className="flex items-center justify-center w-10 h-10 rounded-full border-3 border-white text-lg"
           >
-            {config.emoji}
           </div>
         </AdvancedMarker>
       </Map>

@@ -96,7 +96,6 @@ function PrestaireMarker({
           }}
           className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-white text-xs font-semibold cursor-pointer border-2 border-white"
         >
-          <span className="text-sm leading-none">{config.emoji}</span>
           <span className="max-w-[80px] truncate">
             {artisan.prenom ?? artisan.metier ?? "Pro"}
           </span>
@@ -141,7 +140,6 @@ function PrestaireMarker({
                   className="text-xs font-medium mt-0.5 flex items-center gap-1"
                   style={{ color: config.color }}
                 >
-                  <span>{config.emoji}</span>
                   <span>{artisan.metier ?? "Non spécifié"}</span>
                 </p>
                 <StarRating note={artisan.note_moyenne} />
