@@ -174,7 +174,8 @@ export default function PrestaireOnboardingForm({ userId }: PrestaireOnboardingF
       const { error: updateError } = await supabase
         .from("profiles_artisans")
         // @ts-ignore Supabase generated types outdated
-        .update({
+        .upsert({
+          id: userId,
           nom: data.nom,
           prenom: data.prenom,
           metier: data.metier,
@@ -186,8 +187,7 @@ export default function PrestaireOnboardingForm({ userId }: PrestaireOnboardingF
           longitude,
           photo_url,
           // actif reste false — modération avant publication
-        })
-        .eq("id", userId);
+        }, { onConflict: "id" });
 
       if (updateError) throw new Error(updateError.message);
 
