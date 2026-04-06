@@ -289,11 +289,14 @@ function AddSlotModal({
 }) {
   const [heureDebut, setHeureDebut] = useState("09:00");
   const [heureFin, setHeureFin] = useState("17:00");
-  const jour = JOURS[jourId];
-
+  const [selectedJours, setSelectedJours] = useState<number[]>([jourId]);
   const duree = dureeHeures(heureDebut, heureFin);
-  const isValid = duree > 0;
-
+  const isValid = duree > 0 && selectedJours.length > 0;
+  function toggleJour(id: number) {
+    setSelectedJours(prev =>
+      prev.includes(id) ? prev.filter(j => j !== id) : [...prev, id]
+    );
+  }
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!isValid) return;
