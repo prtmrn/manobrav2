@@ -733,7 +733,7 @@ export default async function artisanPage({ params }: PageProps) {
                   <MiniMap
                     lat={artisan.latitude as number}
                     lng={artisan.longitude as number}
-                    metier={artisan.metier}
+                    metier={Array.isArray(artisan.metier) ? artisan.metier[0] : artisan.metier}
                     label={fullName}
                   />
                 </div>
