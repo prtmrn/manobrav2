@@ -236,6 +236,9 @@ export default function Step3Confirm({
   const [error, setError] = useState<string | null>(null);
   const [reservationId, setReservationId] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [guestNom, setGuestNom] = useState("");
+  const [guestTelephone, setGuestTelephone] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
 
   const fullName = `${artisan.prenom ?? ""} ${artisan.nom ?? ""}`.trim();
 
