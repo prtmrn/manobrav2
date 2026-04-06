@@ -108,9 +108,10 @@ interface Props {
   artisan: Tartisan;
   services: TService[];
   clientId: string | null;
+  isGuest: boolean;
 }
 
-export default function ReservationTunnel({ artisan, services, clientId }: Props) {
+export default function ReservationTunnel({ artisan, services, clientId, isGuest }: Props) {
   const [state, setState] = useState<TunnelState>({
     step: 1,
     service: null,
