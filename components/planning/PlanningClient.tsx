@@ -689,8 +689,6 @@ export default function PlanningClient({
     }
     setModalLoading(false);
   }
-    setModalLoading(false);
-  }
 
   async function deleteDispo(id: string) {
     setDeletingId(id);
