@@ -48,9 +48,9 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
     setSuccess(false);
 
     const supabase = createClient();
-    // @ts-ignore Supabase generated types
     const { error: err } = await supabase
       .from("profiles_artisans")
+      // @ts-ignore Supabase generated types
       .upsert({
         id: userId,
         nom: form.nom,
