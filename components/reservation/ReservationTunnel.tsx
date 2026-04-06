@@ -107,7 +107,7 @@ function ProgressBar({ step }: { step: 1 | 2 | 3 }) {
 interface Props {
   artisan: Tartisan;
   services: TService[];
-  clientId: string;
+  clientId: string | null;
 }
 
 export default function ReservationTunnel({ artisan, services, clientId }: Props) {
