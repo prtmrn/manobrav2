@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Manobra — Artisans & artisans à domicile",
+    title: "Manobra — Artisans qualifiés à domicile",
     description:
       "Trouvez des professionnels vérifiés et réservez en ligne. " +
       "Serrurier, plombier, électricien…",
