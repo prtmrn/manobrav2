@@ -301,7 +301,7 @@ function ReserveButton({
 }) {
   return (
     <Link
-      href={`/auth/login?next=/artisans/${artisan_id}`}
+      href={`/reserver/${artisan_id}`}
       className={`flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-bold text-base py-3.5 px-6 rounded-xl transition-all shadow-brand shadow-lg hover:shadow-xl hover:-translate-y-0.5 ${className}`}
     >
       <svg
@@ -317,7 +317,7 @@ function ReserveButton({
           d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
         />
       </svg>
-      Réserver maintenant
+      Demander une intervention
     </Link>
   );
 }
@@ -405,7 +405,7 @@ export default async function artisanPage({ params }: PageProps) {
 
           {/* CTA mobile sticky */}
           <Link
-            href={`/auth/login?next=/artisans/${id}`}
+            href={`/reserver/${id}`}
             className="sm:hidden inline-flex items-center gap-1 bg-brand-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-brand-700 transition-colors"
           >
             Réserver

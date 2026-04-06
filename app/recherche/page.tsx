@@ -420,7 +420,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                   return (
                     <Link
                       key={p.id}
-                      href={`/artisans/${p.id}`}
+                      href={`/prestataires/${p.id}`}
                       className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
                     >
                       {/* Photo */}
@@ -517,6 +517,15 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                             </span>
                           )}
                         </div>
+                      </div>
+                      <div className="px-4 pb-4">
+                        <Link
+                          href={`/reserver/${p.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors"
+                        >
+                          Demander une intervention
+                        </Link>
                       </div>
                     </Link>
                   );
