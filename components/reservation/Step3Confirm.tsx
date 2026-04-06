@@ -219,6 +219,7 @@ interface Props {
   date: string;
   slot: TSlot;
   onBack: () => void;
+  isGuest: boolean;
 }
 
 export default function Step3Confirm({
@@ -227,6 +228,7 @@ export default function Step3Confirm({
   date,
   slot,
   onBack,
+  isGuest,
 }: Props) {
   const [localStep, setLocalStep] = useState<LocalStep>("address");
   const [adresse, setAdresse] = useState("");
