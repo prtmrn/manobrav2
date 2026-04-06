@@ -358,7 +358,7 @@ export default async function artisanPage({ params }: PageProps) {
   const avis = (avisRes.data ?? []) as Avis[];
 
   // Dérivations
-  const config = getMetierConfig(artisan.metier);
+  const config = getMetierConfig(Array.isArray(artisan.metier) ? artisan.metier[0] : artisan.metier);
   const fullName =
     `${artisan.prenom ?? ""} ${artisan.nom ?? ""}`.trim() ||
     "artisan";
