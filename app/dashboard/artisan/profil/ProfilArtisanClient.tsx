@@ -81,106 +81,6 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Informations personnelles */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-4">
-          <h2 className="text-base font-semibold text-gray-900">Informations personnelles</h2>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Prénom <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={form.prenom}
-                onChange={(e) => setForm({ ...form, prenom: e.target.value })}
-                className={inputClass}
-cat > app/dashboard/artisan/profil/ProfilArtisanClient.tsx << 'ENDOFFILE'
-"use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-
-const METIERS = [
-  "Serrurier", "Plombier", "Chauffagiste", "Électricien",
-  "Vitrier", "Ramoneur", "Frigoriste", "Dépanneur", "Autre",
-];
-
-interface Props {
-  userId: string;
-  email: string;
-  initialData: {
-    nom?: string | null;
-    prenom?: string | null;
-    bio?: string | null;
-    metier?: string | null;
-    adresse?: string | null;
-    ville?: string | null;
-    code_postal?: string | null;
-    photo_url?: string | null;
-  };
-}
-
-export default function ProfilArtisanClient({ userId, email, initialData }: Props) {
-  const router = useRouter();
-  const [form, setForm] = useState({
-    nom: initialData.nom ?? "",
-    prenom: initialData.prenom ?? "",
-    bio: initialData.bio ?? "",
-    metier: initialData.metier ?? "",
-    adresse: initialData.adresse ?? "",
-    ville: initialData.ville ?? "",
-    code_postal: initialData.code_postal ?? "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const inputClass = "w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20";
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
-    setSuccess(false);
-
-    const supabase = createClient();
-    // @ts-ignore Supabase generated types
-    const { error: err } = await supabase
-      .from("profiles_artisans")
-      .upsert({
-        id: userId,
-        nom: form.nom,
-        prenom: form.prenom,
-        bio: form.bio || null,
-        metier: form.metier || null,
-        adresse: form.adresse || null,
-        ville: form.ville || null,
-        code_postal: form.code_postal || null,
-      }, { onConflict: "id" });
-
-    if (err) {
-      setError(err.message);
-    } else {
-      setSuccess(true);
-      router.refresh();
-    }
-    setIsSubmitting(false);
-  }
-
-  return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Mon profil</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Ces informations sont visibles par les clients sur votre fiche artisan.
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Informations personnelles */}
         <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-4">
           <h2 className="text-base font-semibold text-gray-900">Informations personnelles</h2>
 
@@ -256,7 +156,6 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
           </div>
         </div>
 
-        {/* Localisation */}
         <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-4">
           <h2 className="text-base font-semibold text-gray-900">Zone d'intervention</h2>
 
@@ -296,7 +195,6 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
           </div>
         </div>
 
-        {/* Messages */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
             {error}
@@ -308,7 +206,6 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
           </div>
         )}
 
-        {/* Bouton */}
         <div className="flex justify-end">
           <button
             type="submit"
