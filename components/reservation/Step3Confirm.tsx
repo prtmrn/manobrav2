@@ -76,6 +76,8 @@ function SuccessView({
   date,
   slot,
   wasPaid,
+  isGuest,
+  guestEmail,
 }: {
   reservationId: string;
   fullName: string;
@@ -84,7 +86,25 @@ function SuccessView({
   date: string;
   slot: TSlot;
   wasPaid: boolean;
+  isGuest: boolean;
+  guestEmail: string;
 }) {
+  const [accountEmail, setAccountEmail] = useState(guestEmail);
+  const [accountSent, setAccountSent] = useState(false);
+  const [accountLoading, setAccountLoading] = useState(false);
+
+  async function handleCreateAccount() {
+    if (!accountEmail.trim()) return;
+    setAccountLoading(true);
+    const { createClient } = await import("@/lib/supabase/client");
+    const supabase = createClient();
+    await supabase.auth.signInWithOtp({
+      email: accountEmail.trim(),
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    });
+    setAccountSent(true);
+    setAccountLoading(false);
+  }
   return (
     <div className="text-center py-8">
       {/* Icône succès */}
@@ -133,16 +153,53 @@ function SuccessView({
         )}
       </div>
 
+      {/* CTA création de compte pour les guests */}
+      {isGuest && (
+        <div className="mt-6 bg-brand-50 border border-brand-200 rounded-xl p-5 text-left">
+          {accountSent ? (
+            <div className="text-center">
+              <p className="text-sm font-semibold text-brand-700 mb-1">Lien envoyé !</p>
+              <p className="text-xs text-brand-600">Vérifiez votre boîte email pour créer votre mot de passe.</p>
+            </div>
+          ) : (
+            <>
+              <p className="text-sm font-semibold text-gray-900 mb-1">Créez votre compte Manobra</p>
+              <p className="text-xs text-gray-500 mb-3">
+                Retrouvez cette réservation et recontactez votre artisan en un clic.
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={accountEmail}
+                  onChange={(e) => setAccountEmail(e.target.value)}
+                  placeholder="votre@email.com"
+                  className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+                />
+                <button
+                  onClick={handleCreateAccount}
+                  disabled={accountLoading || !accountEmail.trim()}
+                  className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-sm font-semibold transition-colors whitespace-nowrap"
+                >
+                  {accountLoading ? "Envoi…" : "Créer mon compte"}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+      <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
+        {!isGuest && (
+          <Link
+            href="/dashboard/client/reservations"
+            className="px-6 py-3 rounded-xl font-semibold text-white bg-brand-500 hover:bg-brand-600 transition-colors"
+          >
+            Voir mes réservations
+          </Link>
+        )}
         <Link
-          href="/dashboard/client/reservations"
-          className="px-6 py-3 rounded-xl font-semibold text-white bg-brand-500 hover:bg-brand-600 transition-colors"
-        >
-          Voir mes réservations
-        </Link>
-        <Link
-          href={`/artisans/${artisanId}`}
+          href={`/prestataires/${artisanId}`}
           className="px-6 py-3 rounded-xl font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
         >
           Retour au profil
@@ -188,6 +245,10 @@ export default function Step3Confirm({
   async function handleContinue() {
     if (!adresse.trim()) {
       setError("Veuillez saisir l'adresse d'intervention.");
+      return;
+    }
+    if (isGuest && !guestTelephone.trim() && !guestEmail.trim()) {
+      setError("Veuillez saisir au moins un téléphone ou un email pour être contacté.");
       return;
     }
 
@@ -254,6 +315,11 @@ export default function Step3Confirm({
           heureFin: `${slot.fin}:00`,
           adresse: adresse.trim(),
           montantTotal: service.prix,
+          ...(isGuest && {
+            guestNom: guestNom.trim() || undefined,
+            guestTelephone: guestTelephone.trim() || undefined,
+            guestEmail: guestEmail.trim() || undefined,
+          }),
         }),
       });
 
@@ -286,6 +352,8 @@ export default function Step3Confirm({
         date={date}
         slot={slot}
         wasPaid={hasPrix}
+        isGuest={isGuest}
+        guestEmail={guestEmail}
       />
     );
   }
@@ -366,6 +434,58 @@ export default function Step3Confirm({
       </div>
 
       {/* Adresse d'intervention */}
+      {/* Champs guest */}
+      {isGuest && (
+        <div className="mb-5 space-y-3">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              Votre nom
+            </label>
+            <input
+              type="text"
+              value={guestNom}
+              onChange={(e) => setGuestNom(e.target.value)}
+              placeholder="Jean Dupont"
+              className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent hover:border-gray-300"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              Téléphone <span className="text-gray-400 font-normal text-xs">(recommandé)</span>
+            </label>
+            <input
+              type="tel"
+              value={guestTelephone}
+              onChange={(e) => setGuestTelephone(e.target.value)}
+              placeholder="06 12 34 56 78"
+              className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent hover:border-gray-300"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              Email <span className="text-gray-400 font-normal text-xs">(recommandé)</span>
+            </label>
+            <input
+              type="email"
+              value={guestEmail}
+              onChange={(e) => setGuestEmail(e.target.value)}
+              placeholder="jean@exemple.com"
+              className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent hover:border-gray-300"
+            />
+          </div>
+          {guestTelephone.trim() && guestEmail.trim() && (
+            <p className="text-xs text-green-600">Parfait, vous serez joignable par téléphone et email.</p>
+          )}
+          {guestTelephone.trim() && !guestEmail.trim() && (
+            <p className="text-xs text-gray-500">Ajoutez votre email pour recevoir une confirmation écrite.</p>
+          )}
+          {!guestTelephone.trim() && guestEmail.trim() && (
+            <p className="text-xs text-gray-500">Ajoutez votre téléphone pour que l'artisan puisse vous contacter directement.</p>
+          )}
+          <p className="text-xs text-red-500">* Au moins un téléphone ou un email est requis.</p>
+        </div>
+      )}
+
       <div className="mb-5">
         <label
           htmlFor="adresse"

@@ -204,6 +204,7 @@ export default function ReservationTunnel({ artisan, services, clientId }: Props
           date={state.date}
           slot={state.slot}
           onBack={goBack}
+          isGuest={isGuest}
         />
       )}
     </div>
