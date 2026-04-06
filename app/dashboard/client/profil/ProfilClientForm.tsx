@@ -43,6 +43,7 @@ export default function ProfilClientForm({ userId, email, initialData }: Props) 
     // @ts-ignore Supabase generated types
     const { error: err } = await supabase
       .from("profiles_clients")
+      // @ts-ignore Supabase generated types
       .upsert({
         id: userId,
         nom: form.nom || null,
