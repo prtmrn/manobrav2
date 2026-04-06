@@ -283,7 +283,7 @@ function AddSlotModal({
 }: {
   jourId: number;
   onClose: () => void;
-  onSave: (data: { jour_semaine: number; heure_debut: string; heure_fin: string }) => void;
+  onSave: (data: { jours: number[]; heure_debut: string; heure_fin: string }) => void;
   loading: boolean;
   error: string | null;
 }) {
@@ -297,7 +297,7 @@ function AddSlotModal({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!isValid) return;
-    onSave({ jour_semaine: jourId, heure_debut: heureDebut, heure_fin: heureFin });
+    onSave({ jours: selectedJours, heure_debut: heureDebut, heure_fin: heureFin });
   }
 
   return (
@@ -317,7 +317,7 @@ function AddSlotModal({
               Nouveau créneau
             </h3>
             <p className="text-sm text-gray-500">
-              <span className="font-semibold text-brand-600">{jour.long}</span>
+              <span className="font-semibold text-brand-600">{selectedJours.map(id => JOURS[id].court).join(", ")}</span>
             </p>
           </div>
           <button
@@ -339,14 +339,11 @@ function AddSlotModal({
                 <button
                   key={j.id}
                   type="button"
-                  onClick={() => {
-                    // handled via jourId prop in parent, but allow quick switch here
-                    // For simplicity, this modal re-opens per day
-                  }}
+                  onClick={() => toggleJour(j.id)}
                   className={`py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    j.id === jourId
+                    selectedJours.includes(j.id)
                       ? "bg-brand-600 text-white shadow-sm"
-                      : "bg-gray-100 text-gray-400 cursor-default"
+                      : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                   }`}
                 >
                   {j.court}
@@ -657,26 +654,24 @@ export default function PlanningClient({
   // ── Actions Supabase ──────────────────────────────────────────────────────
 
   async function addDispo(data: {
-    jour_semaine: number;
+    jours: number[];
     heure_debut: string;
     heure_fin: string;
   }) {
     setModalLoading(true);
     setModalError(null);
-
+    const rows = data.jours.map((jour_semaine) => ({
+      artisan_id: userId,
+      jour_semaine,
+      heure_debut: data.heure_debut,
+      heure_fin: data.heure_fin,
+      actif: true,
+    }));
     const { data: inserted, error } = await supabase
       .from("disponibilites")
-      // @ts-expect-error – @supabase/ssr@0.5.x / supabase-js@2.98.x generic mismatch
-      .insert({
-        artisan_id: userId,
-        jour_semaine: data.jour_semaine,
-        heure_debut: data.heure_debut,
-        heure_fin: data.heure_fin,
-        actif: true,
-      })
-      .select()
-      .single();
-
+      // @ts-expect-error
+      .insert(rows)
+      .select();
     if (error) {
       setModalError(
         error.code === "23514"
@@ -684,15 +679,16 @@ export default function PlanningClient({
           : error.message
       );
     } else if (inserted) {
-      // Optimistic update already handled by realtime, but add locally for instant feedback
       setDispos((prev) =>
-        [...prev, inserted as Dispo].sort(
+        [...prev, ...(inserted as Dispo[])].sort(
           (a, b) => a.jour_semaine - b.jour_semaine || a.heure_debut.localeCompare(b.heure_debut)
         )
       );
       setModalJour(null);
       showToast("Créneau ajouté", "success");
     }
+    setModalLoading(false);
+  }
     setModalLoading(false);
   }
 
