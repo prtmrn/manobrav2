@@ -398,7 +398,7 @@ export interface Database {
       reservations: {
         Row: {
           id: string;
-          client_id: string;
+          client_id: string | null;
           artisan_id: string;
           service_id: string | null;
           /** Format "YYYY-MM-DD" */
@@ -415,12 +415,15 @@ export interface Database {
           commission_plateforme: number | null;
           montant_artisan: number | null;
           stripe_payment_intent_id: string | null;
+          guest_nom: string | null;
+          guest_telephone: string | null;
+          guest_email: string | null;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id?: string;
-          client_id: string;
+          client_id?: string | null;
           artisan_id: string;
           service_id?: string | null;
           date: string;
