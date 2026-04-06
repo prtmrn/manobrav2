@@ -521,7 +521,6 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                       <div className="px-4 pb-4">
                         <Link
                           href={`/reserver/${p.id}`}
-                          onClick={(e) => e.stopPropagation()}
                           className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors"
                         >
                           Demander une intervention
