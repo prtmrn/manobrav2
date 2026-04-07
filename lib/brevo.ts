@@ -1,15 +1,25 @@
-import { BrevoClient } from "@getbrevo/brevo";
+// ─── Client Brevo (HTTP direct) ──────────────────────────────────────────────
 
-// ─── Client Brevo (SDK v4) ────────────────────────────────────────────────────
-
-let _client: BrevoClient | null = null;
-
-function getClient(): BrevoClient | null {
-  if (!process.env.BREVO_API_KEY) return null;
-  if (!_client) {
-    _client = new BrevoClient({ apiKey: process.env.BREVO_API_KEY });
+async function sendTransacEmail(payload: object): Promise<void> {
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) {
+    console.warn("[Brevo] BREVO_API_KEY absent – email non envoyé.");
+    return;
   }
-  return _client;
+
+  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "api-key": apiKey,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    console.error("[Brevo] Erreur envoi :", res.status, err);
+  }
 }
 
 function getTemplateId(envVar: string): number | null {
@@ -27,24 +37,18 @@ interface SendEmailOpts {
   htmlContent?: string;
 }
 
-/** Envoie un email transactionnel via le SDK Brevo v4 (template ou HTML inline). */
+/** Envoie un email transactionnel via l'API Brevo (HTTP direct). */
 async function sendEmail(opts: SendEmailOpts): Promise<void> {
-  const client = getClient();
-  if (!client) {
-    console.warn("[Brevo] BREVO_API_KEY absent – email non envoyé.");
-    return;
-  }
-
   const sender = {
-    email: process.env.BREVO_SENDER_EMAIL ?? "noreply@maplateforme.fr",
-    name: process.env.BREVO_SENDER_NAME ?? "Ma Plateforme",
+    email: process.env.BREVO_SENDER_EMAIL ?? "noreply@manobra.fr",
+    name: process.env.BREVO_SENDER_NAME ?? "Manobra",
   };
 
   if (opts.templateId) {
-    await client.transactionalEmails.sendTransacEmail({
+    await sendTransacEmail({
       to: opts.to,
       templateId: opts.templateId,
-      params: (opts.params ?? {}) as Record<string, unknown>,
+      params: opts.params ?? {},
       sender,
     });
   } else {
@@ -52,7 +56,7 @@ async function sendEmail(opts: SendEmailOpts): Promise<void> {
       console.warn("[Brevo] subject et htmlContent requis sans templateId.");
       return;
     }
-    await client.transactionalEmails.sendTransacEmail({
+    await sendTransacEmail({
       to: opts.to,
       subject: opts.subject,
       htmlContent: opts.htmlContent,
