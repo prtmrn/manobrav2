@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { METIER_CONFIG, METIER_LIST } from "@/components/map/metier-config";
 import HowItWorksTabs from "@/components/landing/HowItWorksTabs";
 import AuthRedirect from "@/components/landing/AuthRedirect";
+import NavbarLanding from "@/components/landing/NavbarLanding";
 
 // ─── Cache 24 h (ISR) — les avis et stats changent peu ───────────────────────
 export const revalidate = 86400;
@@ -298,23 +299,7 @@ export default async function HomePage() {
             </div>
 
             {/* Auth */}
-            <div className="flex items-center gap-3">
-              <Link
-                href="/auth/login"
-                className="hidden sm:inline text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                Connexion
-              </Link>
-              <Link
-                href="/auth/register"
-                className="inline-flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors shadow-sm"
-              >
-                Commencer
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
+            <NavbarLanding />
           </nav>
         </header>
 
