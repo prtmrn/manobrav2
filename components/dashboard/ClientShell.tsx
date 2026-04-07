@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSelectedLayoutSegment } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useEffect, useState } from "react";
 
 interface ClientShellProps {
   children: React.ReactNode;
@@ -13,6 +14,18 @@ interface ClientShellProps {
 export default function ClientShell({ children, userEmail, userName }: ClientShellProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const [showFab, setShowFab] = useState(false);
+
+  useEffect(() => {
+    const cta = document.getElementById("cta-top");
+    if (!cta) { setShowFab(true); return; }
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowFab(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(cta);
+    return () => observer.disconnect();
+  }, [pathname]);
 
   async function handleSignOut() {
     const supabase = createClient();
@@ -114,20 +127,22 @@ export default function ClientShell({ children, userEmail, userName }: ClientShe
         {children}
       </main>
 
-      {/* ── CTA MOBILE FLOTTANT ── */}
-      <Link
-        href="/recherche"
-        className="sm:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50
-                   inline-flex items-center gap-2
-                   bg-green-600 hover:bg-green-700 text-white font-bold text-sm
-                   px-6 py-3.5 rounded-full shadow-lg shadow-green-200/60
-                   transition-all duration-150"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        Trouver un artisan
-      </Link>
+      {/* ── CTA MOBILE FLOTTANT — visible seulement quand le CTA du haut est hors écran ── */}
+      {showFab && (
+        <Link
+          href="/recherche"
+          className="sm:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50
+                     inline-flex items-center gap-2
+                     bg-green-600 hover:bg-green-700 text-white font-bold text-sm
+                     px-6 py-3.5 rounded-full shadow-lg shadow-green-200/60
+                     transition-all duration-150 animate-fade-in"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          Trouver un artisan
+        </Link>
+      )}
 
     </div>
   );
