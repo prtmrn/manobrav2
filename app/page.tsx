@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { METIER_CONFIG, METIER_LIST } from "@/components/map/metier-config";
 import HowItWorksTabs from "@/components/landing/HowItWorksTabs";
+import AuthRedirect from "@/components/landing/AuthRedirect";
 
 // ─── Cache 24 h (ISR) — les avis et stats changent peu ───────────────────────
 export const revalidate = 86400;
@@ -270,6 +271,7 @@ export default async function HomePage() {
       />
 
       <div className="min-h-screen bg-white">
+        <AuthRedirect />
 
         {/* ══════════════════════════════════════════════════════════════════ */}
         {/*  NAVBAR                                                           */}
