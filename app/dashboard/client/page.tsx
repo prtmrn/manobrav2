@@ -306,73 +306,59 @@ export default async function DashboardClientPage() {
     <div className="p-5 lg:p-8 max-w-4xl mx-auto space-y-8 pb-28">
 
       {/* ════════════════════════════════════════════════════════════════════
-          EN-TÊTE
+          EN-TÊTE + CTA/STATS adaptatifs
           ════════════════════════════════════════════════════════════════════ */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
           {greeting}, {displayName}&nbsp;👋
         </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Bienvenue sur votre espace client.
-        </p>
+        <p className="text-sm text-gray-500 mt-1">Bienvenue sur votre espace client.</p>
       </div>
 
-      {/* ════════════════════════════════════════════════════════════════════
-          STATS RAPIDES
-          ════════════════════════════════════════════════════════════════════ */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {/* Réservations à venir */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-          <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center mb-2">
-            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+      {upcoming.length === 0 && totalTermine === 0 && favoris.length === 0 ? (
+        <Link
+          href="/recherche"
+          id="cta-top"
+          className="flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700
+                     text-white font-bold text-base px-6 py-4 rounded-2xl shadow-md
+                     transition-all duration-150 hover:-translate-y-0.5 w-full"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          Trouver un artisan
+        </Link>
+      ) : (
+        <div className="flex items-center gap-3">
+          <div className="flex-1 grid grid-cols-4 gap-2">
+            {[
+              { label: "À venir", value: upcoming.length, color: "text-blue-600" },
+              { label: "Terminées", value: totalTermine, color: "text-green-600" },
+              { label: "À noter", value: toRate, color: "text-yellow-600" },
+              { label: "Favoris", value: favoris.length, color: "text-red-400" },
+            ].map(({ label, value, color }) => (
+              <div key={label} className="bg-white rounded-xl border border-gray-100 shadow-sm p-2.5 text-center">
+                <p className={`text-lg font-bold tabular-nums ${color}`}>{value}</p>
+                <p className="text-[10px] text-gray-400 mt-0.5 leading-tight">{label}</p>
+              </div>
+            ))}
           </div>
-          <p className="text-2xl font-bold text-gray-900 tabular-nums">{upcoming.length}</p>
-          <p className="text-xs text-gray-500 mt-0.5">À venir</p>
-        </div>
-
-        {/* Terminées */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-          <div className="w-8 h-8 rounded-xl bg-green-50 flex items-center justify-center mb-2">
-            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <Link
+            href="/recherche"
+            id="cta-top"
+            className="flex-shrink-0 flex flex-col items-center justify-center gap-1
+                       bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs
+                       px-3 py-2.5 rounded-xl shadow-sm transition-colors w-16 text-center"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-          </div>
-          <p className="text-2xl font-bold text-gray-900 tabular-nums">{totalTermine}</p>
-          <p className="text-xs text-gray-500 mt-0.5">Terminées</p>
+            Trouver
+          </Link>
         </div>
-
-        {/* À noter */}
-        <div className={`rounded-2xl border shadow-sm p-4 ${
-          toRate > 0
-            ? "bg-yellow-50 border-yellow-200"
-            : "bg-white border-gray-100"
-        }`}>
-          <div className="w-8 h-8 rounded-xl bg-yellow-100 flex items-center justify-center mb-2">
-            <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          </div>
-          <p className="text-2xl font-bold text-gray-900 tabular-nums">{toRate}</p>
-          <p className="text-xs text-gray-500 mt-0.5">À noter</p>
-        </div>
-
-        {/* Favoris */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-          <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center mb-2">
-            <svg className="w-4 h-4 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd"
-                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                clipRule="evenodd" />
-            </svg>
-          </div>
-          <p className="text-2xl font-bold text-gray-900 tabular-nums">{favoris.length}</p>
-          <p className="text-xs text-gray-500 mt-0.5">Favoris</p>
-        </div>
-      </div>
+      )}
 
       {/* ════════════════════════════════════════════════════════════════════
           RÉSERVATIONS À VENIR
