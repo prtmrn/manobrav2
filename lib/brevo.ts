@@ -7,6 +7,10 @@ async function sendTransacEmail(payload: object): Promise<void> {
     return;
   }
 
+  console.log("[Brevo] Tentative envoi vers api.brevo.com...");
+  console.log("[Brevo] API key présente :", apiKey.slice(0, 20) + "...");
+  console.log("[Brevo] Payload :", JSON.stringify(payload).slice(0, 200));
+
   const res = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
     headers: {
@@ -16,9 +20,12 @@ async function sendTransacEmail(payload: object): Promise<void> {
     body: JSON.stringify(payload),
   });
 
+  console.log("[Brevo] Statut réponse :", res.status);
   if (!res.ok) {
     const err = await res.text();
     console.error("[Brevo] Erreur envoi :", res.status, err);
+  } else {
+    console.log("[Brevo] Email envoyé avec succès !");
   }
 }
 
