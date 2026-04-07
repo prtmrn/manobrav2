@@ -194,7 +194,7 @@ export async function POST(request: Request) {
     siteUrl,
   };
 
-  Promise.allSettled([
+  await Promise.allSettled([
     clientEmail ? sendEmailConfirmationClient({
       ...emailData,
       clientEmail,
