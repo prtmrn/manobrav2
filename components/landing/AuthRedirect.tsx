@@ -36,7 +36,12 @@ export default function AuthRedirect() {
 
   if (checking) {
     return (
-      <div className="fixed inset-0 bg-white z-50" />
+      <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        {/* Remplacer ce bloc par <Image src="/logo.png" ... /> quand le logo sera disponible */}
+        <span className="font-bold text-gray-900 text-2xl tracking-tight">
+          Man<span className="text-green-600">obra</span>
+        </span>
+      </div>
     );
   }
 
