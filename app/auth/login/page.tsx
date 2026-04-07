@@ -13,7 +13,7 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div className="text-center">
-          <Link href="/" className="inline-block font-bold text-gray-900 text-2xl tracking-tight">
+          <Link href="/" className="inline-block font-bold text-gray-900 text-3xl tracking-tight">
             Man<span className="text-brand-600">obra</span>
           </Link>
           <h1 className="mt-3 text-xl font-bold text-gray-900">Connexion</h1>
