@@ -18,7 +18,7 @@ export default function AuthRedirect() {
         .from("profiles")
         .select("role")
         .eq("id", user.id)
-        .maybeSingle();
+        .maybeSingle() as { data: { role: string } | null };
 
       if (profile?.role === "artisan") {
         router.replace("/dashboard/artisan");
