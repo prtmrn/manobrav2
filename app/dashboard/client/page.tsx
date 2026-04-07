@@ -713,26 +713,6 @@ export default async function DashboardClientPage() {
         )}
       </section>
 
-      {/* ════════════════════════════════════════════════════════════════════
-          BOUTON FLOTTANT — Trouver un artisan
-          ════════════════════════════════════════════════════════════════════ */}
-      <Link
-        href="/map"
-        className="fixed bottom-6 right-4 sm:right-6 z-50
-                   inline-flex items-center gap-2
-                   bg-brand-600 hover:bg-brand-700 active:bg-brand-800
-                   text-white font-bold text-sm
-                   pl-4 pr-5 py-3.5 rounded-full
-                   shadow-lg shadow-brand-200/60
-                   hover:shadow-xl hover:-translate-y-0.5
-                   transition-all duration-150"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        Trouver un artisan
-      </Link>
 
     </div>
   );
