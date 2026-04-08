@@ -814,7 +814,7 @@ export default function PlanningClient({
             label: "Cette semaine",
             value:
               totalHeuresSemaine === 0
-                ? "—"
+                ? "N/A"
                 : `${totalHeuresSemaine % 1 === 0 ? totalHeuresSemaine : totalHeuresSemaine.toFixed(1)} h`,
             sub: "heures disponibles",
             color: "bg-brand-50 border-brand-100",

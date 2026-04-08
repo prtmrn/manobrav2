@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import ServicesClient from "./ServicesClient";
 
 export const metadata: Metadata = {
-  title: "Mes services — Manobra",
+  title: "Mes services | Manobra",
 };
 
 export default async function ServicesPage() {

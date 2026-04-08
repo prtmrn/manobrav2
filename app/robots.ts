@@ -16,7 +16,7 @@ export default function robots(): MetadataRoute.Robots {
           "/artisans/",
         ],
         disallow: [
-          // Pages privées — dashboard, réservations, avis, onboarding
+          // Pages privées | dashboard, réservations, avis, onboarding
           "/dashboard/",
           "/reserver/",
           "/avis/",

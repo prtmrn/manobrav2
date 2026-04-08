@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Paiements — Manobra",
+  title: "Paiements | Manobra",
 };
 
 export default function PaiementsPage() {

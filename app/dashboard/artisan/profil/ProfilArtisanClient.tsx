@@ -149,7 +149,7 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Numéro SIRET <span className="text-red-500">*</span></label>
             <input type="text" maxLength={14} value={form.siret} onChange={(e) => setForm({ ...form, siret: e.target.value.replace(/\s/g, "") })} className={inputClass} placeholder="12345678901234" />
-            <p className="text-xs text-gray-400 mt-1">14 chiffres sans espaces — obligatoire pour activer votre profil.</p>
+            <p className="text-xs text-gray-400 mt-1">14 chiffres sans espaces | obligatoire pour activer votre profil.</p>
           </div>
 
           <div>
@@ -230,7 +230,7 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
               <input type="number" min="0" step="5" value={form.tarif_horaire_max} onChange={(e) => setForm({ ...form, tarif_horaire_max: e.target.value })} className={inputClass} placeholder="80" />
             </div>
           </div>
-          <p className="text-xs text-gray-400">Fourchette indicative — le devis définitif est établi sur place.</p>
+          <p className="text-xs text-gray-400">Fourchette indicative | le devis définitif est établi sur place.</p>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Frais de déplacement</label>

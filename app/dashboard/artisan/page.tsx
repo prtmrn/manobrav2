@@ -50,7 +50,7 @@ interface ReservationDetail {
 // ─── Helpers de formatage ─────────────────────────────────────────────────────
 
 function fmtEuro(v: number | null) {
-  if (v === null || v === 0) return "—";
+  if (v === null || v === 0) return "N/A";
   return new Intl.NumberFormat("fr-FR", {
     style: "currency", currency: "EUR", minimumFractionDigits: 0,
   }).format(v);
@@ -423,7 +423,7 @@ export default async function DashboardartisanPage() {
             <p className="text-2xl font-bold text-gray-900 tabular-nums">
               {artisan.note_moyenne > 0
                 ? artisan.note_moyenne.toFixed(1)
-                : "—"}
+                : "N/A"}
             </p>
             <p className="text-xs font-medium text-gray-500 mt-0.5">Note moyenne</p>
             <p className="text-[11px] text-gray-400 mt-0.5">sur 5 étoiles</p>

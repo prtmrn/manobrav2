@@ -7,13 +7,13 @@ import HowItWorksTabs from "@/components/landing/HowItWorksTabs";
 import AuthRedirect from "@/components/landing/AuthRedirect";
 import NavbarLanding from "@/components/landing/NavbarLanding";
 
-// ─── Cache 24 h (ISR) — les avis et stats changent peu ───────────────────────
+// ─── Cache 24 h (ISR) | les avis et stats changent peu ───────────────────────
 export const revalidate = 86400;
 
 // ─── SEO : Metadata ───────────────────────────────────────────────────────────
 export const metadata: Metadata = {
   title:
-    "Manobra — Artisans qualifiés à domicile | Serrurier, Plombier, Électricien",
+    "Manobra | Artisans qualifiés à domicile | Serrurier, Plombier, Électricien",
   description:
     "Trouvez des artisans et artisans vérifiés près de chez vous : plombier, " +
     "électricien, peintre, ménage, jardinage à Paris, Lyon, Marseille, Bordeaux, " +
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     siteName: "Manobra",
-    title: "Manobra — Artisans qualifiés à domicile",
+    title: "Manobra | Artisans qualifiés à domicile",
     description:
       "Trouvez des professionnels vérifiés près de chez vous et réservez en ligne. " +
       "Serrurier, plombier, électricien, chauffagiste et plus encore.",
@@ -50,13 +50,13 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Manobra — Artisans qualifiés à domicile",
+        alt: "Manobra | Artisans qualifiés à domicile",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Manobra — Artisans qualifiés à domicile",
+    title: "Manobra | Artisans qualifiés à domicile",
     description:
       "Trouvez des professionnels vérifiés et réservez en ligne. " +
       "Serrurier, plombier, électricien…",
@@ -581,7 +581,7 @@ export default async function HomePage() {
               <div className="inline-flex items-center gap-3 bg-white border border-amber-100 rounded-2xl px-5 py-3 shadow-sm">
                 <StarsFull count={5} />
                 <span className="text-2xl font-extrabold text-gray-900">4.9</span>
-                <span className="text-sm text-gray-400">sur 5 — note moyenne</span>
+                <span className="text-sm text-gray-400">sur 5 | note moyenne</span>
               </div>
             </div>
 
@@ -764,7 +764,7 @@ export default async function HomePage() {
               </p>
             </div>
 
-            {/* Villes couvertes — SEO local */}
+            {/* Villes couvertes | SEO local */}
             <div className="mt-8 pt-8 border-t border-gray-800">
               <p className="text-xs text-gray-600 text-center leading-relaxed">
                 Artisans disponibles à{" "}

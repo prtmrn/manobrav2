@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
   }
 
-  // 2. Role check — artisans uniquement
+  // 2. Role check | artisans uniquement
   const { data: profileData } = await supabase
     .from("profiles")
     .select("role")

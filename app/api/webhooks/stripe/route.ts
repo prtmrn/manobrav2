@@ -131,7 +131,7 @@ async function handlePaymentFailed(
 ): Promise<void> {
   const admin = createAdminClient();
 
-  // 1. Chercher la réservation (peut ne pas encore exister — race condition)
+  // 1. Chercher la réservation (peut ne pas encore exister | race condition)
   const { data: reservation, error: fetchErr } = await admin
     .from("reservations")
     .select("id, statut, client_id, montant_total")

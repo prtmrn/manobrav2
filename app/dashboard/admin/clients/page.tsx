@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Clients — Admin Manobra" };
+export const metadata: Metadata = { title: "Clients | Admin Manobra" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminClientsPage() {
@@ -49,8 +49,8 @@ export default async function AdminClientsPage() {
           <tbody className="divide-y divide-gray-800">
             {list.map((c) => {
               const cp = clientProfileMap.get(c.id) as any;
-              const nom = cp ? `${cp.prenom ?? ""} ${cp.nom ?? ""}`.trim() : "—";
-              const email = emailMap.get(c.id) ?? "—";
+              const nom = cp ? `${cp.prenom ?? ""} ${cp.nom ?? ""}`.trim() : "N/A";
+              const email = emailMap.get(c.id) ?? "N/A";
               const nbRes = reservCount.get(c.id) ?? 0;
               const date = new Date(c.created_at).toLocaleDateString("fr-FR", {
                 day: "numeric", month: "short", year: "numeric"

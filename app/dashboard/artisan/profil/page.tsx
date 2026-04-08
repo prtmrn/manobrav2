@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import ProfilArtisanClient from "./ProfilArtisanClient";
 
 export const metadata: Metadata = {
-  title: "Mon profil — Manobra",
+  title: "Mon profil | Manobra",
 };
 
 export default async function ProfilArtisanPage() {

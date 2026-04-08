@@ -23,13 +23,13 @@ function getSiteUrl(): string {
 /**
  * Vérifie que la requête vient d'une source autorisée.
  * En prod : header "Authorization: Bearer <CRON_SECRET>"
- * CRON_SECRET doit toujours être défini — on refuse si absent (fail closed).
+ * CRON_SECRET doit toujours être défini | on refuse si absent (fail closed).
  */
 function isAuthorized(request: Request): boolean {
   const secret = process.env.CRON_SECRET;
   // Sécurité : on refuse l'accès si CRON_SECRET n'est pas configuré.
   if (!secret) {
-    console.warn("[CRON] CRON_SECRET non défini — accès refusé par sécurité.");
+    console.warn("[CRON] CRON_SECRET non défini | accès refusé par sécurité.");
     return false;
   }
   return request.headers.get("Authorization") === `Bearer ${secret}`;

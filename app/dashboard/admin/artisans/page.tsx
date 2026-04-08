@@ -68,7 +68,7 @@ export default async function AdminArtisansPage() {
           <tbody className="divide-y divide-gray-800">
             {list.map((a) => {
               const nom = `${a.prenom ?? ""} ${a.nom ?? ""}`.trim() || "Sans nom";
-              const email = emailMap.get(a.id) ?? "—";
+              const email = emailMap.get(a.id) ?? "N/A";
               const date = new Date(a.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
               return (
                 <tr key={a.id} className="hover:bg-gray-800/50 transition-colors">
@@ -80,10 +80,10 @@ export default async function AdminArtisansPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-gray-300">{a.metier ?? "—"}</span>
+                    <span className="text-gray-300">{a.metier ?? "N/A"}</span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-gray-300">{a.ville ?? "—"}</span>
+                    <span className="text-gray-300">{a.ville ?? "N/A"}</span>
                   </td>
                   <td className="px-4 py-3">
                     <span className={`text-xs font-mono ${a.siret ? "text-green-400" : "text-red-400"}`}>

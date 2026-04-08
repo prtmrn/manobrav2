@@ -22,7 +22,7 @@ function isAuthorized(request: Request): boolean {
   // En production, CRON_SECRET doit toujours être défini.
   // Si non défini, on bloque pour éviter une exposition accidentelle.
   if (!secret) {
-    console.warn("[CRON] CRON_SECRET non défini — accès refusé par sécurité.");
+    console.warn("[CRON] CRON_SECRET non défini | accès refusé par sécurité.");
     return false;
   }
   return request.headers.get("Authorization") === `Bearer ${secret}`;

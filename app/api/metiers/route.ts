@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { METIER_CONFIG, METIER_LIST } from "@/components/map/metier-config";
 
-// ─── Cache 24 h — la liste des métiers ne change qu'avec un déploiement ──────
+// ─── Cache 24 h | la liste des métiers ne change qu'avec un déploiement ──────
 // Next.js App Router: revalidate the route every 24 hours (ISR-style)
 export const revalidate = 86400;
 

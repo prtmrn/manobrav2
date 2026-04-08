@@ -25,7 +25,7 @@ function isAuthorized(request: Request): boolean {
   // En production, CRON_SECRET doit toujours être défini.
   // Si non défini, on bloque pour éviter une exposition accidentelle.
   if (!secret) {
-    console.warn("[CRON] CRON_SECRET non défini — accès refusé par sécurité.");
+    console.warn("[CRON] CRON_SECRET non défini | accès refusé par sécurité.");
     return false;
   }
   return request.headers.get("Authorization") === `Bearer ${secret}`;
@@ -95,7 +95,7 @@ export async function GET(request: Request) {
 
   // ── Traitement réservation par réservation ───────────────────────────────────
   for (const rd of reservations) {
-    // Récupérer les emails (auth.admin — bypass RLS)
+    // Récupérer les emails (auth.admin | bypass RLS)
     const [clientAuthRes, artisanAuthRes] = await Promise.all([
       admin.auth.admin.getUserById(rd.client_id),
       admin.auth.admin.getUserById(rd.artisan_id),

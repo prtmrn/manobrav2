@@ -9,7 +9,7 @@ import SearchMapView from "@/components/recherche/SearchMapView";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Rechercher un artisan — Manobra",
+  title: "Rechercher un artisan | Manobra",
   description: "Trouvez le meilleur artisan près de chez vous.",
 };
 
@@ -315,7 +315,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SearchResultsPage",
-    name: "Recherche de artisans — Manobra",
+    name: "Recherche de artisans | Manobra",
     description: "Résultats de recherche de artisans à domicile",
     url: process.env.NEXT_PUBLIC_SITE_URL
       ? `${process.env.NEXT_PUBLIC_SITE_URL}/recherche`

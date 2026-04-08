@@ -34,7 +34,7 @@ export default async function AdminDashboardPage() {
     <div className="p-6 max-w-5xl mx-auto space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-white">Vue d'ensemble</h1>
-        <p className="text-sm text-gray-400 mt-1">Plateforme Manobra — back-office interne</p>
+        <p className="text-sm text-gray-400 mt-1">Plateforme Manobra | back-office interne</p>
       </div>
 
       {/* Stats */}

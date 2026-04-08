@@ -78,10 +78,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const fullName = `${p.prenom ?? ""} ${p.nom ?? ""}`.trim() || "artisan";
-  const title = `${fullName} — ${p.metier ?? "artisan"} à ${p.ville ?? "France"} | Manobra`;
+  const title = `${fullName} | ${p.metier ?? "artisan"} à ${p.ville ?? "France"} | Manobra`;
   const description = p.bio
     ? p.bio.slice(0, 155) + (p.bio.length > 155 ? "…" : "")
-    : `Profil de ${fullName}, ${p.metier ?? "artisan"} à ${p.ville ?? "France"}. Note ${p.note_moyenne?.toFixed(1) ?? "—"}/5 (${p.nombre_avis ?? 0} avis). Réservez en ligne sur Manobra.`;
+    : `Profil de ${fullName}, ${p.metier ?? "artisan"} à ${p.ville ?? "France"}. Note ${p.note_moyenne?.toFixed(1) ?? "N/A"}/5 (${p.nombre_avis ?? 0} avis). Réservez en ligne sur Manobra.`;
 
   return {
     title,
@@ -255,7 +255,7 @@ function RatingSummary({
       {/* Score global */}
       <div className="flex flex-col items-center text-center flex-shrink-0">
         <span className="text-5xl font-black text-gray-900 leading-none">
-          {note > 0 ? note.toFixed(1) : "—"}
+          {note > 0 ? note.toFixed(1) : "N/A"}
         </span>
         <StarRow note={note} size="sm" />
         <span className="text-xs text-gray-400 mt-1">
@@ -651,7 +651,7 @@ export default async function artisanPage({ params }: PageProps) {
           </div>
 
           {/* ════════════════════════════════════════════════════════════════
-              SIDEBAR (1/3) — sticky sur desktop
+              SIDEBAR (1/3) | sticky sur desktop
           ════════════════════════════════════════════════════════════════ */}
           <aside className="mt-5 lg:mt-0 space-y-4 lg:sticky lg:top-[72px]">
 
