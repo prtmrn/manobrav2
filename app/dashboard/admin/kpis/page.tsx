@@ -36,7 +36,7 @@ export default function AdminKpisPage() {
       ] = await Promise.all([
         supabase.from("profiles").select("id, role, created_at"),
         supabase.from("profiles_artisans").select("id, actif, metier, note_moyenne, nombre_avis, ville, created_at"),
-        supabase.from("profiles").select("id, created_at").eq("role", "client"),
+        supabase.from("profiles").select("id, role, created_at"),
         supabase.from("reservations").select("id, statut, montant_total, date, created_at, client_id, artisan_id, heure_debut, heure_fin"),
         supabase.from("avis").select("note, created_at"),
       ]);
@@ -47,7 +47,7 @@ export default function AdminKpisPage() {
       const lastMonthKey = `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, "0")}`;
 
       const artisansList = artisans ?? [];
-      const clientsList = clients ?? [];
+      const clientsList = (clients ?? []).filter((p: any) => p.role === "client");
       const reservList = reservations ?? [];
       const avisList = avis ?? [];
 
