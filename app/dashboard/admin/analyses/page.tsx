@@ -133,13 +133,13 @@ export default function AdminAnalysesPage() {
       // ── Géographie ──
       const villeCount: Record<string, number> = {};
       for (const r of reservList) {
-        const artisan = (artisansProfiles ?? []).find((a: any) => a.id === r.artisan_id);
+        const artisan = ((artisansProfiles ?? []) as any[]).find((a: any) => a.id === r.artisan_id);
         const ville = artisan?.ville;
         if (ville) villeCount[ville] = (villeCount[ville] ?? 0) + 1;
       }
 
       const artisanParVille: Record<string, number> = {};
-      for (const a of artisansProfiles ?? []) {
+      for (const a of (artisansProfiles ?? []) as any[]) {
         if ((a as any).ville) artisanParVille[(a as any).ville] = (artisanParVille[(a as any).ville] ?? 0) + 1;
       }
 
