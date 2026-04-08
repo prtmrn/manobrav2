@@ -135,6 +135,8 @@ export const DEPT_NAMES: Record<string, string> = {
 
 export function getDeptFromCP(cp: string): string {
   if (!cp || cp.length < 2) return "Autre";
+  // Code postal français = 5 chiffres
+  if (!/^\d{5}$/.test(cp)) return "Autre";
   // DOM-TOM : 971, 972, 973, 974, 976
   if (cp.startsWith("97")) return cp.slice(0, 3);
   // Corse : 2A / 2B
