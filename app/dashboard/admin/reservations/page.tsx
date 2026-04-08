@@ -27,8 +27,8 @@ export default async function AdminReservationsPage() {
   const admin = createAdminClient();
 
   const { data: reservations } = await admin
-    .from("reservations_detail")
-    .select("id, date, heure_debut, heure_fin, statut, montant_total, service_titre, created_at, client_id, artisan_id, artisan_nom, artisan_prenom, artisan_metier, guest_nom, guest_email")
+    .from("reservations")
+    .select("id, date, heure_debut, heure_fin, statut, montant_total, created_at, client_id, artisan_id, guest_nom, guest_email, services!service_id(titre), profiles_artisans!artisan_id(nom, prenom, metier)")
     .order("created_at", { ascending: false })
     .limit(100);
 
@@ -94,7 +94,10 @@ export default async function AdminReservationsPage() {
               const clientNom = r.client_id
                 ? (clientMap.get(r.client_id) || "Client")
                 : (r.guest_nom || r.guest_email || "Guest");
-              const artisanNom = `${r.artisan_prenom ?? ""} ${r.artisan_nom ?? ""}`.trim() || "N/A";
+              const artisan = (r.profiles_artisans as any);
+              const artisanNom = artisan ? `${artisan.prenom ?? ""} ${artisan.nom ?? ""}`.trim() : "N/A";
+              const artisanMetier = artisan?.metier ?? null;
+              const serviceTitre = (r.services as any)?.titre ?? "N/A";
               const statut = STATUT_CONFIG[r.statut] ?? { label: r.statut, color: "text-gray-400 bg-gray-800 border-gray-700" };
               return (
                 <tr key={r.id} className="hover:bg-gray-800/50 transition-colors">
@@ -105,9 +108,9 @@ export default async function AdminReservationsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <p className="text-white text-sm">{artisanNom}</p>
-                    {r.artisan_metier && <p className="text-xs text-gray-500">{r.artisan_metier}</p>}
+                    {artisanMetier && <p className="text-xs text-gray-500">{artisanMetier}</p>}
                   </td>
-                  <td className="px-4 py-3 text-gray-300 text-sm max-w-[150px] truncate">{r.service_titre ?? "N/A"}</td>
+                  <td className="px-4 py-3 text-gray-300 text-sm max-w-[150px] truncate">{serviceTitre}</td>
                   <td className="px-4 py-3 text-gray-300 text-xs whitespace-nowrap">{fmtDate(r.date)}</td>
                   <td className="px-4 py-3 text-sm font-medium text-white">{fmtEuro(r.montant_total)}</td>
                   <td className="px-4 py-3">
