@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/middleware";
 const PROTECTED_ROUTES = ["/dashboard", "/onboarding"];
 
 // Routes accessibles uniquement aux non-connectés (correspondance exacte)
-const AUTH_ONLY_ROUTES = ["/auth/login", "/auth/register"];
+const AUTH_ONLY_ROUTES = ["/auth/login", "/auth/register", "/"];
 
 export async function middleware(request: NextRequest) {
   const { supabase, response } = await createClient(request);
