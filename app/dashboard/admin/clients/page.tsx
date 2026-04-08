@@ -1,31 +1,34 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { Metadata } from "next";
 
+export const metadata: Metadata = { title: "Clients — Admin Manobra" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminClientsPage() {
   const admin = createAdminClient();
 
-  const { data: clients } = await admin
-    .from("profiles_clients")
-    .select("id, nom, prenom, created_at")
-    .order("created_at", { ascending: false });
-
   const { data: authUsers } = await admin.auth.admin.listUsers();
-  const emailMap = new Map(authUsers.users.map((u) => [u.id, u.email]));
+  const { data: profiles } = await admin
+    .from("profiles")
+    .select("id, role, created_at")
+    .eq("role", "client");
+
+  const { data: clientProfiles } = await admin
+    .from("profiles_clients")
+    .select("id, nom, prenom");
 
   const { data: reservationsData } = await admin
     .from("reservations")
     .select("client_id");
 
+  const emailMap = new Map(authUsers.users.map((u) => [u.id, u.email]));
+  const clientProfileMap = new Map((clientProfiles ?? []).map((c: any) => [c.id, c]));
   const reservCount = new Map<string, number>();
   for (const r of reservationsData ?? []) {
     if (r.client_id) reservCount.set(r.client_id, (reservCount.get(r.client_id) ?? 0) + 1);
   }
 
-  const list = (clients ?? []) as Array<{
-    id: string; nom: string | null; prenom: string | null;
-    created_at: string;
-  }>;
+  const list = (profiles ?? []) as Array<{ id: string; created_at: string }>;
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
@@ -39,16 +42,16 @@ export default async function AdminClientsPage() {
           <thead>
             <tr className="border-b border-gray-800">
               <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Client</th>
-
               <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Réservations</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Inscrit le</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
             {list.map((c) => {
-              const nom = `${c.prenom ?? ""} ${c.nom ?? ""}`.trim() || "Sans nom";
+              const cp = clientProfileMap.get(c.id) as any;
+              const nom = cp ? `${cp.prenom ?? ""} ${cp.nom ?? ""}`.trim() : "—";
               const email = emailMap.get(c.id) ?? "—";
-              const nbReservations = reservCount.get(c.id) ?? 0;
+              const nbRes = reservCount.get(c.id) ?? 0;
               const date = new Date(c.created_at).toLocaleDateString("fr-FR", {
                 day: "numeric", month: "short", year: "numeric"
               });
@@ -58,10 +61,9 @@ export default async function AdminClientsPage() {
                     <p className="font-medium text-white">{nom}</p>
                     <p className="text-xs text-gray-500">{email}</p>
                   </td>
-
                   <td className="px-4 py-3">
-                    <span className={`text-sm font-semibold ${nbReservations > 0 ? "text-brand-400" : "text-gray-600"}`}>
-                      {nbReservations}
+                    <span className={`text-sm font-semibold ${nbRes > 0 ? "text-brand-400" : "text-gray-600"}`}>
+                      {nbRes}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-gray-400 text-xs">{date}</td>
