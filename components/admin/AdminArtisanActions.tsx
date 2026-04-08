@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
 
 export default function AdminArtisanActions({ artisanId, actif }: { artisanId: string; actif: boolean }) {
@@ -10,11 +9,11 @@ export default function AdminArtisanActions({ artisanId, actif }: { artisanId: s
 
   async function toggle() {
     setLoading(true);
-    const supabase = createClient();
-    await supabase
-      .from("profiles_artisans")
-      .update({ actif: !actif } as any)
-      .eq("id", artisanId);
+    await fetch("/api/admin/artisans/toggle", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ artisanId, actif: !actif }),
+    });
     router.refresh();
     setLoading(false);
   }
