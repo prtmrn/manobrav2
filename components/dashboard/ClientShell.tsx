@@ -52,7 +52,7 @@ export default function ClientShell({ children, userEmail, userName }: ClientShe
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
 
           {/* Logo */}
-          <Link href="/dashboard/client" className="font-bold text-gray-900 text-base tracking-tight flex-shrink-0">
+          <Link href="/" className="font-bold text-gray-900 text-base tracking-tight flex-shrink-0">
             Man<span className="text-green-600">obra</span>
           </Link>
 
