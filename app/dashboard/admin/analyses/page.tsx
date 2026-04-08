@@ -65,10 +65,11 @@ export default function AdminAnalysesPage() {
         supabase.from("profiles_artisans").select("id, ville"),
       ]);
 
-      const allProfiles = profiles ?? [];
-      const artisansList = artisans ?? [];
-      const reservList = reservations ?? [];
 
+      const artisansList = (artisans ?? []) as any[];
+      const reservList = (reservations ?? []) as any[];
+
+      const allProfiles = (profiles ?? []) as any[];
       const clients = allProfiles.filter((p: any) => p.role === "client");
       const totalInscrits = clients.length;
       const clientsAvecReservation = new Set(reservList.filter((r: any) => r.client_id).map((r: any) => r.client_id));
