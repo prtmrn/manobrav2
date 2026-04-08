@@ -16,7 +16,7 @@ export default async function AdminRevenusPage() {
   const admin = createAdminClient();
 
   const [abonnementsRes, reservationsRes] = await Promise.all([
-    admin.from("abonnements").select("id, artisan_id, plan, statut, montant, created_at, updated_at"),
+    (admin as any).from("abonnements").select("id, artisan_id, plan, statut, montant, created_at, updated_at"),
     admin.from("reservations").select("id, statut, montant_total, date, created_at"),
   ]);
 
