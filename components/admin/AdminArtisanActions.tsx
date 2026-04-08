@@ -13,7 +13,7 @@ export default function AdminArtisanActions({ artisanId, actif }: { artisanId: s
     const supabase = createClient();
     await supabase
       .from("profiles_artisans")
-      .update({ actif: !actif })
+      .update({ actif: !actif } as any)
       .eq("id", artisanId);
     router.refresh();
     setLoading(false);
