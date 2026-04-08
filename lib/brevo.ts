@@ -1,3 +1,30 @@
+import { createAdminClient } from "@/lib/supabase/admin";
+
+// ─── Logger email en base ─────────────────────────────────────────────────────
+async function logEmail(opts: {
+  destinataire: string;
+  sujet: string;
+  categorie: string;
+  reservationId?: string | null;
+  artisanId?: string | null;
+  clientId?: string | null;
+}) {
+  try {
+    const admin = createAdminClient();
+    await (admin as any).from("email_logs").insert({
+      destinataire: opts.destinataire,
+      sujet: opts.sujet,
+      categorie: opts.categorie,
+      statut: "envoye",
+      reservation_id: opts.reservationId ?? null,
+      artisan_id: opts.artisanId ?? null,
+      client_id: opts.clientId ?? null,
+    });
+  } catch {
+    // Ne pas bloquer l'envoi si le log échoue
+  }
+}
+
 // ─── Client Brevo (HTTP direct) ──────────────────────────────────────────────
 
 async function sendTransacEmail(payload: object): Promise<void> {
@@ -178,6 +205,12 @@ export interface ReservationEmailData {
 export async function sendEmailConfirmationClient(
   data: ReservationEmailData
 ): Promise<void> {
+  await logEmail({
+    destinataire: data.clientEmail,
+    sujet: `Demande envoyée - ${data.serviceTitre}`,
+    categorie: "confirmation_client",
+    reservationId: data.reservationId,
+  });
   const ref = data.reservationId.slice(0, 8).toUpperCase();
   const dashUrl = `${data.siteUrl}/dashboard/client/reservations`;
   const templateId = getTemplateId("BREVO_TEMPLATE_CONFIRMATION_CLIENT");
@@ -254,6 +287,11 @@ export interface NotifPrestaEmailData {
 export async function sendEmailNotifartisan(
   data: NotifPrestaEmailData
 ): Promise<void> {
+  await logEmail({
+    destinataire: data.artisanEmail,
+    sujet: `Nouvelle demande - ${data.serviceTitre}`,
+    categorie: "notification_artisan",
+  });
   const dashUrl = `${data.siteUrl}/dashboard/artisan/reservations`;
   const templateId = getTemplateId("BREVO_TEMPLATE_NOTIF_artisan");
 
