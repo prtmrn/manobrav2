@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { getRegionFromCP, getDeptNameFromCP } from "@/lib/geo-france";
 import { createClient } from "@/lib/supabase/client";
 
 const ONGLETS = ["Funnel", "Personas", "Artisans", "Géographie", "Temporalité"];
@@ -62,7 +63,7 @@ export default function AdminAnalysesPage() {
         supabase.from("profiles").select("id, role, created_at"),
         supabase.from("profiles_artisans").select("id, actif, metier, ville, note_moyenne, nombre_avis, created_at"),
         supabase.from("reservations").select("id, statut, date, heure_debut, created_at, client_id, artisan_id, adresse_intervention"),
-        supabase.from("profiles_artisans").select("id, ville"),
+        supabase.from("profiles_artisans").select("id, ville, code_postal"),
       ]);
 
 
@@ -131,11 +132,35 @@ export default function AdminAnalysesPage() {
         : null;
 
       // ── Géographie ──
+      const regionCount: Record<string, number> = {};
+      const deptCount: Record<string, number> = {};
       const villeCount: Record<string, number> = {};
+
       for (const r of reservList) {
         const artisan = ((artisansProfiles ?? []) as any[]).find((a: any) => a.id === r.artisan_id);
+        const cp = artisan?.code_postal;
         const ville = artisan?.ville;
+        if (cp) {
+          const region = getRegionFromCP(cp);
+          const dept = getDeptNameFromCP(cp);
+          regionCount[region] = (regionCount[region] ?? 0) + 1;
+          deptCount[dept] = (deptCount[dept] ?? 0) + 1;
+        } else if (ville) {
+          regionCount["Autre"] = (regionCount["Autre"] ?? 0) + 1;
+        }
         if (ville) villeCount[ville] = (villeCount[ville] ?? 0) + 1;
+      }
+
+      const artisanParRegion: Record<string, number> = {};
+      const artisanParDept: Record<string, number> = {};
+      for (const a of (artisansProfiles ?? []) as any[]) {
+        const cp = (a as any).code_postal;
+        if (cp) {
+          const region = getRegionFromCP(cp);
+          const dept = getDeptNameFromCP(cp);
+          artisanParRegion[region] = (artisanParRegion[region] ?? 0) + 1;
+          artisanParDept[dept] = (artisanParDept[dept] ?? 0) + 1;
+        }
       }
 
       const artisanParVille: Record<string, number> = {};
@@ -168,7 +193,7 @@ export default function AdminAnalysesPage() {
         reservJourMeme, reservAvance, heurePic,
         metierDemande, noteMoyGlobal, tempsMovenJours,
         artisansAvecNote: artisansAvecNote.length,
-        villeCount, artisanParVille,
+        regionCount, deptCount, villeCount, artisanParRegion, artisanParDept, artisanParVille,
         jourCount, jourSemaine, moisCount, heureCount,
       });
       setLoading(false);
@@ -274,24 +299,58 @@ export default function AdminAnalysesPage() {
       {/* ── GÉOGRAPHIE ── */}
       {onglet === "Géographie" && (
         <div className="space-y-6">
+          {/* Régions */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="bg-gray-900 rounded-2xl border border-gray-800 p-5">
-              <h3 className="text-sm font-semibold text-white mb-4">Réservations par ville</h3>
+              <h3 className="text-sm font-semibold text-white mb-4">Réservations par région</h3>
               <div className="space-y-3">
-                {Object.entries(d.villeCount).sort((a: any, b: any) => b[1] - a[1]).map(([ville, count]: any) => (
-                  <BarRow key={ville} label={ville} value={count} max={maxVille} />
+                {Object.entries(d.regionCount).sort((a: any, b: any) => b[1] - a[1]).map(([region, count]: any) => (
+                  <BarRow key={region} label={region} value={count} max={Math.max(...Object.values(d.regionCount) as number[], 1)} />
                 ))}
-                {Object.keys(d.villeCount).length === 0 && <p className="text-gray-500 text-sm">Aucune donnée</p>}
+                {Object.keys(d.regionCount).length === 0 && <p className="text-gray-500 text-sm">Aucune donnée</p>}
               </div>
             </div>
             <div className="bg-gray-900 rounded-2xl border border-gray-800 p-5">
-              <h3 className="text-sm font-semibold text-white mb-4">Artisans par ville</h3>
+              <h3 className="text-sm font-semibold text-white mb-4">Artisans par région</h3>
               <div className="space-y-3">
-                {Object.entries(d.artisanParVille).sort((a: any, b: any) => b[1] - a[1]).map(([ville, count]: any) => (
-                  <BarRow key={ville} label={ville} value={count} max={Math.max(...Object.values(d.artisanParVille) as number[])} color="bg-green-600" />
+                {Object.entries(d.artisanParRegion).sort((a: any, b: any) => b[1] - a[1]).map(([region, count]: any) => (
+                  <BarRow key={region} label={region} value={count} max={Math.max(...Object.values(d.artisanParRegion) as number[], 1)} color="bg-green-600" />
                 ))}
-                {Object.keys(d.artisanParVille).length === 0 && <p className="text-gray-500 text-sm">Aucune donnée</p>}
+                {Object.keys(d.artisanParRegion).length === 0 && <p className="text-gray-500 text-sm">Aucune donnée</p>}
               </div>
+            </div>
+          </div>
+
+          {/* Départements */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="bg-gray-900 rounded-2xl border border-gray-800 p-5">
+              <h3 className="text-sm font-semibold text-white mb-4">Réservations par département</h3>
+              <div className="space-y-3">
+                {Object.entries(d.deptCount).sort((a: any, b: any) => b[1] - a[1]).map(([dept, count]: any) => (
+                  <BarRow key={dept} label={dept} value={count} max={Math.max(...Object.values(d.deptCount) as number[], 1)} color="bg-purple-600" />
+                ))}
+                {Object.keys(d.deptCount).length === 0 && <p className="text-gray-500 text-sm">Aucune donnée</p>}
+              </div>
+            </div>
+            <div className="bg-gray-900 rounded-2xl border border-gray-800 p-5">
+              <h3 className="text-sm font-semibold text-white mb-4">Artisans par département</h3>
+              <div className="space-y-3">
+                {Object.entries(d.artisanParDept).sort((a: any, b: any) => b[1] - a[1]).map(([dept, count]: any) => (
+                  <BarRow key={dept} label={dept} value={count} max={Math.max(...Object.values(d.artisanParDept) as number[], 1)} color="bg-blue-600" />
+                ))}
+                {Object.keys(d.artisanParDept).length === 0 && <p className="text-gray-500 text-sm">Aucune donnée</p>}
+              </div>
+            </div>
+          </div>
+
+          {/* Villes */}
+          <div className="bg-gray-900 rounded-2xl border border-gray-800 p-5">
+            <h3 className="text-sm font-semibold text-white mb-4">Réservations par ville</h3>
+            <div className="space-y-3">
+              {Object.entries(d.villeCount).sort((a: any, b: any) => b[1] - a[1]).slice(0, 15).map(([ville, count]: any) => (
+                <BarRow key={ville} label={ville} value={count} max={Math.max(...Object.values(d.villeCount) as number[], 1)} color="bg-amber-600" />
+              ))}
+              {Object.keys(d.villeCount).length === 0 && <p className="text-gray-500 text-sm">Aucune donnée</p>}
             </div>
           </div>
         </div>
