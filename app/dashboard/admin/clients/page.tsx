@@ -7,7 +7,7 @@ export default async function AdminClientsPage() {
 
   const { data: clients } = await admin
     .from("profiles_clients")
-    .select("id, nom, prenom, telephone, adresse, created_at")
+    .select("id, nom, prenom, created_at")
     .order("created_at", { ascending: false });
 
   const { data: authUsers } = await admin.auth.admin.listUsers();
@@ -24,7 +24,7 @@ export default async function AdminClientsPage() {
 
   const list = (clients ?? []) as Array<{
     id: string; nom: string | null; prenom: string | null;
-    telephone: string | null; adresse: string | null; created_at: string;
+    created_at: string;
   }>;
 
   return (
@@ -39,8 +39,7 @@ export default async function AdminClientsPage() {
           <thead>
             <tr className="border-b border-gray-800">
               <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Client</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Téléphone</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Adresse</th>
+
               <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Réservations</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Inscrit le</th>
             </tr>
@@ -59,8 +58,7 @@ export default async function AdminClientsPage() {
                     <p className="font-medium text-white">{nom}</p>
                     <p className="text-xs text-gray-500">{email}</p>
                   </td>
-                  <td className="px-4 py-3 text-gray-300">{c.telephone ?? "—"}</td>
-                  <td className="px-4 py-3 text-gray-300 max-w-[200px] truncate">{c.adresse ?? "—"}</td>
+
                   <td className="px-4 py-3">
                     <span className={`text-sm font-semibold ${nbReservations > 0 ? "text-brand-400" : "text-gray-600"}`}>
                       {nbReservations}
