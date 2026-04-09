@@ -287,7 +287,7 @@ export default function SearchMapView({ artisans, modeUrgence = false }: SearchM
                   <p className="text-sm">Aucun artisan géolocalisé</p>
                 </div>
               ) : (
-                (artisansAvecCoords as ArtisanCard[]).map(a => (
+                (artisansAvecCoords as ArtisanCard[]).map((a: ArtisanCard) => (
                   <ArtisanListCard
                     key={a.id}
                     artisan={a}
