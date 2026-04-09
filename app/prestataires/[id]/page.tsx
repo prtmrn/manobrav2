@@ -400,7 +400,7 @@ export default async function artisanPage({ params }: PageProps) {
             href="/"
             className="text-brand-600 font-bold text-lg hover:text-brand-700 transition-colors"
           >
-            🏠 Manobra
+            Manobra
           </Link>
 
           {/* CTA mobile sticky */}

@@ -58,7 +58,7 @@ export default async function MapPage() {
             href="/"
             className="flex items-center gap-2 text-brand-600 font-bold text-lg hover:text-brand-700 transition-colors"
           >
-            <span className="text-2xl">🏠</span>
+            
             <span className="hidden sm:inline">Manobra</span>
           </Link>
           <span className="text-gray-200 font-light text-xl hidden sm:block">

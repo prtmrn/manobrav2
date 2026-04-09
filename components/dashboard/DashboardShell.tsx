@@ -225,7 +225,7 @@ export default function DashboardShell({
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center gap-2.5 flex-shrink-0">
             <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
-              <span className="text-white text-sm font-bold leading-none">S</span>
+              <span className="text-white text-sm font-bold leading-none">M</span>
             </div>
             <span className="hidden sm:block font-semibold text-gray-900 text-sm tracking-tight">
               Manobra

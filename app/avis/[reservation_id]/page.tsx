@@ -197,7 +197,7 @@ export default async function AvisPage({ params }: PageProps) {
             </svg>
             Mon tableau de bord
           </Link>
-          <span className="text-brand-600 font-bold text-sm">🏠 Manobra</span>
+          <span className="text-brand-600 font-bold text-sm">Manobra</span>
         </div>
       </nav>
 
