@@ -252,6 +252,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   });
   console.log("[recherche] rawData count:", rawData?.length, "error:", rawError?.message);
   console.log("[recherche] noms:", (rawData ?? []).map((a: any) => a.nom).join(", "));
+  console.log("[recherche] rawData[1]:", JSON.stringify(rawData?.[1]));
 
   // ── 3. City autocomplete list ──────────────────────────────────────────────
   const { data: citiesData } = await admin
