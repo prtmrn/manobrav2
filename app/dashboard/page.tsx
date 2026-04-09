@@ -41,7 +41,7 @@ export default async function DashboardPage() {
     redirect("/dashboard/artisan");
   }
 
-  if (role === "admin") redirect("/dashboard/admin");
+  if ((role as string) === "admin") redirect("/dashboard/admin");
   // Client
   redirect("/dashboard/client");
 }
