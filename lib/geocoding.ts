@@ -1,12 +1,6 @@
 /**
- * Géocodage d'adresse via l'API Google Maps Geocoding.
- * Clé requise : GOOGLE_MAPS_GEOCODING_KEY dans .env.local (serveur uniquement, sans préfixe NEXT_PUBLIC_)
- *
- * @example
- * const coords = await geocodeAddress("12 rue de la Paix", "Paris", "75001");
- * // → { latitude: 48.8698, longitude: 2.3309 } ou null
+ * Géocodage via Nominatim (OpenStreetMap) — gratuit, sans clé API.
  */
-
 export interface GeocoderResult {
   latitude: number;
   longitude: number;
@@ -18,41 +12,30 @@ export async function geocodeAddress(
   ville: string,
   code_postal: string
 ): Promise<GeocoderResult | null> {
-  const apiKey = process.env.GOOGLE_MAPS_GEOCODING_KEY;
-
-  if (!apiKey) {
-    console.warn(
-      "[geocoding] GOOGLE_MAPS_GEOCODING_KEY manquante — coordonnées ignorées."
-    );
-    return null;
-  }
-
   const query = `${adresse}, ${code_postal} ${ville}, France`;
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&key=${apiKey}`;
+  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
 
   try {
-    const res = await fetch(url, { cache: "no-store" });
-
-    if (!res.ok) {
-      console.error("[geocoding] Erreur HTTP :", res.status);
-      return null;
-    }
-
+    const res = await fetch(url, {
+      cache: "no-store",
+      headers: {
+        "User-Agent": "Manobra/1.0 (contact@manobra.fr)",
+        "Accept-Language": "fr",
+      },
+    });
+    if (!res.ok) return null;
     const data = await res.json();
-
-    if (data.status !== "OK" || !data.results?.length) {
-      console.warn("[geocoding] Statut inattendu :", data.status, data.error_message ?? "");
-      return null;
+    if (!data?.length) {
+      const fallback = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(`${code_postal} ${ville}, France`)}&format=json&limit=1`,
+        { cache: "no-store", headers: { "User-Agent": "Manobra/1.0 (contact@manobra.fr)" } }
+      );
+      const fd = await fallback.json();
+      if (!fd?.length) return null;
+      return { latitude: parseFloat(fd[0].lat), longitude: parseFloat(fd[0].lon), formatted_address: fd[0].display_name };
     }
-
-    const { lat, lng } = data.results[0].geometry.location;
-    return {
-      latitude: lat,
-      longitude: lng,
-      formatted_address: data.results[0].formatted_address,
-    };
-  } catch (err) {
-    console.error("[geocoding] Exception :", err);
+    return { latitude: parseFloat(data[0].lat), longitude: parseFloat(data[0].lon), formatted_address: data[0].display_name };
+  } catch {
     return null;
   }
 }
