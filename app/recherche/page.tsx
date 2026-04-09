@@ -222,34 +222,27 @@ export default async function RecherchePage({ searchParams }: PageProps) {
     dispoIds = new Set((dispoRows ?? []).map((d) => d.artisan_id));
   }
 
-  // ── 2. Main query ──────────────────────────────────────────────────────────
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let query = (admin as any)
-    .from("profiles_artisans")
-    .select(
-      "id, nom, prenom, metier, ville, code_postal, photo_url, " +
-        "note_moyenne, nombre_avis, abonnement_pro, latitude, longitude"
-    )
-    .eq("actif", true);
-
-  if (metierFilter) {
-    query = query.contains("metier", [metierFilter]);
-  }
-
-  if (villeFilter) {
-    // Match against ville OR code_postal, case-insensitive
-    query = query.or(
-      `ville.ilike.%${villeFilter}%,code_postal.ilike.%${villeFilter}%`
-    );
-  }
-
-  if (noteMin !== null && noteMin > 0) {
-    query = query.gte("note_moyenne", noteMin);
-  }
-
-  const { data: rawData, error: rawError } = await query.order("note_moyenne", {
-    ascending: false,
+  // ── 2. Main query via fetch direct ────────────────────────────────────────
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  const params = new URLSearchParams({
+    select: "id,nom,prenom,metier,ville,code_postal,photo_url,note_moyenne,nombre_avis,abonnement_pro,latitude,longitude",
+    actif: "eq.true",
+    order: "note_moyenne.desc",
   });
+  if (metierFilter) params.append("metier", `cs.{${metierFilter}}`);
+  if (villeFilter) params.append("or", `(ville.ilike.*${villeFilter}*,code_postal.ilike.*${villeFilter}*)`);
+  if (noteMin !== null && noteMin > 0) params.append("note_moyenne", `gte.${noteMin}`);
+  const apiRes = await fetch(`${supabaseUrl}/rest/v1/profiles_artisans?${params.toString()}`, {
+    headers: {
+      "apikey": serviceKey,
+      "Authorization": `Bearer ${serviceKey}`,
+      "Content-Type": "application/json",
+    },
+    cache: "no-store",
+  });
+  const rawData = apiRes.ok ? await apiRes.json() : [];
+  console.log("[recherche] fetch count:", Array.isArray(rawData) ? rawData.length : "not array", "noms:", Array.isArray(rawData) ? rawData.map((a) => a.nom).join(", ") : "");
   console.log("[recherche] rawData count:", rawData?.length, "error:", rawError?.message);
   console.log("[recherche] noms:", (rawData ?? []).map((a: any) => a.nom).join(", "));
   console.log("[recherche] rawData[1]:", JSON.stringify(rawData?.[1]));
