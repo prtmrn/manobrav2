@@ -227,8 +227,8 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   let query = (admin as any)
     .from("profiles_artisans")
     .select(
-      "id, nom, prenom, metier, ville, code_postal, photo_url, bio, siret, " +
-        "note_moyenne, nombre_avis, abonnement_pro, latitude, longitude, disponible_urgence"
+      "id, nom, prenom, metier, ville, code_postal, photo_url, " +
+        "note_moyenne, nombre_avis, abonnement_pro, latitude, longitude"
     )
     .eq("actif", true);
 
