@@ -231,7 +231,7 @@ export default async function DashboardartisanPage() {
 
   // ── Données profil ────────────────────────────────────────────────────────
   const artisan = profileRes.data as PrestaProfile | null;
-  if (!artisan?.nom) redirect("/onboarding/artisan");
+  // Onboarding skippable — l'artisan peut accéder au dashboard sans compléter son profil
 
   const fullName = `${artisan.prenom ?? ""} ${artisan.nom ?? ""}`.trim();
 
