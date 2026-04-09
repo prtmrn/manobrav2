@@ -242,7 +242,6 @@ export default async function RecherchePage({ searchParams }: PageProps) {
     cache: "no-store",
   });
   const rawData = apiRes.ok ? await apiRes.json() : [];
-  console.log("[recherche] fetch count:", Array.isArray(rawData) ? rawData.length : "not array", "noms:", Array.isArray(rawData) ? rawData.map((a) => a.nom).join(", ") : "");
 
   // ── 3. City autocomplete list ──────────────────────────────────────────────
   const { data: citiesData } = await admin
@@ -259,7 +258,6 @@ export default async function RecherchePage({ searchParams }: PageProps) {
 
   // ── 4. Enrich, filter, sort, paginate ────────────────────────────────────
   const data = (Array.isArray(rawData) ? rawData : Object.values(rawData ?? {})) as unknown as Rawartisan[];
-  console.log("[recherche] data length after conversion:", data.length, "noms:", data.map((a: any) => a.nom).join(", "));
 
   const enriched: Enrichedartisan[] = data.map((p) => {
     const prices = (p.services ?? [])
