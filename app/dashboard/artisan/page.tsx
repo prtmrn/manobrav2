@@ -233,7 +233,7 @@ export default async function DashboardartisanPage() {
   const artisan = profileRes.data as PrestaProfile | null;
   // Onboarding skippable — l'artisan peut accéder au dashboard sans compléter son profil
 
-  const fullName = `${artisan.prenom ?? ""} ${artisan.nom ?? ""}`.trim();
+  const fullName = `${artisan?.prenom ?? ""} ${artisan?.nom ?? ""}`.trim();
 
   // ── Calcul des stats ──────────────────────────────────────────────────────
   const statsRows = (statsRes.data ?? []) as {
@@ -251,15 +251,15 @@ export default async function DashboardartisanPage() {
 
   // -- Calcul de l'etat d'onboarding
   const profileComplete =
-    !!(artisan.nom && artisan.prenom && artisan.metier && artisan.ville);
+    !!(artisan?.nom && artisan?.prenom && artisan?.metier && artisan?.ville);
 
   const onboardingStatus: OnboardingStatus = {
     savedStep:        0,
     profileComplete,
     hasService:       (servicesRes.count ?? 0) > 0,
     hasDisponibilite: (dispoRes.count ?? 0) > 0,
-    stripeConnected:  artisan.stripe_onboarding_complete === true,
-    hasSubscription:  !!(artisan.plan_actif && artisan.plan_actif !== "aucun"),
+    stripeConnected:  artisan?.stripe_onboarding_complete === true,
+    hasSubscription:  !!(artisan?.plan_actif && artisan?.plan_actif !== "aucun"),
   };
 
   const onboardingComplete =
@@ -270,7 +270,7 @@ export default async function DashboardartisanPage() {
     onboardingStatus.hasSubscription;
 
   // ── Abonnement ────────────────────────────────────────────────────────────
-  const plan = (artisan.plan_actif ?? "aucun") as PlanActif;
+  const plan = (artisan?.plan_actif ?? "aucun") as PlanActif;
 
   const planConfig: Record<PlanActif, { label: string; color: string; bg: string; dot: string }> = {
     aucun:     { label: "Aucun plan",     color: "text-gray-500",  bg: "bg-gray-50",   dot: "bg-gray-300" },
@@ -287,8 +287,8 @@ export default async function DashboardartisanPage() {
     paused:   "En pause",
   };
 
-  const renewalDate = artisan.subscription_end_date
-    ? new Date(artisan.subscription_end_date).toLocaleDateString("fr-FR", {
+  const renewalDate = artisan?.subscription_end_date
+    ? new Date(artisan?.subscription_end_date).toLocaleDateString("fr-FR", {
         day: "numeric", month: "long", year: "numeric",
       })
     : null;
@@ -307,8 +307,8 @@ export default async function DashboardartisanPage() {
         {/* Avatar */}
         <div className="relative w-16 h-16 rounded-2xl overflow-hidden ring-4
                         ring-white shadow-md flex-shrink-0 bg-gray-100">
-          {artisan.photo_url ? (
-            <Image src={artisan.photo_url} alt={fullName}
+          {artisan?.photo_url ? (
+            <Image src={artisan?.photo_url} alt={fullName}
                    fill className="object-cover" unoptimized />
           ) : (
             <div className="w-full h-full bg-brand-600 flex items-center justify-center">
@@ -322,16 +322,16 @@ export default async function DashboardartisanPage() {
         {/* Infos */}
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl font-bold text-gray-900 leading-tight">
-            {greeting}, {artisan.prenom ?? fullName}&nbsp;👋
+            {greeting}, {artisan?.prenom ?? fullName}&nbsp;👋
           </h1>
           <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-2 flex-wrap">
-            {artisan.metier && (
-              <span className="font-medium text-brand-600">{artisan.metier}</span>
+            {artisan?.metier && (
+              <span className="font-medium text-brand-600">{artisan?.metier}</span>
             )}
-            {artisan.metier && artisan.ville && (
+            {artisan?.metier && artisan?.ville && (
               <span className="text-gray-300">·</span>
             )}
-            {artisan.ville && (
+            {artisan?.ville && (
               <span className="flex items-center gap-1">
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -339,7 +339,7 @@ export default async function DashboardartisanPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                {artisan.ville}
+                {artisan?.ville}
               </span>
             )}
           </p>
@@ -348,12 +348,12 @@ export default async function DashboardartisanPage() {
         {/* Badge statut */}
         <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
                           text-xs font-semibold flex-shrink-0 ${
-          artisan.actif
+          artisan?.actif
             ? "bg-green-50 text-green-700 ring-1 ring-green-200"
             : "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
         }`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${artisan.actif ? "bg-green-500" : "bg-amber-400"}`} />
-          {artisan.actif ? "Profil visible" : "En attente de validation"}
+          <span className={`w-1.5 h-1.5 rounded-full ${artisan?.actif ? "bg-green-500" : "bg-amber-400"}`} />
+          {artisan?.actif ? "Profil visible" : "En attente de validation"}
         </span>
       </div>
 
@@ -363,7 +363,7 @@ export default async function DashboardartisanPage() {
       )}
 
       {/* Alerte profil inactif */}
-      {!artisan.actif && (
+      {!artisan?.actif && (
         <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl p-4">
           <svg className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd"
@@ -421,8 +421,8 @@ export default async function DashboardartisanPage() {
               </svg>
             </div>
             <p className="text-2xl font-bold text-gray-900 tabular-nums">
-              {artisan.note_moyenne > 0
-                ? artisan.note_moyenne.toFixed(1)
+              {artisan?.note_moyenne > 0
+                ? artisan?.note_moyenne.toFixed(1)
                 : "N/A"}
             </p>
             <p className="text-xs font-medium text-gray-500 mt-0.5">Note moyenne</p>
@@ -438,7 +438,7 @@ export default async function DashboardartisanPage() {
               </svg>
             </div>
             <p className="text-2xl font-bold text-gray-900 tabular-nums">
-              {artisan.nombre_avis}
+              {artisan?.nombre_avis}
             </p>
             <p className="text-xs font-medium text-gray-500 mt-0.5">Avis clients</p>
             <p className="text-[11px] text-gray-400 mt-0.5">au total</p>
@@ -723,15 +723,15 @@ export default async function DashboardartisanPage() {
                   {planConfig[plan].label}
                 </span>
               </div>
-              {artisan.subscription_status && artisan.subscription_status !== "canceled" && (
+              {artisan?.subscription_status && artisan?.subscription_status !== "canceled" && (
                 <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
-                  artisan.subscription_status === "active"
+                  artisan?.subscription_status === "active"
                     ? "bg-green-100 text-green-700"
-                    : artisan.subscription_status === "trialing"
+                    : artisan?.subscription_status === "trialing"
                     ? "bg-blue-100 text-blue-700"
                     : "bg-red-100 text-red-600"
                 }`}>
-                  {subStatusLabel[artisan.subscription_status] ?? artisan.subscription_status}
+                  {subStatusLabel[artisan?.subscription_status] ?? artisan?.subscription_status}
                 </span>
               )}
             </div>
