@@ -154,7 +154,7 @@ export default function SearchMapView({ artisans, modeUrgence = false }: SearchM
   const markersRef = useRef<any[]>([]);
   const [selectedArtisan, setSelectedArtisan] = useState<ArtisanCard | null>(null);
   const [view, setView] = useState<"liste" | "carte">("carte");
-  const artisansAvecCoords = artisans.filter(a => a.latitude && a.longitude);
+  const artisansAvecCoords: ArtisanCard[] = artisans.filter(a => a.latitude && a.longitude);
 
   const handleSelectArtisan = useCallback((artisan: ArtisanCard) => {
     setSelectedArtisan(artisan);
