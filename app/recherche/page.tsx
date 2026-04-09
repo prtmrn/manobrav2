@@ -306,8 +306,11 @@ export default async function RecherchePage({ searchParams }: PageProps) {
       ville: p.ville,
       photo_url: p.photo_url,
       note_moyenne: p.note_moyenne,
+      nombre_avis: p.nombre_avis,
       latitude: p.latitude!,
       longitude: p.longitude!,
+      prixMin: p.prixMin ?? null,
+      disponible_urgence: false,
     }));
 
   // ── Render ─────────────────────────────────────────────────────────────────
