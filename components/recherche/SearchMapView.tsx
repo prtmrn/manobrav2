@@ -9,7 +9,7 @@ export interface ArtisanCard {
   id: string;
   nom: string | null;
   prenom: string | null;
-  metier: string | null;
+  metier: string | string[] | null;
   ville: string | null;
   photo_url: string | null;
   note_moyenne: number;
@@ -41,7 +41,8 @@ function StarRow({ note }: { note: number }) {
 
 function ArtisanListCard({ artisan, onClick, selected }: { artisan: ArtisanCard; onClick: () => void; selected: boolean }) {
   const nom = `${artisan.prenom ?? ""} ${artisan.nom ?? ""}`.trim() || "Artisan";
-  const config = getMetierConfig(artisan.metier ?? "Autre");
+  const metierStr = Array.isArray(artisan.metier) ? artisan.metier[0] : (artisan.metier ?? "Autre");
+  const config = getMetierConfig(metierStr);
   const initials = nom.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
 
   return (
@@ -87,7 +88,8 @@ function ArtisanListCard({ artisan, onClick, selected }: { artisan: ArtisanCard;
 
 function ArtisanDetail({ artisan, onBack }: { artisan: ArtisanCard; onBack: () => void }) {
   const nom = `${artisan.prenom ?? ""} ${artisan.nom ?? ""}`.trim() || "Artisan";
-  const config = getMetierConfig(artisan.metier ?? "Autre");
+  const metierStr = Array.isArray(artisan.metier) ? artisan.metier[0] : (artisan.metier ?? "Autre");
+  const config = getMetierConfig(metierStr);
   const initials = nom.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
   const siretVerifie = !!artisan.siret;
   const fmtEuro = (n: number) => new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
@@ -228,7 +230,8 @@ export default function SearchMapView({ artisans, modeUrgence = false }: SearchM
       markersRef.current = [];
 
       artisansAvecCoords.forEach((artisan) => {
-        const config = getMetierConfig(artisan.metier ?? "Autre");
+        const metierStr = Array.isArray(artisan.metier) ? artisan.metier[0] : (artisan.metier ?? "Autre");
+  const config = getMetierConfig(metierStr);
         const isUrgence = modeUrgence && artisan.disponible_urgence;
         const color = isUrgence ? "#ef4444" : (modeUrgence ? "#d1d5db" : config.color);
         const nom = `${artisan.prenom ?? ""} ${artisan.nom ?? ""}`.trim() || "Artisan";
