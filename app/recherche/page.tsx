@@ -225,15 +225,15 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   // ── 2. Main query via fetch direct ────────────────────────────────────────
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  const params = new URLSearchParams({
+  const queryParams = new URLSearchParams({
     select: "id,nom,prenom,metier,ville,code_postal,photo_url,note_moyenne,nombre_avis,abonnement_pro,latitude,longitude",
     actif: "eq.true",
     order: "note_moyenne.desc",
   });
-  if (metierFilter) params.append("metier", `cs.{${metierFilter}}`);
-  if (villeFilter) params.append("or", `(ville.ilike.*${villeFilter}*,code_postal.ilike.*${villeFilter}*)`);
-  if (noteMin !== null && noteMin > 0) params.append("note_moyenne", `gte.${noteMin}`);
-  const apiRes = await fetch(`${supabaseUrl}/rest/v1/profiles_artisans?${params.toString()}`, {
+  if (metierFilter) queryParams.append("metier", `cs.{${metierFilter}}`);
+  if (villeFilter) queryParams.append("or", `(ville.ilike.*${villeFilter}*,code_postal.ilike.*${villeFilter}*)`);
+  if (noteMin !== null && noteMin > 0) queryParams.append("note_moyenne", `gte.${noteMin}`);
+  const apiRes = await fetch(`${supabaseUrl}/rest/v1/profiles_artisans?${queryParams.toString()}`, {
     headers: {
       "apikey": serviceKey,
       "Authorization": `Bearer ${serviceKey}`,
