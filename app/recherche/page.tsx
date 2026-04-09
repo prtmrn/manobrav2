@@ -62,7 +62,7 @@ type Rawartisan = {
   abonnement_pro: boolean;
   latitude: number | null;
   longitude: number | null;
-  services?: { prix: number | null }[];
+  services: { prix: number | null }[];
 };
 
 type Enrichedartisan = Rawartisan & {
@@ -225,7 +225,8 @@ export default async function RecherchePage({ searchParams }: PageProps) {
     .from("profiles_artisans")
     .select(
       "id, nom, prenom, metier, ville, code_postal, photo_url, " +
-        "note_moyenne, nombre_avis, abonnement_pro, latitude, longitude"
+        "note_moyenne, nombre_avis, abonnement_pro, latitude, longitude, " +
+        "services(prix)"
     )
     .eq("actif", true);
 
