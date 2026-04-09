@@ -63,6 +63,9 @@ type Rawartisan = {
   latitude: number | null;
   longitude: number | null;
   services?: { prix: number | null }[];
+  siret?: string | null;
+  bio?: string | null;
+  disponible_urgence?: boolean;
 };
 
 type Enrichedartisan = Rawartisan & {
@@ -224,8 +227,8 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   let query = (admin as any)
     .from("profiles_artisans")
     .select(
-      "id, nom, prenom, metier, ville, code_postal, photo_url, " +
-        "note_moyenne, nombre_avis, abonnement_pro, latitude, longitude"
+      "id, nom, prenom, metier, ville, code_postal, photo_url, bio, siret, " +
+        "note_moyenne, nombre_avis, abonnement_pro, latitude, longitude, disponible_urgence"
     )
     .eq("actif", true);
 
@@ -309,7 +312,9 @@ export default async function RecherchePage({ searchParams }: PageProps) {
       latitude: p.latitude!,
       longitude: p.longitude!,
       prixMin: p.prixMin ?? null,
-      disponible_urgence: false,
+      disponible_urgence: p.disponible_urgence ?? false,
+      siret: (p as any).siret ?? null,
+      bio: (p as any).bio ?? null,
     }));
 
   // ── Render ─────────────────────────────────────────────────────────────────

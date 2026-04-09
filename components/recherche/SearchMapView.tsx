@@ -18,6 +18,8 @@ export interface ArtisanCard {
   longitude: number | null;
   prixMin: number | null;
   disponible_urgence?: boolean;
+  siret?: string | null;
+  bio?: string | null;
 }
 
 interface SearchMapViewProps {
@@ -87,62 +89,89 @@ function ArtisanDetail({ artisan, onBack }: { artisan: ArtisanCard; onBack: () =
   const nom = `${artisan.prenom ?? ""} ${artisan.nom ?? ""}`.trim() || "Artisan";
   const config = getMetierConfig(artisan.metier ?? "Autre");
   const initials = nom.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+  const siretVerifie = !!artisan.siret;
+  const fmtEuro = (n: number) => new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
 
   return (
     <div className="flex flex-col h-full">
-      <button onClick={onBack} className="flex items-center gap-2 text-sm text-brand-600 font-medium mb-4 hover:text-brand-700">
+      <button onClick={onBack} className="flex items-center gap-2 text-sm text-brand-600 font-medium mb-3 hover:text-brand-700">
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
         Retour à la liste
       </button>
 
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4">
-        <div className="flex items-center gap-4">
-          {artisan.photo_url ? (
-            <div className="relative w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0">
-              <Image src={artisan.photo_url} alt={nom} fill className="object-cover" unoptimized />
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-4">
+        {/* Header */}
+        <div className="flex items-start gap-4">
+          {/* Photo + badge SIRET */}
+          <div className="relative flex-shrink-0">
+            <div className={`w-16 h-16 rounded-full overflow-hidden border-2 ${siretVerifie ? "border-brand-500" : "border-gray-200"}`}>
+              {artisan.photo_url ? (
+                <div className="relative w-full h-full">
+                  <Image src={artisan.photo_url} alt={nom} fill className="object-cover" unoptimized />
+                </div>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-white font-bold text-lg"
+                  style={{ backgroundColor: config.color }}>
+                  {initials}
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-white font-bold text-lg"
-              style={{ backgroundColor: config.color }}>
-              {initials}
+            {siretVerifie && (
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-brand-500 rounded-full flex items-center justify-center border-2 border-white">
+                <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            )}
+          </div>
+
+          {/* Infos */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-base font-bold text-gray-900">{nom}</h2>
+              {artisan.disponible_urgence && (
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                  Disponible immédiatement
+                </span>
+              )}
             </div>
-          )}
-          <div>
-            <h2 className="text-lg font-bold text-gray-900">{nom}</h2>
             <p className="text-sm text-gray-500">{config.label}</p>
             {artisan.ville && <p className="text-xs text-gray-400 mt-0.5">{artisan.ville}</p>}
           </div>
         </div>
 
-        {artisan.note_moyenne > 0 && (
+        {/* Note */}
+        {artisan.note_moyenne > 0 ? (
           <div className="flex items-center gap-2">
             <StarRow note={artisan.note_moyenne} />
             <span className="text-sm font-semibold text-gray-700">{artisan.note_moyenne.toFixed(1)}</span>
             <span className="text-sm text-gray-400">({artisan.nombre_avis} avis)</span>
           </div>
+        ) : (
+          <p className="text-xs text-gray-400">Pas encore d'avis</p>
         )}
 
-        {artisan.prixMin && (
+        {/* Prix */}
+        {artisan.prixMin != null && (
           <p className="text-sm text-gray-600">
-            À partir de <span className="font-semibold text-brand-600">
-              {new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(artisan.prixMin)}
-            </span>
+            À partir de <span className="font-semibold text-brand-600">{fmtEuro(artisan.prixMin)}</span>
           </p>
         )}
 
-        {artisan.disponible_urgence && (
-          <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl p-3">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
-            <span className="text-sm font-medium text-red-700">Disponible en urgence</span>
-          </div>
-        )}
-
-        <Link href={`/prestataires/${artisan.id}`}
-          className="block w-full text-center bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-xl transition-colors">
-          Demander une intervention
-        </Link>
+        {/* Boutons */}
+        <div className="flex gap-2 pt-1">
+          <Link href={`/prestataires/${artisan.id}`}
+            className="flex-1 text-center text-sm border border-brand-600 text-brand-600 hover:bg-brand-50 font-semibold py-2.5 rounded-xl transition-colors">
+            Voir le profil
+          </Link>
+          <Link href={`/prestataires/${artisan.id}#reserver`}
+            className="flex-1 text-center text-sm bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-xl transition-colors">
+            Demander
+          </Link>
+        </div>
       </div>
     </div>
   );
