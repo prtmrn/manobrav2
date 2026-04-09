@@ -41,6 +41,7 @@ export default async function DashboardPage() {
     redirect("/dashboard/artisan");
   }
 
-  // Client → dashboard générique (à enrichir)
+  if (role === "admin") redirect("/dashboard/admin");
+  // Client
   redirect("/dashboard/client");
 }

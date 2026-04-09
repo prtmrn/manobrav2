@@ -20,8 +20,17 @@ export async function middleware(request: NextRequest) {
   }
 
   // Rediriger vers dashboard si déjà connecté et sur une route auth
-  // Note : /auth/reset-password est exclu (session de récupération de MDP)
   if (AUTH_ONLY_ROUTES.includes(pathname) && user) {
+    // Récupérer le rôle pour rediriger vers le bon dashboard
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    const role = (profile as any)?.role;
+    if (role === "artisan") return NextResponse.redirect(new URL("/dashboard/artisan", request.url));
+    if (role === "client") return NextResponse.redirect(new URL("/dashboard/client", request.url));
+    if (role === "admin") return NextResponse.redirect(new URL("/dashboard/admin", request.url));
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
