@@ -424,7 +424,8 @@ export default async function RecherchePage({ searchParams }: PageProps) {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {paginated.map((p, cardIndex) => {
-                  const config = getMetierConfig(p.metier);
+                  const metierVal = Array.isArray(p.metier) ? p.metier[0] : p.metier;
+                  const config = getMetierConfig(metierVal);
                   return (
                     <Link
                       key={p.id}
