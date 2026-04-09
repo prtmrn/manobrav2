@@ -292,7 +292,7 @@ export default function SearchMapView({ artisans, modeUrgence = false }: SearchM
                     key={a.id}
                     artisan={a}
                     onClick={() => handleSelectArtisan(a)}
-                    selected={selectedArtisan?.id === a.id}
+                    selected={selectedArtisan !== null && selectedArtisan.id === a.id}
                   />
                 ))
               )}
