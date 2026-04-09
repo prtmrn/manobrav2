@@ -268,7 +268,8 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   ) as string[];
 
   // ── 4. Enrich, filter, sort, paginate ────────────────────────────────────
-  const data = (rawData ?? []) as unknown as Rawartisan[];
+  const data = (Array.isArray(rawData) ? rawData : Object.values(rawData ?? {})) as unknown as Rawartisan[];
+  console.log("[recherche] data length after conversion:", data.length, "noms:", data.map((a: any) => a.nom).join(", "));
 
   const enriched: Enrichedartisan[] = data.map((p) => {
     const prices = (p.services ?? [])
