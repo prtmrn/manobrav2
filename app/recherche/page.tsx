@@ -233,7 +233,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
     .eq("actif", true);
 
   if (metierFilter) {
-    query = query.eq("metier", metierFilter);
+    query = query.contains("metier", [metierFilter]);
   }
 
   if (villeFilter) {
@@ -251,6 +251,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
     ascending: false,
   });
   console.log("[recherche] rawData count:", rawData?.length, "error:", rawError?.message);
+  console.log("[recherche] noms:", (rawData ?? []).map((a: any) => a.nom).join(", "));
 
   // ── 3. City autocomplete list ──────────────────────────────────────────────
   const { data: citiesData } = await admin
