@@ -53,7 +53,7 @@ type Rawartisan = {
   id: string;
   nom: string | null;
   prenom: string | null;
-  metier: string | null;
+  metier: string | string[] | null;
   ville: string | null;
   code_postal: string | null;
   photo_url: string | null;
@@ -247,9 +247,10 @@ export default async function RecherchePage({ searchParams }: PageProps) {
     query = query.gte("note_moyenne", noteMin);
   }
 
-  const { data: rawData } = await query.order("note_moyenne", {
+  const { data: rawData, error: rawError } = await query.order("note_moyenne", {
     ascending: false,
   });
+  console.log("[recherche] rawData count:", rawData?.length, "error:", rawError?.message);
 
   // ── 3. City autocomplete list ──────────────────────────────────────────────
   const { data: citiesData } = await admin
