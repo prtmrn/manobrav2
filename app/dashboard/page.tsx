@@ -26,18 +26,6 @@ export default async function DashboardPage() {
   const role = (profile as any)?.role as UserRole | null;
 
   if (role === "artisan") {
-    // Vérifier si l'onboarding est terminé (nom renseigné)
-    // @ts-ignore Supabase generated types
-  // @ts-ignore
-  const { data: artisan } = await supabase
-      .from("profiles_artisans")
-      .select("nom")
-      .eq("id", user.id)
-      .single();
-
-    if (!(artisan as any)?.nom) {
-      redirect("/onboarding/artisan");
-    }
     redirect("/dashboard/artisan");
   }
 
