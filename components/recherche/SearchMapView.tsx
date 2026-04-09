@@ -275,29 +275,33 @@ export default function SearchMapView({ artisans, modeUrgence = false }: SearchM
           sm:w-80 sm:flex-shrink-0
           ${view === "liste" ? "flex w-full" : "hidden sm:flex"}
         `}>
-          {selectedArtisan ? (
-            <ArtisanDetail artisan={selectedArtisan} onBack={() => setSelectedArtisan(null)} />
-          ) : (
-            <>
-              <p className="text-xs text-gray-400 flex-shrink-0">
-                {artisansAvecCoords.length} artisan{artisansAvecCoords.length > 1 ? "s" : ""} sur la carte
-              </p>
-              {artisansAvecCoords.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-40 text-gray-400">
-                  <p className="text-sm">Aucun artisan géolocalisé</p>
-                </div>
-              ) : (
-                (artisansAvecCoords as ArtisanCard[]).map((a: ArtisanCard) => (
-                  <ArtisanListCard
-                    key={a.id}
-                    artisan={a}
-                    onClick={() => handleSelectArtisan(a)}
-                    selected={selectedArtisan !== null && selectedArtisan.id === a.id}
-                  />
-                ))
-              )}
-            </>
-          )}
+          {(() => {
+            const selId = selectedArtisan?.id ?? null;
+            if (selectedArtisan) {
+              return <ArtisanDetail artisan={selectedArtisan} onBack={() => setSelectedArtisan(null)} />;
+            }
+            return (
+              <>
+                <p className="text-xs text-gray-400 flex-shrink-0">
+                  {artisansAvecCoords.length} artisan{artisansAvecCoords.length > 1 ? "s" : ""} sur la carte
+                </p>
+                {artisansAvecCoords.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-40 text-gray-400">
+                    <p className="text-sm">Aucun artisan géolocalisé</p>
+                  </div>
+                ) : (
+                  (artisansAvecCoords as ArtisanCard[]).map((a: ArtisanCard) => (
+                    <ArtisanListCard
+                      key={a.id}
+                      artisan={a}
+                      onClick={() => handleSelectArtisan(a)}
+                      selected={selId === a.id}
+                    />
+                  ))
+                )}
+              </>
+            );
+          })()}
         </div>
 
         {/* ── CARTE DROITE ── */}
