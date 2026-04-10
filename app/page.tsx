@@ -277,7 +277,7 @@ export default async function HomePage() {
         {/* ══════════════════════════════════════════════════════════════════ */}
         {/*  NAVBAR                                                           */}
         {/* ══════════════════════════════════════════════════════════════════ */}
-        <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100">
+        <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 relative">
           <nav className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 group">
