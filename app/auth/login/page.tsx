@@ -61,7 +61,7 @@ export default function LoginPage() {
         </div>
 
         {/* Formulaire */}
-        <LoginForm />
+        <LoginForm mode={mode} />
 
         <div className="flex items-center justify-between text-sm">
           <Link href="/auth/register" className="text-brand-600 hover:text-brand-700 font-medium">

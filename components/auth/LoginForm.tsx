@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export default function LoginForm() {
+export default function LoginForm({ mode = "client",  mode = "client" }: { mode?: "client" | "artisan" }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,15 +17,34 @@ export default function LoginForm() {
     setError(null);
 
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data: signInData, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      setError(error.message);
+      setError("Email ou mot de passe incorrect.");
       setLoading(false);
       return;
     }
 
     router.push("/dashboard");
+    // Vérifier que le rôle correspond au mode sélectionné
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", signInData.user!.id)
+      .single();
+    const role = (profile as any)?.role;
+    if (mode === "client" && role === "artisan") {
+      await supabase.auth.signOut();
+      setError("Ce compte est un compte artisan. Veuillez utiliser le mode Artisan.");
+      setLoading(false);
+      return;
+    }
+    if (mode === "artisan" && role === "client") {
+      await supabase.auth.signOut();
+      setError("Ce compte est un compte client. Veuillez utiliser le mode Client.");
+      setLoading(false);
+      return;
+    }
     router.refresh();
   }
 
