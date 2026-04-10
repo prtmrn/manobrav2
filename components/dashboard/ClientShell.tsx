@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSelectedLayoutSegment } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface ClientShellProps {
   children: React.ReactNode;
@@ -15,6 +15,18 @@ export default function ClientShell({ children, userEmail, userName }: ClientShe
   const pathname = usePathname();
   const router = useRouter();
   const [showFab, setShowFab] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const cta = document.getElementById("cta-top");
@@ -89,16 +101,33 @@ export default function ClientShell({ children, userEmail, userName }: ClientShe
             </Link>
 
             {/* Avatar + déconnexion */}
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+            <div className="relative flex items-center gap-2" ref={menuRef}>
+              <button
+                onClick={() => setMenuOpen(o => !o)}
+                className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-green-400"
+              >
                 <span className="text-xs font-bold text-white">{initials}</span>
-              </div>
+              </button>
               <button
                 onClick={handleSignOut}
                 className="text-xs text-gray-400 hover:text-red-500 transition-colors hidden sm:block"
               >
                 Déconnexion
               </button>
+              {menuOpen && (
+                <div className="absolute right-0 top-10 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+                  <div className="px-4 py-2 text-xs text-gray-400 border-b border-gray-100 truncate">{userEmail}</div>
+                  <Link href="/dashboard/client/profil" className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                    Mon profil
+                  </Link>
+                  <Link href="/dashboard/client/reservations" className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                    Mes réservations
+                  </Link>
+                  <button onClick={handleSignOut} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50">
+                    Déconnexion
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
