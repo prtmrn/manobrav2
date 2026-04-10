@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export default function LoginForm({ mode = "client",  mode = "client" }: { mode?: "client" | "artisan" }) {
+export default function LoginForm({ mode = "client" }: { mode?: "client" | "artisan" }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
