@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const NAV_LINKS = [
-  { href: "/recherche", label: "Trouver un pro" },
+  { href: "/recherche", label: "Trouver un artisan" },
   { href: "/metiers", label: "Nos métiers" },
   { href: "/qui-sommes-nous", label: "Qui sommes-nous" },
   { href: "/blog", label: "Blog" },
