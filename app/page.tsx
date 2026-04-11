@@ -290,12 +290,7 @@ export default async function HomePage() {
 
             {/* Links */}
             <div className="hidden sm:flex items-center gap-6 text-sm text-gray-600">
-              <Link href="/recherche" className="hover:text-brand-600 transition-colors font-medium">
-                Trouver un pro
-              </Link>
-              <Link href="/map" className="hover:text-brand-600 transition-colors font-medium">
-                Carte
-              </Link>
+
             </div>
 
             {/* Auth */}
