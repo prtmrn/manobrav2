@@ -13,7 +13,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     .eq("id", user.id)
     .single();
 
-  if ((profile as any)?.role !== "admin") redirect("/dashboard");
+  if ((profile as any)?.role !== "admin") redirect("/auth/login");
 
   return (
     <AdminShell userEmail={user.email ?? ""}>
