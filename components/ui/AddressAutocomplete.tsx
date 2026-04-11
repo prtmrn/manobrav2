@@ -108,7 +108,7 @@ export default function AddressAutocomplete({ value, onChange, placeholder, inpu
         </div>
       )}
       {open && suggestions.length > 0 && (
-        <ul className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+        <ul className="fixed z-[9999] bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto" style={{ width: containerRef.current?.getBoundingClientRect().width, left: containerRef.current?.getBoundingClientRect().left, top: (containerRef.current?.getBoundingClientRect().bottom ?? 0) + 4 }}>
           {suggestions.map((s, i) => (
             <li
               key={i}
