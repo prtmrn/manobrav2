@@ -1,4 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import AdminClientActions from "@/components/admin/AdminClientActions";
+import AdminClientActions from "@/components/admin/AdminClientActions";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Clients | Admin Manobra" };
@@ -44,6 +46,8 @@ export default async function AdminClientsPage() {
               <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Client</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Réservations</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Inscrit le</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
@@ -67,6 +71,7 @@ export default async function AdminClientsPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-gray-400 text-xs">{date}</td>
+                  <td className="px-4 py-3"><AdminClientActions clientId={c.id} /></td>
                 </tr>
               );
             })}
