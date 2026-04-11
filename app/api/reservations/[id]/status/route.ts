@@ -130,7 +130,7 @@ export async function PATCH(request: Request, context: RouteContext) {
         const color = newStatut === "confirme" ? "#16a34a" : "#dc2626";
 
         await sendBrevoEmail({
-          to: clientEmail,
+          to: [{ email: clientEmail, name: clientPrenom }],
           subject,
           htmlContent: `
             <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px">
@@ -148,7 +148,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     // Email artisan si client annule
     if (role === "client" && newStatut === "annule" && artisanEmail) {
       await sendBrevoEmail({
-        to: artisanEmail,
+        to: [{ email: artisanEmail, name: artisan?.prenom ?? '' }],
         subject: `Réservation annulée — ${serviceTitre}`,
         htmlContent: `
           <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px">
