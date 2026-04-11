@@ -52,26 +52,25 @@ export default function RegisterForm({ defaultRole }: { defaultRole?: "client" |
   if (success) {
     const loginUrl = role === "artisan" ? "https://artisan.manobra.fr/auth/login" : "/auth/login";
     return (
-      <div className="bg-green-50 border border-green-200 rounded-2xl p-8 text-center space-y-2">
+      <div className="bg-green-50 border border-green-200 rounded-2xl p-8 text-center space-y-3">
         <p className="font-semibold text-green-800">Vérifiez vos emails !</p>
         <p className="text-sm text-green-700">
           Un lien de confirmation a été envoyé à{" "}
           <span className="font-medium">{email}</span>.
         </p>
-        <p className="text-sm text-green-600 mt-2">
+        <p className="text-sm text-green-600">
           Vous vous êtes inscrit en tant que{" "}
-          <span className="font-semibold capitalize">{role === "artisan" ? "Artisan" : "Client"}</span>.
+          <span className="font-semibold">{role === "artisan" ? "Artisan" : "Client"}</span>.
         </p>
         
           href={loginUrl}
-          className="inline-block mt-4 px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg text-sm transition-colors"
+          className="inline-block mt-2 px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg text-sm transition-colors"
         >
           Accéder à mon espace
         </a>
       </div>
     );
   }
-
   return (
     <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-2xl p-8 space-y-5 shadow-sm">
       {error && (
