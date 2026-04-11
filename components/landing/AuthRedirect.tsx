@@ -24,9 +24,9 @@ export default function AuthRedirect() {
         .maybeSingle() as { data: { role: string } | null };
 
       if (profile?.role === "artisan") {
-        router.replace("/dashboard/artisan");
+        router.replace("/dashboard");
       } else if (profile?.role === "client") {
-        router.replace("/dashboard/client");
+        router.replace("/dashboard");
       } else {
         setChecking(false);
       }

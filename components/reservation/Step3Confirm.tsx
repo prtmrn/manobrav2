@@ -192,7 +192,7 @@ function SuccessView({
       <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
         {!isGuest && (
           <Link
-            href="/dashboard/client/reservations"
+            href="/dashboard/reservations"
             className="px-6 py-3 rounded-xl font-semibold text-white bg-brand-500 hover:bg-brand-600 transition-colors"
           >
             Voir mes réservations

@@ -343,7 +343,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
               Vue carte globale
             </Link>
             <Link
-              href="/dashboard/client"
+              href="/dashboard"
               className="text-sm font-medium text-gray-700 hover:text-brand-600 transition-colors"
             >
               Mon espace

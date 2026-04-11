@@ -109,7 +109,7 @@ export default async function AvisPage({ params }: PageProps) {
             <strong className="text-gray-700"> {resa.statut?.replace("_", " ")}</strong>.
           </p>
           <Link
-            href="/dashboard/client"
+            href="/dashboard"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm hover:bg-brand-700 transition-colors"
           >
             Retour au tableau de bord
@@ -163,7 +163,7 @@ export default async function AvisPage({ params }: PageProps) {
             </div>
 
             <Link
-              href="/dashboard/client"
+              href="/dashboard"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm hover:bg-brand-700 transition-colors"
             >
               Retour au tableau de bord
@@ -187,7 +187,7 @@ export default async function AvisPage({ params }: PageProps) {
       <nav className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-gray-100 h-14">
         <div className="max-w-lg mx-auto px-4 h-full flex items-center justify-between">
           <Link
-            href="/dashboard/client"
+            href="/dashboard"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500
                        hover:text-gray-900 transition-colors group"
           >

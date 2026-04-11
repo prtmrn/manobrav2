@@ -114,7 +114,7 @@ function CheckoutForm({
       clientSecret,
       confirmParams: {
         // Fallback si une redirection est quand même nécessaire (ex : Bancontact)
-        return_url: `${window.location.origin}/dashboard/client/reservations?payment=redirect`,
+        return_url: `${window.location.origin}/dashboard/reservations?payment=redirect`,
       },
       redirect: "if_required",
     });

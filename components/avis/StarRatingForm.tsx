@@ -69,7 +69,7 @@ export default function StarRatingForm({ reservationId, artisanNom }: Props) {
           Il sera visible sur la page publique du artisan dans quelques instants.
         </p>
         <button
-          onClick={() => router.push("/dashboard/client")}
+          onClick={() => router.push("/dashboard")}
           className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-700
                      text-white font-semibold text-sm transition-colors shadow-sm"
         >
