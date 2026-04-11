@@ -1,6 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import AdminClientActions from "@/components/admin/AdminClientActions";
-import AdminClientActions from "@/components/admin/AdminClientActions";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Clients | Admin Manobra" };
