@@ -88,39 +88,19 @@ export async function middleware(request: NextRequest) {
 
   // ── MANOBRA.FR (domaine principal) ───────────────────────────────────────
   if (isMainDomain) {
-    const PROTECTED_ROUTES = ["/dashboard", "/onboarding"];
-    const AUTH_ONLY_ROUTES = ["/auth/login", "/auth/register", "/"];
-
-    // Routes protégées sans connexion → login
-    if (PROTECTED_ROUTES.some(r => pathname.startsWith(r)) && !user) {
-      const loginUrl = new URL("/auth/login", request.url);
-      loginUrl.searchParams.set("next", pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-
-    // Connecté sur auth routes → rediriger vers dashboard selon rôle
-    if (AUTH_ONLY_ROUTES.includes(pathname) && user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-      const role = (profile as any)?.role;
-      // Sur manobra.fr, connecté → rester sur le site vitrine (pas de redirection)
-      // Le bouton "Accéder à mon espace" est géré côté client dans NavbarLanding
-      return response;
-    }
-
-    // Empêcher un client d'accéder à /dashboard/artisan sur manobra.fr
-    if (pathname.startsWith("/dashboard/artisan") && user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-      const role = (profile as any)?.role;
-      if (role === "client") {
-        return NextResponse.redirect(new URL("/dashboard/client", request.url));
+    if (pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")) {
+      if (!user) {
+        const loginUrl = new URL("/auth/login", request.url);
+        loginUrl.searchParams.set("next", pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+      if (pathname === "/dashboard" || pathname === "/dashboard/") {
+        return NextResponse.rewrite(new URL("/dashboard/client", request.url));
+      }
+      if (pathname.startsWith("/dashboard/") && !pathname.startsWith("/dashboard/client")) {
+        return NextResponse.rewrite(
+          new URL(pathname.replace("/dashboard/", "/dashboard/client/"), request.url)
+        );
       }
     }
   }

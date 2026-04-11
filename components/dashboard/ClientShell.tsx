@@ -51,9 +51,10 @@ export default function ClientShell({ children, userEmail, userName }: ClientShe
     : userEmail.slice(0, 2).toUpperCase();
 
   const navLinks = [
-    { href: "/dashboard/client", label: "Accueil", exact: true },
-    { href: "/dashboard/client/reservations", label: "Mes réservations" },
-    { href: "/dashboard/client/profil", label: "Mon profil" },
+    { href: "/", label: "Accueil", exact: true, external: true },
+    { href: "/dashboard", label: "Dashboard", exact: true },
+    { href: "/dashboard/reservations", label: "Mes réservations" },
+    { href: "/dashboard/profil", label: "Mon profil" },
   ];
 
   return (
@@ -70,8 +71,8 @@ export default function ClientShell({ children, userEmail, userName }: ClientShe
 
           {/* Nav liens — desktop */}
           <nav className="hidden sm:flex items-center gap-1">
-            {navLinks.map(({ href, label, exact }) => {
-              const isActive = exact ? pathname === href : pathname.startsWith(href);
+            {navLinks.map(({ href, label, exact, external }) => {
+              const isActive = !external && (exact ? pathname === href : pathname.startsWith(href));
               return (
                 <Link
                   key={href}
@@ -117,10 +118,10 @@ export default function ClientShell({ children, userEmail, userName }: ClientShe
               {menuOpen && (
                 <div className="absolute right-0 top-10 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
                   <div className="px-4 py-2 text-xs text-gray-400 border-b border-gray-100 truncate">{userEmail}</div>
-                  <Link href="/dashboard/client/profil" className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                  <Link href="/dashboard/profil" className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
                     Mon profil
                   </Link>
-                  <Link href="/dashboard/client/reservations" className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                  <Link href="/dashboard/reservations" className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
                     Mes réservations
                   </Link>
                   <button onClick={handleSignOut} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50">
@@ -134,8 +135,8 @@ export default function ClientShell({ children, userEmail, userName }: ClientShe
 
         {/* Nav mobile — barre du bas */}
         <nav className="sm:hidden flex border-t border-gray-100">
-          {navLinks.map(({ href, label, exact }) => {
-            const isActive = exact ? pathname === href : pathname.startsWith(href);
+          {navLinks.map(({ href, label, exact, external }) => {
+            const isActive = !external && (exact ? pathname === href : pathname.startsWith(href));
             return (
               <Link
                 key={href}

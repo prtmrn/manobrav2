@@ -30,6 +30,6 @@ export default async function DashboardPage() {
   }
 
   if ((role as string) === "admin") redirect("/dashboard/admin");
-  // Client
-  redirect("/dashboard/client");
+  // Client — le middleware réécrit /dashboard → /dashboard/client
+  return null;
 }
