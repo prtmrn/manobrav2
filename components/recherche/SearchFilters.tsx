@@ -175,8 +175,7 @@ export default function SearchFilters({
           >
             <option value="">Tous les métiers</option>
             {METIER_LIST.map((m) => (
-              <option key={m} value={m}>
-              </option>
+              <option key={m} value={m}>{m}</option>
             ))}
           </select>
         </div>
