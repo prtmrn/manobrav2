@@ -50,9 +50,11 @@ export default function RegisterForm({ defaultRole }: { defaultRole?: "client" |
   }
 
   if (success) {
+    const loginUrl = role === "artisan"
+      ? "https://artisan.manobra.fr/auth/login"
+      : "/auth/login";
     return (
       <div className="bg-green-50 border border-green-200 rounded-2xl p-8 text-center space-y-2">
-        
         <p className="font-semibold text-green-800">Vérifiez vos emails !</p>
         <p className="text-sm text-green-700">
           Un lien de confirmation a été envoyé à{" "}
@@ -60,8 +62,14 @@ export default function RegisterForm({ defaultRole }: { defaultRole?: "client" |
         </p>
         <p className="text-sm text-green-600 mt-2">
           Vous vous êtes inscrit en tant que{" "}
-          <span className="font-semibold capitalize">{role}</span>.
+          <span className="font-semibold capitalize">{role === "artisan" ? "Artisan" : "Client"}</span>.
         </p>
+        
+          href={loginUrl}
+          className="inline-block mt-4 px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg text-sm transition-colors"
+        >
+          Accéder à mon espace
+        </a>
       </div>
     );
   }
