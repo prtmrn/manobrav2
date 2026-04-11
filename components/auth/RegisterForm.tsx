@@ -4,10 +4,10 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { UserRole } from "@/types";
 
-export default function RegisterForm() {
+export default function RegisterForm({ defaultRole }: { defaultRole?: "client" | "artisan" }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("client");
+  const [role, setRole] = useState<UserRole>(defaultRole ?? "client");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
