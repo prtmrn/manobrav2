@@ -50,9 +50,7 @@ export default function RegisterForm({ defaultRole }: { defaultRole?: "client" |
   }
 
   if (success) {
-    const loginUrl = role === "artisan"
-      ? "https://artisan.manobra.fr/auth/login"
-      : "/auth/login";
+    const loginUrl = role === "artisan" ? "https://artisan.manobra.fr/auth/login" : "/auth/login";
     return (
       <div className="bg-green-50 border border-green-200 rounded-2xl p-8 text-center space-y-2">
         <p className="font-semibold text-green-800">Vérifiez vos emails !</p>
