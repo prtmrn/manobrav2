@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import type { ReservationItem } from "@/app/dashboard/client/reservations/page";
+import type { ReservationItem } from "@/app/dashboard/reservations/page";
 import type { ReservationStatut } from "@/types";
 
 // ─── Statuts ───────────────────────────────────────────────────────────────────
