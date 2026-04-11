@@ -94,14 +94,7 @@ export async function middleware(request: NextRequest) {
         loginUrl.searchParams.set("next", pathname);
         return NextResponse.redirect(loginUrl);
       }
-      if (pathname === "/dashboard" || pathname === "/dashboard/") {
-        return NextResponse.rewrite(new URL("/dashboard/client", request.url));
-      }
-      if (pathname.startsWith("/dashboard/") && !pathname.startsWith("/dashboard/client")) {
-        return NextResponse.rewrite(
-          new URL(pathname.replace("/dashboard/", "/dashboard/client/"), request.url)
-        );
-      }
+
     }
   }
 

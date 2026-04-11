@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import ClientReservationsView from "@/components/dashboard/client/ClientReservationsView";
+import ClientReservationsView from "@/components/dashboard/ClientReservationsView";
 import type { ReservationStatut } from "@/types";
 
 export const metadata: Metadata = { title: "Mes réservations" };
