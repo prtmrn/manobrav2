@@ -61,8 +61,7 @@ export default function AddressAutocomplete({ value, onChange, placeholder, inpu
       setLoading(true);
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&countrycodes=fr&q=${encodeURIComponent(val)}`,
-          { headers: { "Accept-Language": "fr", "User-Agent": "Manobra/1.0 (contact@manobra.fr)" } }
+          `/api/geocode?q=${encodeURIComponent(val)}`
         );
         const data: AddressSuggestion[] = await res.json();
         setSuggestions(data);
