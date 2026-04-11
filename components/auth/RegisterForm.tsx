@@ -57,7 +57,7 @@ export default function RegisterForm({ defaultRole }: { defaultRole?: "client" |
           Vous vous êtes inscrit en tant que{" "}
           <span className="font-semibold">{role === "artisan" ? "Artisan" : "Client"}</span>.
         </p>
-        
+        <a
           href={loginUrl}
           className="inline-block mt-2 px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg text-sm transition-colors"
         >
