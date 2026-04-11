@@ -18,7 +18,12 @@ export default async function ClientDashboardLayout({
     .eq("id", user.id)
     .single();
 
-  if (!profile || (profile as any).role !== "client") redirect("/dashboard");
+  const role = (profile as any)?.role;
+  // Laisser passer admin et artisan — leurs propres layouts gèrent l'auth
+  if (role === "admin" || role === "artisan") {
+    return <>{children}</>;
+  }
+  if (role !== "client") redirect("/auth/login");
 
   const { data: client } = await supabase
     .from("profiles_clients")
