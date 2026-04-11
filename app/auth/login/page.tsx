@@ -19,7 +19,7 @@ export default async function LoginPage() {
           <h1 className="mt-3 text-xl font-bold text-gray-900">Connexion</h1>
           <p className="mt-1 text-sm text-gray-400">{label}</p>
         </div>
-        <LoginForm mode={mode} />
+        <LoginForm mode={mode as any} />
         <div className="flex items-center justify-between text-sm">
           <Link href="/auth/register" className="text-brand-600 hover:text-brand-700 font-medium">
             Créer un compte
