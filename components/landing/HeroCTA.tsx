@@ -4,16 +4,26 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export default function HeroCTA() {
-  const [role, setRole] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null | undefined>(undefined);
 
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
+      if (!user) { setRole(null); return; }
       supabase.from("profiles").select("role").eq("id", user.id).single()
         .then(({ data }) => setRole((data as any)?.role ?? null));
     });
   }, []);
+
+  if (role === undefined) {
+    return (
+      <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <span className="font-bold text-gray-900 text-3xl tracking-tight">
+          Man<span className="text-green-600">obra</span>
+        </span>
+      </div>
+    );
+  }
 
   if (role === "client") {
     return (
