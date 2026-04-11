@@ -26,8 +26,6 @@ export async function middleware(request: NextRequest) {
         .single();
       const role = (profile as any)?.role;
       if (role !== "admin") {
-        // Pas admin → déconnecter et rediriger vers login
-        await supabase.auth.signOut();
         return NextResponse.redirect(new URL("/auth/login", request.url));
       }
       // Admin connecté sur / → dashboard
