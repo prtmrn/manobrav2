@@ -57,7 +57,7 @@ export default function NavbarLanding() {
           <div className="w-24 h-8 bg-gray-100 rounded-xl animate-pulse" />
         ) : role ? (
           <Link
-            href={role === "artisan" ? "/dashboard/artisan" : role === "admin" ? "/dashboard/admin" : "/dashboard/client"}
+            href="/dashboard"
             className="inline-flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors shadow-sm">
             Mon espace →
           </Link>
@@ -110,7 +110,7 @@ export default function NavbarLanding() {
             )}
             {role && (
               <Link
-                href={role === "artisan" ? "/dashboard/artisan" : role === "admin" ? "/dashboard/admin" : "/dashboard/client"}
+                href="/dashboard"
                 className="block px-3 py-2.5 rounded-lg text-sm font-semibold text-brand-600 hover:bg-brand-50">
                 Mon espace →
               </Link>
