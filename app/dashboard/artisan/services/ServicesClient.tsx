@@ -30,6 +30,13 @@ export default function ServicesClient({ userId, services: initial }: Props) {
     prix: "",
     duree_minutes: "",
   });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({
+    titre: "",
+    description: "",
+    prix: "",
+    duree_minutes: "",
+  });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -58,6 +65,42 @@ export default function ServicesClient({ userId, services: initial }: Props) {
     setServices((prev) => [data, ...prev]);
     setForm({ titre: "", description: "", prix: "", duree_minutes: "" });
     setShowForm(false);
+    setIsSubmitting(false);
+    router.refresh();
+  }
+
+  function startEdit(service: Service) {
+    setEditingId(service.id);
+    setEditForm({
+      titre: service.titre,
+      description: service.description ?? "",
+      prix: service.prix?.toString() ?? "",
+      duree_minutes: service.duree_minutes?.toString() ?? "",
+    });
+  }
+
+  async function handleEditSubmit(id: string) {
+    if (!editForm.titre.trim()) return;
+    setIsSubmitting(true);
+    const supabase = createClient();
+    await supabase
+      .from("services")
+      // @ts-ignore
+      .update({
+        titre: editForm.titre.trim(),
+        description: editForm.description.trim() || null,
+        prix: editForm.prix ? parseFloat(editForm.prix) : null,
+        duree_minutes: editForm.duree_minutes ? parseInt(editForm.duree_minutes) : null,
+      })
+      .eq("id", id);
+    setServices(prev => prev.map(s => s.id === id ? {
+      ...s,
+      titre: editForm.titre.trim(),
+      description: editForm.description.trim() || null,
+      prix: editForm.prix ? parseFloat(editForm.prix) : null,
+      duree_minutes: editForm.duree_minutes ? parseInt(editForm.duree_minutes) : null,
+    } : s));
+    setEditingId(null);
     setIsSubmitting(false);
     router.refresh();
   }
@@ -200,45 +243,65 @@ export default function ServicesClient({ userId, services: initial }: Props) {
       ) : (
         <div className="space-y-3">
           {services.map((service) => (
-            <div
-              key={service.id}
-              className="bg-white border border-gray-200 rounded-xl px-5 py-4 flex items-center justify-between gap-4"
-            >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{service.titre}</p>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                    service.actif ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
-                  }`}>
-                    {service.actif ? "Actif" : "Inactif"}
-                  </span>
+            <div key={service.id} className="bg-white border border-gray-200 rounded-xl px-5 py-4">
+              {editingId === service.id ? (
+                <div className="space-y-3">
+                  <input value={editForm.titre} onChange={e => setEditForm(f => ({...f, titre: e.target.value}))}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="Titre" />
+                  <input value={editForm.description} onChange={e => setEditForm(f => ({...f, description: e.target.value}))}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="Description" />
+                  <div className="flex gap-2">
+                    <input value={editForm.prix} onChange={e => setEditForm(f => ({...f, prix: e.target.value}))}
+                      className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="Prix (€)" type="number" />
+                    <input value={editForm.duree_minutes} onChange={e => setEditForm(f => ({...f, duree_minutes: e.target.value}))}
+                      className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="Durée (min)" type="number" />
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => setEditingId(null)}
+                      className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50">
+                      Annuler
+                    </button>
+                    <button onClick={() => handleEditSubmit(service.id)} disabled={isSubmitting}
+                      className="flex-1 px-3 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-sm font-semibold text-white disabled:opacity-60">
+                      {isSubmitting ? "..." : "Enregistrer"}
+                    </button>
+                  </div>
                 </div>
-                {service.description && (
-                  <p className="text-xs text-gray-500 mt-0.5 truncate">{service.description}</p>
-                )}
-                <div className="flex items-center gap-3 mt-1">
-                  {service.prix && (
-                    <span className="text-xs text-gray-600 font-medium">À partir de {service.prix} €</span>
-                  )}
-                  {service.duree_minutes && (
-                    <span className="text-xs text-gray-400">{service.duree_minutes} min</span>
-                  )}
+              ) : (
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold text-gray-900 truncate">{service.titre}</p>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        service.actif ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                      }`}>
+                        {service.actif ? "Actif" : "Inactif"}
+                      </span>
+                    </div>
+                    {service.description && (
+                      <p className="text-xs text-gray-500 mt-0.5 truncate">{service.description}</p>
+                    )}
+                    <div className="flex items-center gap-3 mt-1">
+                      {service.prix && <span className="text-xs text-gray-600 font-medium">{service.prix} €</span>}
+                      {service.duree_minutes && <span className="text-xs text-gray-400">{service.duree_minutes} min</span>}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button onClick={() => startEdit(service)}
+                      className="text-xs px-3 py-1.5 rounded-lg border border-brand-200 text-brand-600 hover:bg-brand-50 transition-colors">
+                      Modifier
+                    </button>
+                    <button onClick={() => handleToggle(service)}
+                      className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                      {service.actif ? "Désactiver" : "Activer"}
+                    </button>
+                    <button onClick={() => handleDelete(service.id)}
+                      className="text-xs px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
+                      Supprimer
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <button
-                  onClick={() => handleToggle(service)}
-                  className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
-                >
-                  {service.actif ? "Désactiver" : "Activer"}
-                </button>
-                <button
-                  onClick={() => handleDelete(service.id)}
-                  className="text-xs px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
-                >
-                  Supprimer
-                </button>
-              </div>
+              )}
             </div>
           ))}
         </div>
