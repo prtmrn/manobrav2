@@ -157,7 +157,7 @@ export default function ClientShell({ children, userEmail, userName }: ClientShe
       </main>
 
       {/* ── CTA MOBILE FLOTTANT — visible seulement quand le CTA du haut est hors écran ── */}
-      {showFab && (
+      {showFab && !pathname.includes("/reservations") && !pathname.includes("/profil") && (
         <Link
           href="/recherche"
           className="sm:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50
