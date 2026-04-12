@@ -1,4 +1,5 @@
 "use client";
+import { METIER_LIST } from "@/components/map/metier-config";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
