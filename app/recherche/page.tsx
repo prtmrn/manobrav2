@@ -477,7 +477,13 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                           style={{ color: config.color }}
                         >
                           <span>{Array.isArray(p.metier)
-    ? p.metier.slice(0, 2).join(" · ") + (p.metier.length > 2 ? ` +${p.metier.length - 2}` : "")
+    ? (() => {
+        const metiers = p.metier as string[];
+        const filtered = metierFilter && metiers.includes(metierFilter)
+          ? [metierFilter, ...metiers.filter(m => m !== metierFilter)]
+          : metiers;
+        return filtered.slice(0, 2).join(" · ") + (metiers.length > 2 ? ` +${metiers.length - 2}` : "");
+      })()
     : (p.metier ?? "Non spécifié")}</span>
                         </p>
 
