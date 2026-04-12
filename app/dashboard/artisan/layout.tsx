@@ -5,33 +5,33 @@ import type { NavItem } from "@/components/dashboard/DashboardShell";
 
 const navItems: NavItem[] = [
   {
-    href: "/dashboard/artisan",
+    href: "/dashboard",
     label: "Accueil",
     icon: "home",
     exact: true,
   },
   {
-    href: "/dashboard/artisan/profil",
+    href: "/dashboard/profil",
     label: "Mon profil",
     icon: "user",
   },
   {
-    href: "/dashboard/artisan/services",
+    href: "/dashboard/services",
     label: "Mes services",
     icon: "briefcase",
   },
   {
-    href: "/dashboard/artisan/planning",
+    href: "/dashboard/planning",
     label: "Mon planning",
     icon: "calendar",
   },
   {
-    href: "/dashboard/artisan/reservations",
+    href: "/dashboard/reservations",
     label: "Mes réservations",
     icon: "clipboard",
   },
   {
-    href: "/dashboard/artisan/abonnement",
+    href: "/dashboard/abonnement",
     label: "Mon abonnement",
     icon: "credit-card",
   },

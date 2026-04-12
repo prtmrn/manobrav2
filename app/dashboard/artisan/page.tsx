@@ -454,7 +454,7 @@ export default async function DashboardartisanPage() {
           <SectionHeader
             title="Réservations en attente"
             count={attentes.length}
-            href="/dashboard/artisan/reservations"
+            href="/dashboard/reservations"
             linkLabel="Tout voir"
           />
 
@@ -564,7 +564,7 @@ export default async function DashboardartisanPage() {
       <section>
         <SectionHeader
           title="Prochaines interventions"
-          href="/dashboard/artisan/reservations"
+          href="/dashboard/reservations"
           linkLabel="Tout voir"
         />
 
@@ -758,7 +758,7 @@ export default async function DashboardartisanPage() {
             )}
 
             <Link
-              href="/dashboard/artisan/abonnement"
+              href="/dashboard/abonnement"
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl
                          bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold
                          transition-colors shadow-sm"
@@ -790,7 +790,7 @@ export default async function DashboardartisanPage() {
             </p>
             <div className="space-y-2">
               <Link
-                href="/dashboard/artisan/planning"
+                href="/dashboard/planning"
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl
                            bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold
                            transition-colors shadow-sm"
@@ -798,7 +798,7 @@ export default async function DashboardartisanPage() {
                 Modifier mes disponibilités
               </Link>
               <Link
-                href="/dashboard/artisan/reservations"
+                href="/dashboard/reservations"
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl
                            bg-white border border-gray-200 hover:bg-gray-50 text-gray-700
                            text-xs font-semibold transition-colors"

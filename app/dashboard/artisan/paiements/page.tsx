@@ -22,7 +22,7 @@ export default function PaiementsPage() {
         Manobra intégrera Stripe pour vous permettre de recevoir vos revenus directement sur votre compte bancaire.
       </p>
       <Link
-        href="/dashboard/artisan"
+        href="/dashboard"
         className="inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
