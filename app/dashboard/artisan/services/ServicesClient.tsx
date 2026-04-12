@@ -38,6 +38,7 @@ export default function ServicesClient({ userId, services: initial }: Props) {
     description: "",
     prix: "",
     duree_minutes: "",
+    metier: "",
   });
 
   async function handleSubmit(e: React.FormEvent) {
