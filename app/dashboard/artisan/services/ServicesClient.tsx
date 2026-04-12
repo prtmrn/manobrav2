@@ -11,6 +11,7 @@ interface Service {
   prix: number | null;
   duree_minutes: number | null;
   actif: boolean;
+  metier: string | null;
 }
 
 interface Props {
@@ -29,6 +30,7 @@ export default function ServicesClient({ userId, services: initial }: Props) {
     description: "",
     prix: "",
     duree_minutes: "",
+    metier: "",
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
@@ -53,6 +55,7 @@ export default function ServicesClient({ userId, services: initial }: Props) {
         description: form.description.trim() || null,
         prix: form.prix ? parseFloat(form.prix) : null,
         duree_minutes: form.duree_minutes ? parseInt(form.duree_minutes) : null,
+        metier: form.metier || null,
         actif: true,
       })
       .select()
@@ -63,7 +66,7 @@ export default function ServicesClient({ userId, services: initial }: Props) {
       return;
     }
     setServices((prev) => [data, ...prev]);
-    setForm({ titre: "", description: "", prix: "", duree_minutes: "" });
+    setForm({ titre: "", description: "", prix: "", duree_minutes: "", metier: "" });
     setShowForm(false);
     setIsSubmitting(false);
     router.refresh();
@@ -76,6 +79,7 @@ export default function ServicesClient({ userId, services: initial }: Props) {
       description: service.description ?? "",
       prix: service.prix?.toString() ?? "",
       duree_minutes: service.duree_minutes?.toString() ?? "",
+      metier: service.metier ?? "",
     });
   }
 
@@ -91,6 +95,7 @@ export default function ServicesClient({ userId, services: initial }: Props) {
         description: editForm.description.trim() || null,
         prix: editForm.prix ? parseFloat(editForm.prix) : null,
         duree_minutes: editForm.duree_minutes ? parseInt(editForm.duree_minutes) : null,
+        metier: editForm.metier || null,
       })
       .eq("id", id);
     setServices(prev => prev.map(s => s.id === id ? {
@@ -99,6 +104,7 @@ export default function ServicesClient({ userId, services: initial }: Props) {
       description: editForm.description.trim() || null,
       prix: editForm.prix ? parseFloat(editForm.prix) : null,
       duree_minutes: editForm.duree_minutes ? parseInt(editForm.duree_minutes) : null,
+      metier: editForm.metier || null,
     } : s));
     setEditingId(null);
     setIsSubmitting(false);
@@ -163,6 +169,17 @@ export default function ServicesClient({ userId, services: initial }: Props) {
                 className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 required
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Métier associé</label>
+              <select
+                value={form.metier}
+                onChange={(e) => setForm({ ...form, metier: e.target.value })}
+                className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+              >
+                <option value="">Sélectionner un métier</option>
+                {METIER_LIST.map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
@@ -256,6 +273,11 @@ export default function ServicesClient({ userId, services: initial }: Props) {
                     <input value={editForm.duree_minutes} onChange={e => setEditForm(f => ({...f, duree_minutes: e.target.value}))}
                       className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="Durée (min)" type="number" />
                   </div>
+                  <select value={editForm.metier} onChange={e => setEditForm(f => ({...f, metier: e.target.value}))}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+                    <option value="">Sélectionner un métier</option>
+                    {METIER_LIST.map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
                   <div className="flex gap-2">
                     <button onClick={() => setEditingId(null)}
                       className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50">
