@@ -21,6 +21,8 @@ interface Props {
     adresse?: string | null;
     ville?: string | null;
     code_postal?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     photo_url?: string | null;
     telephone?: string | null;
     siret?: string | null;
@@ -43,6 +45,8 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
     adresse: initialData.adresse ?? "",
     ville: initialData.ville ?? "",
     code_postal: initialData.code_postal ?? "",
+    latitude: initialData.latitude ?? null,
+    longitude: initialData.longitude ?? null,
     telephone: initialData.telephone ?? "",
     siret: initialData.siret ?? "",
     zone_intervention_km: initialData.zone_intervention_km?.toString() ?? "20",
@@ -91,6 +95,8 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
         adresse: form.adresse || null,
         ville: form.ville || null,
         code_postal: form.code_postal || null,
+        latitude: form.latitude || null,
+        longitude: form.longitude || null,
         telephone: form.telephone || null,
         siret: form.siret || null,
         zone_intervention_km: form.zone_intervention_km ? parseInt(form.zone_intervention_km) : 20,
