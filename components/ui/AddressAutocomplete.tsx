@@ -64,8 +64,10 @@ export default function AddressAutocomplete({ value, onChange, placeholder, inpu
           `/api/geocode?q=${encodeURIComponent(val)}`
         );
         const data: AddressSuggestion[] = await res.json();
+        console.log("suggestions:", data.length, data);
         setSuggestions(data);
         setOpen(data.length > 0);
+        console.log("open set to:", data.length > 0);
       } catch {
         setSuggestions([]);
       } finally {
