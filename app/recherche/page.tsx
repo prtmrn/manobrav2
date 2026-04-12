@@ -476,7 +476,9 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                           className="text-xs font-medium flex items-center gap-1 mb-2"
                           style={{ color: config.color }}
                         >
-                          <span>{Array.isArray(p.metier) ? p.metier.join(" · ") : (p.metier ?? "Non spécifié")}</span>
+                          <span>{Array.isArray(p.metier)
+    ? p.metier.slice(0, 2).join(" · ") + (p.metier.length > 2 ? ` +${p.metier.length - 2}` : "")
+    : (p.metier ?? "Non spécifié")}</span>
                         </p>
 
                         {/* Stars (only if no note to show in overlay, or always show) */}
