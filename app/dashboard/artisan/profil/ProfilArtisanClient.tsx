@@ -1,4 +1,5 @@
 "use client";
+import AddressAutocomplete from "@/components/ui/AddressAutocomplete";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -192,7 +193,18 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Adresse</label>
-            <input type="text" value={form.adresse} onChange={(e) => setForm({ ...form, adresse: e.target.value })} className={inputClass} placeholder="12 rue de la Paix" />
+            <AddressAutocomplete
+              value={form.adresse}
+              inputClass={inputClass}
+              onChange={(result) => setForm({
+                ...form,
+                adresse: result.adresse,
+                ville: result.ville,
+                code_postal: result.code_postal,
+                latitude: result.latitude,
+                longitude: result.longitude,
+              })}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
