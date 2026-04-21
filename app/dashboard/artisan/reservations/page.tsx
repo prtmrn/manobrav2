@@ -52,7 +52,7 @@ export default async function PrestaReservationsPage() {
     .eq("artisan_id", user.id)
     .order("date", { ascending: false });
 
-  const reservations = (data ?? []) as PrestaReservationItem[];
+  const reservations = (data ?? []) as unknown as PrestaReservationItem[];
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
