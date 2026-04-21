@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import ProfilArtisanClient from "./ProfilArtisanClient";
 
 export const metadata: Metadata = {
@@ -20,7 +21,8 @@ export default async function ProfilArtisanPage() {
 
   if (!profile || (profile as any).role !== "artisan") redirect("/dashboard");
 
-  const { data: artisan } = await supabase
+  const adminClient = createAdminClient();
+  const { data: artisan } = await adminClient
     .from("profiles_artisans")
     .select("nom, prenom, bio, metier, adresse, ville, code_postal, photo_url, siret, telephone, latitude, longitude, zone_intervention_km, tarif_horaire_min, tarif_horaire_max, frais_deplacement, disponible_urgence, delai_urgence_minutes, abonnement_pro")
     .eq("id", user.id)
