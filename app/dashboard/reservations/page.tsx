@@ -33,7 +33,8 @@ export default async function ClientReservationsPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
 
-  const { data: profileData } = await supabase
+  const admin = createAdminClient();
+  const { data: profileData } = await admin
     .from("profiles")
     .select("role")
     .eq("id", user.id)
@@ -42,7 +43,6 @@ export default async function ClientReservationsPage() {
   if (profile?.role !== "client") redirect("/dashboard");
 
   // ── Fetch réservations via la vue enrichie ────────────────────────────────
-  const admin = createAdminClient();
   const { data } = await admin
     .from("reservations_detail")
     .select(
