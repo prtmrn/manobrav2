@@ -115,7 +115,7 @@ function ReservationCard({
           <div className="flex items-start justify-between gap-2 flex-wrap">
             <div>
               <p className="font-semibold text-gray-900 leading-tight">{fullName}</p>
-              <p className="text-sm text-gray-500">{resa.artisan_metier}</p>
+              <p className="text-sm text-gray-500">{Array.isArray(resa.artisan_metier) ? resa.artisan_metier.slice(0,2).join(" · ") : resa.artisan_metier}</p>
             </div>
             <StatusBadge statut={resa.statut} />
           </div>
@@ -163,6 +163,14 @@ function ReservationCard({
               className="text-sm text-brand-600 hover:text-brand-700 font-medium hover:underline"
             >
               Voir le profil →
+            </Link>
+          )}
+          {resa.statut === "termine" && (
+            <Link
+              href={`/avis/${resa.id}`}
+              className="ml-auto text-sm text-brand-600 hover:text-brand-700 font-medium px-3 py-1.5 rounded-lg hover:bg-brand-50 transition-colors"
+            >
+              Laisser un avis
             </Link>
           )}
           {canCancel && (
