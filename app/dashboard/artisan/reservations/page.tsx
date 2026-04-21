@@ -42,7 +42,8 @@ export default async function PrestaReservationsPage() {
 
   // ── Fetch via la vue enrichie ─────────────────────────────────────────────
   const admin = createAdminClient();
-  const { data } = await admin
+  console.log("[DEBUG] artisan user.id:", user.id);
+  const { data, error: fetchError } = await admin
     .from("reservations_detail")
     .select(
       "id, date, heure_debut, heure_fin, statut, adresse_intervention, " +
@@ -51,6 +52,7 @@ export default async function PrestaReservationsPage() {
     )
     .eq("artisan_id", user.id)
     .order("date", { ascending: false });
+  console.log("[DEBUG] reservations data:", JSON.stringify(data), "error:", fetchError);
 
   const reservations = (data ?? []) as unknown as PrestaReservationItem[];
 
