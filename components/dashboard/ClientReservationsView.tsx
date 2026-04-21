@@ -115,7 +115,7 @@ function ReservationCard({
           <div className="flex items-start justify-between gap-2 flex-wrap">
             <div>
               <p className="font-semibold text-gray-900 leading-tight">{fullName}</p>
-              <p className="text-sm text-gray-500">{Array.isArray(resa.artisan_metier) ? resa.artisan_metier.slice(0,2).join(" · ") : resa.artisan_metier}</p>
+              <p className="text-sm text-gray-500">{Array.isArray(resa.artisan_metier) ? (resa.artisan_metier as string[]).slice(0,2).join(" · ") : resa.artisan_metier}</p>
             </div>
             <StatusBadge statut={resa.statut} />
           </div>
