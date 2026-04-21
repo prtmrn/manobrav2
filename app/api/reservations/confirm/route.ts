@@ -137,8 +137,7 @@ export async function POST(request: Request) {
     const code = insertError.code;
     const message =
       code === "23514" ? "Créneau invalide (contrainte horaire)." :
-      code === "23503" ? "Artisan ou service introuvable." :
-      insertError.message;
+      insertError.message + " (code: " + code + ")";
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
