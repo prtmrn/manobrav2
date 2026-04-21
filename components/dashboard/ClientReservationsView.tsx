@@ -165,7 +165,7 @@ function ReservationCard({
               Voir le profil →
             </Link>
           )}
-          {resa.statut === "termine" && (
+          {(resa.statut as string) === "termine" && (
             <Link
               href={`/avis/${resa.id}`}
               className="ml-auto text-sm text-brand-600 hover:text-brand-700 font-medium px-3 py-1.5 rounded-lg hover:bg-brand-50 transition-colors"
