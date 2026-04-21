@@ -24,7 +24,7 @@ export default async function ProfilArtisanPage() {
   const adminClient = createAdminClient();
   const { data: artisan } = await adminClient
     .from("profiles_artisans")
-    .select("nom, prenom, bio, metier, adresse, ville, code_postal, photo_url, siret, telephone, latitude, longitude, zone_intervention_km, tarif_horaire_min, tarif_horaire_max, frais_deplacement, disponible_urgence, delai_urgence_minutes, abonnement_pro")
+    .select("nom, prenom, bio, metier, adresse, ville, code_postal, photo_url, siret, telephone, latitude, longitude, zone_intervention_km, tarif_horaire_min, tarif_horaire_max, frais_deplacement, disponible_urgence, abonnement_pro")
     .eq("id", user.id)
     .single();
 
