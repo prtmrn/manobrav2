@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import ClientReservationsView from "@/components/dashboard/ClientReservationsView";
 import type { ReservationStatut } from "@/types";
 
@@ -24,7 +25,7 @@ export type ReservationItem = {
 };
 
 export default async function ClientReservationsPage() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   // ── Auth ──────────────────────────────────────────────────────────────────
   const {
@@ -41,7 +42,8 @@ export default async function ClientReservationsPage() {
   if (profile?.role !== "client") redirect("/dashboard");
 
   // ── Fetch réservations via la vue enrichie ────────────────────────────────
-  const { data } = await supabase
+  const admin = createAdminClient();
+  const { data } = await admin
     .from("reservations_detail")
     .select(
       "id, date, heure_debut, heure_fin, statut, adresse_intervention, " +
