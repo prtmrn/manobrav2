@@ -18,9 +18,10 @@ interface Service {
 interface Props {
   userId: string;
   services: Service[];
+  metiers: string[];
 }
 
-export default function ServicesClient({ userId, services: initial }: Props) {
+export default function ServicesClient({ userId, services: initial, metiers }: Props) {
   const router = useRouter();
   const [services, setServices] = useState<Service[]>(initial);
   const [showForm, setShowForm] = useState(false);
@@ -172,6 +173,7 @@ export default function ServicesClient({ userId, services: initial }: Props) {
                 required
               />
             </div>
+            {metiers.length > 1 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Métier associé</label>
               <select
@@ -180,9 +182,10 @@ export default function ServicesClient({ userId, services: initial }: Props) {
                 className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
               >
                 <option value="">Sélectionner un métier</option>
-                {METIER_LIST.map(m => <option key={m} value={m}>{m}</option>)}
+                {metiers.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
             </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
               <textarea

@@ -18,5 +18,11 @@ export default async function ServicesPage() {
     .eq("artisan_id", user.id)
     .order("created_at", { ascending: false });
 
-  return <ServicesClient userId={user.id} services={services ?? []} />;
+  const { data: profil } = await supabase
+    .from("profiles_artisans")
+    .select("metier")
+    .eq("id", user.id)
+    .single();
+  const metiers: string[] = (profil as any)?.metier ?? [];
+  return <ServicesClient userId={user.id} services={services ?? []} metiers={metiers} />;
 }
