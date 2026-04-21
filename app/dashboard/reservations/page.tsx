@@ -53,7 +53,7 @@ export default async function ClientReservationsPage() {
     .eq("client_id", user.id)
     .order("date", { ascending: false });
 
-  const reservations = (data ?? []) as ReservationItem[];
+  const reservations = (data ?? []) as unknown as ReservationItem[];
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
