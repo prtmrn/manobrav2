@@ -47,8 +47,7 @@ export default async function PrestaReservationsPage() {
     .from("reservations_detail")
     .select(
       "id, date, heure_debut, heure_fin, statut, adresse_intervention, " +
-      "montant_total, created_at, client_id, client_nom, client_prenom, " +
-      "client_photo_url, service_titre"
+      "montant_total, created_at, client_id, client_nom, client_prenom, service_titre"
     )
     .eq("artisan_id", user.id)
     .order("date", { ascending: false });
