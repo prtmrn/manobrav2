@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import PrestaReservationsView from "@/components/dashboard/artisan/PrestaReservationsView";
 import type { ReservationStatut } from "@/types";
 
@@ -40,7 +41,8 @@ export default async function PrestaReservationsPage() {
   if (profile?.role !== "artisan") redirect("/dashboard");
 
   // ── Fetch via la vue enrichie ─────────────────────────────────────────────
-  const { data } = await supabase
+  const admin = createAdminClient();
+  const { data } = await admin
     .from("reservations_detail")
     .select(
       "id, date, heure_debut, heure_fin, statut, adresse_intervention, " +
