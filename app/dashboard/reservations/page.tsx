@@ -25,7 +25,7 @@ export type ReservationItem = {
 };
 
 export default async function ClientReservationsPage() {
-  const supabase = createAdminClient();
+  const supabase = await createClient();
 
   // ── Auth ──────────────────────────────────────────────────────────────────
   const {
