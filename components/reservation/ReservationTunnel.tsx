@@ -113,9 +113,14 @@ interface Props {
 }
 
 export default function ReservationTunnel({ artisan, services, clientId, isGuest, clientProfile }: Props) {
+  const searchParams = useSearchParams();
+  const preselectedServiceId = searchParams.get("service");
+  const initialService = preselectedServiceId
+    ? services.find(s => s.id === preselectedServiceId) ?? null
+    : null;
   const [state, setState] = useState<TunnelState>({
-    step: 1,
-    service: null,
+    step: initialService ? 2 : 1,
+    service: initialService,
     date: null,
     slot: null,
   });
