@@ -241,12 +241,13 @@ export default function Step3Confirm({
   const [guestNom, setGuestNom] = useState(clientProfile ? `${clientProfile.prenom ?? ""} ${clientProfile.nom ?? ""}`.trim() : "");
   const [guestTelephone, setGuestTelephone] = useState(clientProfile?.telephone ?? "");
   const [guestEmail, setGuestEmail] = useState("");
+  const [message, setMessage] = useState("");
 
   const fullName = `${artisan.prenom ?? ""} ${artisan.nom ?? ""}`.trim();
 
   // Services payants (prix > 0) → flux Stripe
   // Services gratuits ou sur devis → flux direct sans paiement
-  const hasPrix = service.prix !== null && service.prix > 0;
+  const hasPrix = false; // Toujours flux direct — pas de paiement avant devis
 
   // ── Continuer depuis le formulaire d'adresse ──────────────────────────────
   async function handleContinue() {
@@ -321,6 +322,7 @@ export default function Step3Confirm({
           heureDebut: `${slot.debut}:00`,
           heureFin: `${slot.fin}:00`,
           adresse: adresse.trim(),
+          message: message.trim() || undefined,
           montantTotal: service.prix,
           ...(isGuest && {
             guestNom: guestNom.trim() || undefined,
@@ -434,7 +436,7 @@ export default function Step3Confirm({
           value={`${slot.debut} → ${slot.fin} (${formatDuree(service.duree_minutes)})`}
         />
         <RecapRow
-          label={hasPrix ? "Total à payer" : "Prix"}
+          label={hasPrix ? "Tarif indicatif" : "Prix"}
           value={formatPrix(service.prix)}
           highlight
         />
@@ -520,8 +522,34 @@ export default function Step3Confirm({
           }`}
         />
         <p className="text-xs text-gray-400 mt-1.5">
-          Indiquez où le artisan devra intervenir.
+          Indiquez où l'artisan devra intervenir.
         </p>
+      </div>
+
+      {/* Message / description du besoin */}
+      <div className="mb-5">
+        <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-1.5">
+          Décrivez votre besoin
+        </label>
+        <textarea
+          id="message"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Ex : Mon robinet fuit depuis hier soir, eau sous l'évier..."
+          rows={3}
+          className="w-full rounded-xl border-2 border-gray-200 bg-white hover:border-gray-300 px-4 py-3 text-sm resize-none transition focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent"
+        />
+        <p className="text-xs text-gray-400 mt-1.5">
+          Plus votre description est précise, mieux l'artisan pourra préparer son intervention.
+        </p>
+      </div>
+
+      {/* Encadré informatif */}
+      <div className="mb-5 flex gap-3 p-4 rounded-xl bg-blue-50 border border-blue-100 text-sm text-blue-800">
+        <svg className="w-4 h-4 mt-0.5 shrink-0 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p>Aucun paiement n'est requis maintenant. L'artisan vous contactera pour établir un devis avant toute intervention.</p>
       </div>
 
       {/* Message d'erreur */}
