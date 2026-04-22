@@ -187,7 +187,7 @@ function ServiceCard({ service, artisanId }: { service: Service; artisanId: stri
           </span>
         )}
       </div>
-    </div>
+    </Link>
   );
 }
 
