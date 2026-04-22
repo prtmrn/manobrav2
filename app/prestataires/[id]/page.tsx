@@ -561,7 +561,7 @@ export default async function artisanPage({ params }: PageProps) {
                       </svg>
                       SIRET vérifié
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Bouton Réserver visible sur mobile */}
