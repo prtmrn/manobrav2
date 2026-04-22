@@ -377,7 +377,7 @@ export default async function artisanPage({ params }: PageProps) {
       <nav className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-gray-200 h-14">
         <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
           <Link
-            href="/map"
+            href="/recherche"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors group"
           >
             <svg
@@ -393,7 +393,7 @@ export default async function artisanPage({ params }: PageProps) {
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            Retour à la carte
+            Retour
           </Link>
 
           <Link
