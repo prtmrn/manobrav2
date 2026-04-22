@@ -140,10 +140,10 @@ function StarRow({
 }
 
 /** Carte d'un service */
-function ServiceCard({ service }: { service: Service }) {
+function ServiceCard({ service, artisanId }: { service: Service; artisanId: string }) {
   const duree = formatDuree(service.duree_minutes);
   return (
-    <div className="group relative bg-white border border-gray-100 rounded-xl p-5 hover:shadow-md hover:border-brand-200 transition-all">
+    <Link href={`/reserver/${artisanId}?service=${service.id}`} className="group relative bg-white border border-gray-100 rounded-xl p-5 hover:shadow-md hover:border-brand-200 transition-all block">
       {/* Catégorie */}
       {service.categorie && (
         <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full mb-2">
@@ -362,9 +362,11 @@ export default async function artisanPage({ params }: PageProps) {
   const fullName =
     `${artisan.prenom ?? ""} ${artisan.nom ?? ""}`.trim() ||
     "artisan";
-  const location = [artisan.ville, artisan.code_postal]
-    .filter(Boolean)
-    .join(" ");
+  const location = artisan.ville
+    ? artisan.code_postal
+      ? `${artisan.ville} (${artisan.code_postal})`
+      : artisan.ville
+    : null;
   const minPrix = services
     .filter((s) => s.prix !== null)
     .sort((a, b) => (a.prix ?? 0) - (b.prix ?? 0))[0]?.prix ?? null;
@@ -497,7 +499,7 @@ export default async function artisanPage({ params }: PageProps) {
                       color: config.color,
                     }}
                   >
-                    <span>{artisan.metier ?? "artisan"}</span>
+                    <span>{Array.isArray(artisan.metier) ? artisan.metier.join(" · ") : (artisan.metier ?? "artisan")}</span>
                   </div>
                 </div>
 
@@ -550,7 +552,15 @@ export default async function artisanPage({ params }: PageProps) {
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
-                    Membre depuis {formatDateMoisAnnee(artisan.created_at)}
+  Membre depuis {formatDateMoisAnnee(artisan.created_at)}
+                  </div>
+                  {artisan.siret && (
+                    <div className="flex items-center gap-1 text-xs text-green-600 font-medium">
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                      SIRET vérifié
+                    </div>
                   </div>
                 </div>
 
@@ -598,7 +608,7 @@ export default async function artisanPage({ params }: PageProps) {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {services.map((s) => (
-                    <ServiceCard key={s.id} service={s} />
+                    <ServiceCard key={s.id} service={s} artisanId={id} />
                   ))}
                 </div>
               )}
@@ -658,7 +668,7 @@ export default async function artisanPage({ params }: PageProps) {
             {/* ── CTA Réservation ───────────────────────────────────────── */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
               {/* Prix affiché */}
-              {minPrix !== null && (
+              {minPrix !== null && minPrix > 0 && (
                 <div className="text-center mb-4">
                   <p className="text-xs text-gray-400 mb-0.5">À partir de</p>
                   <p className="text-3xl font-black text-gray-900">
@@ -672,9 +682,7 @@ export default async function artisanPage({ params }: PageProps) {
 
               <ReserveButton artisan_id={id} className="w-full" />
 
-              <p className="text-center text-xs text-gray-400 mt-2.5">
-                🔒 Réservation gratuite, sans engagement
-              </p>
+
 
               {/* Séparateur */}
               <div className="my-4 border-t border-gray-100" />
@@ -697,14 +705,7 @@ export default async function artisanPage({ params }: PageProps) {
 
               {/* Infos rapides */}
               <dl className="mt-3 space-y-2 text-sm">
-                {artisan.metier && (
-                  <div className="flex justify-between">
-                    <dt className="text-gray-500">Métier</dt>
-                    <dd className="font-medium text-gray-800 flex items-center gap-1">
-                      {artisan.metier}
-                    </dd>
-                  </div>
-                )}
+
                 {location && (
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Localisation</dt>
