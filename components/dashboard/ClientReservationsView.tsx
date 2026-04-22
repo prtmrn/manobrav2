@@ -94,6 +94,7 @@ function ReservationCard({
     `${resa.artisan_prenom ?? ""} ${resa.artisan_nom ?? ""}`.trim() || "artisan";
   const canCancel = resa.statut === "en_attente" || resa.statut === "confirme";
 
+  const ref = resa.id.slice(0, 8).toUpperCase();
   return (
     <article className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow">
       <div className="flex items-start gap-4">
@@ -148,12 +149,13 @@ function ReservationCard({
             )}
           </div>
 
-          {resa.montant_total && (
+          {(resa.montant_total !== null && resa.montant_total > 0) && (
             <p className="mt-2 text-sm font-bold text-gray-900">{formatPrix(resa.montant_total)}</p>
           )}
         </div>
       </div>
 
+      <p className="mt-2 text-xs text-gray-400">Réf. {ref}</p>
       {/* Actions */}
       {(canCancel || resa.artisan_id) && (
         <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
@@ -163,6 +165,14 @@ function ReservationCard({
               className="text-sm text-brand-600 hover:text-brand-700 font-medium hover:underline"
             >
               Voir le profil →
+            </Link>
+          )}
+          {(resa.statut as string) === "termine" && resa.artisan_id && (
+            <Link
+              href={`/reserver/${resa.artisan_id}`}
+              className="text-sm text-gray-500 hover:text-gray-700 font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Réserver à nouveau
             </Link>
           )}
           {(resa.statut as string) === "termine" && (
