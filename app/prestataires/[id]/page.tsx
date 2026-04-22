@@ -193,7 +193,7 @@ function ServiceCard({ service, artisanId }: { service: Service; artisanId: stri
 
 /** Carte d'un avis */
 function AvisCard({ avis }: { avis: Avis }) {
-  const displayName = avis.nom_client ?? "Client Manobra";
+  const displayName = avis.nom_client ?? "Client";
   const initials = displayName
     .split(" ")
     .map((n) => n[0])
@@ -552,7 +552,7 @@ export default async function artisanPage({ params }: PageProps) {
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
-  Membre depuis {formatDateMoisAnnee(artisan.created_at)}
+                    Membre depuis {formatDateMoisAnnee(artisan.created_at)}
                   </div>
                   {artisan.siret && (
                     <div className="flex items-center gap-1 text-xs text-green-600 font-medium">
