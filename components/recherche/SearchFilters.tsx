@@ -235,6 +235,7 @@ export default function SearchFilters({
           )}
         </button>
 
+      </div>
       {/* ── Advanced filter panel ─────────────────────────────────────────── */}
       {showFilters && (
         <div className="mt-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
