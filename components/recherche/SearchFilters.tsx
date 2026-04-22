@@ -209,41 +209,31 @@ export default function SearchFilters({
           Rechercher
         </button>
 
-        {/* View toggle (grille / carte) */}
-        <div className="hidden sm:flex items-center rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-          <button
-            onClick={() => {
-              setVue("grille");
-              applyFilters({ vue: "grille" });
-            }}
-            className={`px-3 py-2.5 transition-colors ${
-              vue === "grille" ? "bg-brand-600 text-white" : "text-gray-500 hover:bg-gray-50"
-            }`}
-            title="Vue grille"
-            aria-label="Vue grille"
-          >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-            </svg>
-          </button>
-          <button
-            onClick={() => {
-              setVue("carte");
-              applyFilters({ vue: "carte" });
-            }}
-            className={`px-3 py-2.5 transition-colors border-l border-gray-100 ${
-              vue === "carte" ? "bg-brand-600 text-white" : "text-gray-500 hover:bg-gray-50"
-            }`}
-            title="Vue carte"
-            aria-label="Vue carte"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-            </svg>
-          </button>
-        </div>
-      </div>
+        {/* View toggle */}
+        <button
+          onClick={() => {
+            const newVue = vue === "carte" ? "grille" : "carte";
+            setVue(newVue);
+            applyFilters({ vue: newVue });
+          }}
+          className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 bg-white shadow-sm text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+        >
+          {vue === "carte" ? (
+            <>
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+              <span className="hidden sm:inline">Afficher la liste</span>
+            </>
+          ) : (
+            <>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+              <span className="hidden sm:inline">Afficher la carte</span>
+            </>
+          )}
+        </button>
 
       {/* ── Advanced filter panel ─────────────────────────────────────────── */}
       {showFilters && (
