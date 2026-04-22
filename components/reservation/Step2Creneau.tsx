@@ -389,6 +389,7 @@ export default function Step2Creneau({ artisanId, service, onSelect, onBack }: P
           ? `Continuer – ${JOURS_COURTS[selectedDayIdx!]} ${selectedDayInfo.date.getDate()} ${MOIS[selectedDayInfo.date.getMonth()]} à ${selectedSlot.debut}`
           : "Sélectionnez un créneau pour continuer"}
       </button>
+      <p className="mt-6 text-xs text-gray-400 text-center">Aucun paiement requis — devis établi avant toute intervention.</p>
     </div>
   );
 }

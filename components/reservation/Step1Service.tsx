@@ -132,6 +132,7 @@ export default function Step1Service({ services, onSelect }: Props) {
           </button>
         ))}
       </div>
+      <p className="mt-6 text-xs text-gray-400 text-center">Aucun paiement requis — devis établi avant toute intervention.</p>
     </div>
   );
 }

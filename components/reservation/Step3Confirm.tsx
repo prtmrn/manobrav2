@@ -436,7 +436,7 @@ export default function Step3Confirm({
           value={`${slot.debut} → ${slot.fin} (${formatDuree(service.duree_minutes)})`}
         />
         <RecapRow
-          label={hasPrix ? "Tarif indicatif" : "Prix"}
+          label="Estimation avant devis"
           value={formatPrix(service.prix)}
           highlight
         />
@@ -545,12 +545,7 @@ export default function Step3Confirm({
       </div>
 
       {/* Encadré informatif */}
-      <div className="mb-5 flex gap-3 p-4 rounded-xl bg-blue-50 border border-blue-100 text-sm text-blue-800">
-        <svg className="w-4 h-4 mt-0.5 shrink-0 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <p>Aucun paiement n'est requis maintenant. L'artisan vous contactera pour établir un devis avant toute intervention.</p>
-      </div>
+      <p className="mb-4 text-xs text-gray-400 text-center">Aucun paiement requis — devis établi avant toute intervention.</p>
 
       {/* Message d'erreur */}
       {error && (
@@ -637,7 +632,7 @@ export default function Step3Confirm({
                 d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
               />
             </svg>
-            Procéder au paiement · {formatPrix(service.prix)}
+            Envoyer la demande
           </>
         ) : (
           <>
