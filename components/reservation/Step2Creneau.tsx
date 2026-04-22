@@ -342,7 +342,7 @@ export default function Step2Creneau({ artisanId, service, onSelect, onBack }: P
       {selectedDayInfo && (
         <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-200">
           <p className="text-sm font-semibold text-gray-700 mb-3">
-            Créneaux disponibles —{" "}
+            Créneaux disponibles :{" "}
             <span className="text-brand-600">
               {JOURS_COURTS[selectedDayIdx!]} {selectedDayInfo.date.getDate()} {MOIS[selectedDayInfo.date.getMonth()]}
             </span>
@@ -389,7 +389,7 @@ export default function Step2Creneau({ artisanId, service, onSelect, onBack }: P
           ? `Continuer – ${JOURS_COURTS[selectedDayIdx!]} ${selectedDayInfo.date.getDate()} ${MOIS[selectedDayInfo.date.getMonth()]} à ${selectedSlot.debut}`
           : "Sélectionnez un créneau pour continuer"}
       </button>
-      <p className="mt-6 text-xs text-gray-400 text-center">Aucun paiement requis — devis établi avant toute intervention.</p>
+      <p className="mt-6 text-xs text-gray-400 text-center">Aucun paiement requis - devis établi avant toute intervention.</p>
     </div>
   );
 }

@@ -81,7 +81,7 @@ export default async function OnboardingartisanPage() {
         <div className="mt-6 text-center">
           <a href="/dashboard/artisan"
             className="text-sm text-gray-400 hover:text-gray-600 underline underline-offset-2">
-            Passer pour l&apos;instant — je compléterai mon profil plus tard
+            Passer pour l&apos;instant - je compléterai mon profil plus tard
           </a>
         </div>
       </main>

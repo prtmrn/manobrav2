@@ -153,7 +153,7 @@ export default function AdminKpisPage() {
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-white">KPIs</h1>
-        <p className="text-sm text-gray-400 mt-1">Indicateurs clés de performance — Manobra</p>
+        <p className="text-sm text-gray-400 mt-1">Indicateurs clés de performance - Manobra</p>
       </div>
 
       {/* Onglets */}

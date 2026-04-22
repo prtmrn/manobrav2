@@ -108,7 +108,7 @@ export default function PhotoUpload({
             </div>
             {value && (
               <p className="text-xs text-gray-400">
-                {value.name} — {(value.size / 1024 / 1024).toFixed(2)} Mo
+                {value.name} - {(value.size / 1024 / 1024).toFixed(2)} Mo
               </p>
             )}
           </div>
@@ -129,7 +129,7 @@ export default function PhotoUpload({
                 ou <span className="text-brand-600 font-semibold">parcourir</span>
               </p>
               <p className="text-xs text-gray-400 mt-1">
-                JPG, PNG, WebP — max {MAX_MB} Mo
+                JPG, PNG, WebP - max {MAX_MB} Mo
               </p>
             </div>
           </div>

@@ -545,7 +545,7 @@ export default function Step3Confirm({
       </div>
 
       {/* Encadré informatif */}
-      <p className="mb-4 text-xs text-gray-400 text-center">Aucun paiement requis — devis établi avant toute intervention.</p>
+      <p className="mb-4 text-xs text-gray-400 text-center">Aucun paiement requis - devis établi avant toute intervention.</p>
 
       {/* Message d'erreur */}
       {error && (

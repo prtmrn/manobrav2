@@ -124,8 +124,8 @@ export async function PATCH(request: Request, context: RouteContext) {
 
       if (clientEmail) {
         const subject = newStatut === "confirme"
-          ? `Votre réservation est confirmée — ${serviceTitre}`
-          : `Votre réservation a été refusée — ${serviceTitre}`;
+          ? `Votre réservation est confirmée - ${serviceTitre}`
+          : `Votre réservation a été refusée - ${serviceTitre}`;
         const statusLabel = newStatut === "confirme" ? "confirmée" : "refusée";
         const color = newStatut === "confirme" ? "#16a34a" : "#dc2626";
 
@@ -149,7 +149,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     if (role === "client" && newStatut === "annule" && artisanEmail) {
       await sendBrevoEmail({
         to: [{ email: artisanEmail, name: artisan?.prenom ?? '' }],
-        subject: `Réservation annulée — ${serviceTitre}`,
+        subject: `Réservation annulée - ${serviceTitre}`,
         htmlContent: `
           <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px">
             <h1 style="font-size:22px;color:#111">Bonjour ${artisan?.prenom ?? ""},</h1>
