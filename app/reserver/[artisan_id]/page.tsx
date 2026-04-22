@@ -1,6 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import ReservationTunnel from "@/components/reservation/ReservationTunnel";
 import type { Tartisan, TService } from "@/components/reservation/ReservationTunnel";
 
