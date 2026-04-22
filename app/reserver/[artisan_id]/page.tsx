@@ -63,12 +63,24 @@ export default async function ReserverPage({ params }: PageProps) {
 
   if (!artisanRes.data) notFound();
 
+  let clientProfile: { prenom: string | null; nom: string | null; telephone: string | null } | null = null;
+  if (user) {
+    const admin = createAdminClient();
+    const { data: cp } = await admin
+      .from("profiles_clients")
+      .select("prenom, nom, telephone")
+      .eq("id", user.id)
+      .maybeSingle();
+    clientProfile = cp as any;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <ReservationTunnel
         artisan={artisanRes.data as Tartisan}
         services={(servicesRes.data ?? []) as TService[]}
-        clientId={user?.id ?? null}
+clientId={user?.id ?? null}
+        clientProfile={clientProfile}
         isGuest={!user}
       />
     </div>

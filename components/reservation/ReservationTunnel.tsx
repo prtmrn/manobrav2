@@ -109,9 +109,10 @@ interface Props {
   services: TService[];
   clientId: string | null;
   isGuest: boolean;
+  clientProfile?: { prenom: string | null; nom: string | null; telephone: string | null } | null;
 }
 
-export default function ReservationTunnel({ artisan, services, clientId, isGuest }: Props) {
+export default function ReservationTunnel({ artisan, services, clientId, isGuest, clientProfile }: Props) {
   const [state, setState] = useState<TunnelState>({
     step: 1,
     service: null,
@@ -148,7 +149,7 @@ export default function ReservationTunnel({ artisan, services, clientId, isGuest
       {/* En-tête artisan */}
       <div className="flex items-center gap-3 mb-7">
         <Link
-          href={`/artisans/${artisan.id}`}
+          href={`/prestataires/${artisan.id}`}
           className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
           aria-label="Retour au profil du artisan"
         >
@@ -206,6 +207,7 @@ export default function ReservationTunnel({ artisan, services, clientId, isGuest
           slot={state.slot}
           onBack={goBack}
           isGuest={isGuest}
+          clientProfile={clientProfile}
         />
       )}
     </div>

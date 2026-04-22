@@ -220,6 +220,7 @@ interface Props {
   slot: TSlot;
   onBack: () => void;
   isGuest: boolean;
+  clientProfile?: { prenom: string | null; nom: string | null; telephone: string | null } | null;
 }
 
 export default function Step3Confirm({
@@ -229,6 +230,7 @@ export default function Step3Confirm({
   slot,
   onBack,
   isGuest,
+  clientProfile,
 }: Props) {
   const [localStep, setLocalStep] = useState<LocalStep>("address");
   const [adresse, setAdresse] = useState("");
@@ -236,8 +238,8 @@ export default function Step3Confirm({
   const [error, setError] = useState<string | null>(null);
   const [reservationId, setReservationId] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [guestNom, setGuestNom] = useState("");
-  const [guestTelephone, setGuestTelephone] = useState("");
+  const [guestNom, setGuestNom] = useState(clientProfile ? `${clientProfile.prenom ?? ""} ${clientProfile.nom ?? ""}`.trim() : "");
+  const [guestTelephone, setGuestTelephone] = useState(clientProfile?.telephone ?? "");
   const [guestEmail, setGuestEmail] = useState("");
 
   const fullName = `${artisan.prenom ?? ""} ${artisan.nom ?? ""}`.trim();
@@ -559,7 +561,7 @@ export default function Step3Confirm({
         </svg>
         <span>
           {hasPrix
-            ? "Votre paiement sera encaissé immédiatement et sécurisé par Stripe. Le artisan confirmera ensuite votre créneau."
+            ? "Votre demande sera transmise à l'artisan qui confirmera votre créneau."
             : "Votre demande sera transmise au artisan. Vous serez contacté pour définir les modalités."}
         </span>
       </div>
