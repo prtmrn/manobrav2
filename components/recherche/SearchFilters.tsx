@@ -185,7 +185,7 @@ export default function SearchFilters({
               className="flex-1 accent-brand-600"
             />
             <span className="text-xs font-semibold text-brand-600 whitespace-nowrap">
-              {parseInt(rayon) >= 49 ? "50+ km" : `${rayon} km`}
+              {parseInt(rayon) >= 49 ? "50 km" : `${rayon} km`}
             </span>
           </div>
         )}
