@@ -74,6 +74,8 @@ export default function SearchFilters({
   const [prixMax, setPrixMax] = useState(initialPrixMax ?? "");
   const [noteMin, setNoteMin] = useState(initialNoteMin ?? "0");
   const [dispo, setDispo] = useState(initialDispo === "true");
+  const [dispoMode, setDispoMode] = useState("");
+  const [dispoDate, setDispoDate] = useState("");
   const [vue, setVue] = useState<"grille" | "carte">(initialVue);
 
   // ── URL push ─────────────────────────────────────────────────────────────
@@ -316,22 +318,46 @@ export default function SearchFilters({
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                 Disponibilité
               </label>
-              <label className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors select-none">
-                <input
-                  type="checkbox"
-                  checked={dispo}
-                  onChange={(e) => setDispo(e.target.checked)}
-                  className="w-4 h-4 accent-brand-600 cursor-pointer"
-                />
-                <div>
-                  <p className="text-sm text-gray-700 font-medium leading-tight">
-                    Disponible cette semaine
-                  </p>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    Au moins un créneau libre
-                  </p>
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: "Aujourd'hui", value: "today" },
+                    { label: "Demain", value: "tomorrow" },
+                    { label: "Cette semaine", value: "week" },
+                    { label: "Ce week-end", value: "weekend" },
+                  ].map(({ label, value }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => {
+                        const newDispo = dispoMode === value ? false : true;
+                        setDispoMode(dispoMode === value ? "" : value);
+                        setDispo(newDispo);
+                        applyFilters({ dispo: newDispo });
+                      }}
+                      className={`px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                        dispoMode === value
+                          ? "bg-brand-600 text-white border-brand-600"
+                          : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
                 </div>
-              </label>
+                <input
+                  type="date"
+                  value={dispoDate}
+                  min={new Date().toISOString().split("T")[0]}
+                  onChange={(e) => {
+                    setDispoDate(e.target.value);
+                    setDispoMode("");
+                    setDispo(!!e.target.value);
+                    applyFilters({ dispo: !!e.target.value });
+                  }}
+                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                />
+              </div>
             </div>
 
             {/* Mobile view toggle */}
