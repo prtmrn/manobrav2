@@ -96,10 +96,13 @@ export default function SearchFilters({
       const d = overrides.dispo !== undefined ? overrides.dispo : dispo;
       const vu = overrides.vue !== undefined ? overrides.vue : vue;
 
+      const lat = overrides.lat !== undefined ? overrides.lat : clientLat;
+      const lng = overrides.lng !== undefined ? overrides.lng : clientLng;
+      const r = overrides.rayon !== undefined ? overrides.rayon : rayon;
       const qs = new URLSearchParams();
       if (m) qs.set("metier", m);
       if (v.trim()) qs.set("ville", v.trim());
-      if (clientLat) { qs.set("lat", clientLat); qs.set("lng", clientLng); qs.set("rayon", rayon); }
+      if (lat) { qs.set("lat", lat); qs.set("lng", lng); qs.set("rayon", r); }
       if (pm) qs.set("prix_max", pm);
       if (nm && nm !== "0") qs.set("note_min", nm);
       if (d) qs.set("dispo", "true");
@@ -110,7 +113,7 @@ export default function SearchFilters({
         router.push(`${pathname}?${qs.toString()}`);
       });
     },
-    [metier, ville, prixMax, noteMin, dispo, vue, pathname, router]
+    [metier, ville, prixMax, noteMin, dispo, vue, pathname, router, clientLat, clientLng, rayon]
   );
 
   const resetFilters = () => {
