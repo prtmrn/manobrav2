@@ -166,6 +166,26 @@ export default function SearchFilters({
           />
         </div>
 
+        {/* Slider distance inline */}
+        {clientLat && (
+          <div className="flex items-center gap-2 min-w-[140px]">
+            <input
+              type="range"
+              min="1"
+              max="100"
+              step="1"
+              value={rayon}
+              onChange={(e) => {
+                setRayon(e.target.value);
+                applyFilters({ lat: clientLat, lng: clientLng, rayon: e.target.value });
+              }}
+              className="flex-1 accent-brand-600"
+            />
+            <span className="text-xs font-semibold text-brand-600 whitespace-nowrap">
+              {parseInt(rayon) >= 100 ? "50+ km" : `${rayon} km`}
+            </span>
+          </div>
+        )}
         {/* Métier quick select (visible on sm+) */}
         <div className="hidden sm:block w-44">
           <select
@@ -192,7 +212,7 @@ export default function SearchFilters({
               : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
           }`}
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M3 4a1 1 0 011-1h16a1 1 0 010 2H4a1 1 0 01-1-1zm3 5a1 1 0 011-1h10a1 1 0 010 2H7a1 1 0 01-1-1zm4 5a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1z" />
           </svg>
@@ -315,38 +335,13 @@ export default function SearchFilters({
             </div>
 
             {/* Disponibilité */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-                Distance maximale
-              </label>
-              <div className="space-y-2">
-                <input
-                  type="range"
-                  min="1"
-                  max="100"
-                  step="1"
-                  value={rayon}
-                  onChange={(e) => {
-                    setRayon(e.target.value);
-                    if (clientLat) applyFilters({ lat: clientLat, lng: clientLng, rayon: e.target.value });
-                  }}
-                  className="w-full accent-brand-600"
-                />
-                <div className="flex justify-between text-xs text-gray-400">
-                  <span>1 km</span>
-                  <span className="font-semibold text-brand-600">
-                    {parseInt(rayon) >= 100 ? "50+ km" : `${rayon} km`}
-                  </span>
-                  <span>50+ km</span>
-                </div>
-              </div>
-            </div>
+
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                 Disponibilité
               </label>
               <div className="space-y-2">
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-1.5">
                   {[
                     { label: "Aujourd'hui", value: "today" },
                     { label: "Demain", value: "tomorrow" },
@@ -362,7 +357,7 @@ export default function SearchFilters({
                         setDispo(newDispo);
                         applyFilters({ dispo: newDispo });
                       }}
-                      className={`px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                      className={`px-2 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
                         dispoMode === value
                           ? "bg-brand-600 text-white border-brand-600"
                           : "border-gray-200 text-gray-600 hover:bg-gray-50"
@@ -464,7 +459,15 @@ export default function SearchFilters({
               label={`📍 ${ville}`}
               onRemove={() => {
                 setVille("");
-                applyFilters({ ville: "" });
+                setAdresseLabel("");
+                setClientLat("");
+                setClientLng("");
+                const qs = new URLSearchParams(window.location.search);
+                qs.delete("ville");
+                qs.delete("lat");
+                qs.delete("lng");
+                qs.delete("rayon");
+                applyFilters({ ville: "", lat: "", lng: "" });
               }}
             />
           )}
