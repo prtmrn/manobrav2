@@ -15,7 +15,7 @@ const inter = Inter({
 
 // ─── Viewport ─────────────────────────────────────────────────────────────────
 export const viewport: Viewport = {
-  themeColor: "#16a34a",          // brand-600 | barre de statut mobile
+  themeColor: "#1e3a8a",          // brand-600 — barre de statut mobile
   width: "device-width",
   initialScale: 1,
 };
@@ -26,15 +26,15 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://Manobra.fr"
   ),
   title: {
-    default: "Manobra | Artisans & artisans à domicile",
+    default: "Manobra — Artisans qualifiés à domicile",
     template: "%s | Manobra",
   },
   description:
-    "Trouvez des plombiers, électriciens, peintres et autres professionnels " +
+    "Trouvez un artisan vérifié près de chez vous en quelques minutes. Plombier, électricien, serrurier, chauffagiste : disponibilités en temps réel, réservation instantanée, intervention possible en 30 minutes. " +
     "vérifiés près de chez vous. Réservez en ligne en quelques clics.",
   keywords: [
     "artisan",
-    "artisan",
+    "chauffagiste",
     "plombier",
     "électricien",
     "peintre",
@@ -58,13 +58,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     siteName: "Manobra",
-    title: "Manobra | Artisans & artisans à domicile",
+    title: "Manobra — Artisans qualifiés à domicile",
     description:
       "Trouvez des professionnels vérifiés près de chez vous et réservez en ligne.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Manobra | Artisans & artisans à domicile",
+    title: "Manobra — Artisans qualifiés à domicile",
     description:
       "Trouvez des professionnels vérifiés près de chez vous et réservez en ligne.",
   },
