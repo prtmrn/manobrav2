@@ -38,6 +38,9 @@ const fmtEuro = (n: number) =>
 interface SearchParams {
   metier?: string;
   ville?: string;
+  lat?: string;
+  lng?: string;
+  rayon?: string;
   prix_max?: string;
   note_min?: string;
   dispo?: string;
@@ -201,6 +204,9 @@ export default async function RecherchePage({ searchParams }: PageProps) {
       ? params.metier
       : null;
   const villeFilter = params.ville?.trim() || null;
+  const clientLat = params.lat ? parseFloat(params.lat) : null;
+  const clientLng = params.lng ? parseFloat(params.lng) : null;
+  const rayonKm = params.rayon ? parseFloat(params.rayon) : null;
   const prixMax = params.prix_max ? parseInt(params.prix_max) : null;
   const noteMin = params.note_min ? parseFloat(params.note_min) : null;
   const dispoFilter = params.dispo === "true";
@@ -231,7 +237,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
     order: "note_moyenne.desc",
   });
   if (metierFilter) queryParams.append("metier", `cs.{${metierFilter}}`);
-  if (villeFilter) queryParams.append("or", `(ville.ilike.*${villeFilter}*,code_postal.ilike.*${villeFilter}*)`);
+  // Filtre ville remplace par distance cote JS
   if (noteMin !== null && noteMin > 0) queryParams.append("note_moyenne", `gte.${noteMin}`);
   const apiRes = await fetch(`${supabaseUrl}/rest/v1/profiles_artisans?${queryParams.toString()}`, {
     headers: {
@@ -275,6 +281,11 @@ export default async function RecherchePage({ searchParams }: PageProps) {
       return false;
     // Disponibilité filter
     if (dispoIds !== null && !dispoIds.has(p.id)) return false;
+    if (clientLat !== null && clientLng !== null && rayonKm !== null) {
+      if (p.latitude === null || p.longitude === null) return false;
+      const dist = haversine(clientLat, clientLng, p.latitude, p.longitude);
+      if (dist > rayonKm) return false;
+    }
     return true;
   });
 
