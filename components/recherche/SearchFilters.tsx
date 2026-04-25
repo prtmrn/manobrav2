@@ -172,7 +172,7 @@ export default function SearchFilters({
             <input
               type="range"
               min="1"
-              max="100"
+              max="49"
               step="1"
               value={rayon}
               onChange={(e) => {
@@ -182,7 +182,7 @@ export default function SearchFilters({
               className="flex-1 accent-brand-600"
             />
             <span className="text-xs font-semibold text-brand-600 whitespace-nowrap">
-              {parseInt(rayon) >= 100 ? "50+ km" : `${rayon} km`}
+              {parseInt(rayon) >= 49 ? "50+ km" : `${rayon} km`}
             </span>
           </div>
         )}
