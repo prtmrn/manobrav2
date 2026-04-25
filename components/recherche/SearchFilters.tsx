@@ -13,6 +13,7 @@ interface FilterOverrides {
   lat?: string;
   lng?: string;
   rayon?: string;
+  adresse?: string;
   prixMax?: string;
   noteMin?: string;
   dispo?: boolean;
@@ -22,6 +23,7 @@ interface FilterOverrides {
 interface SearchFiltersProps {
   initialMetier?: string;
   initialVille?: string;
+  initialAdresse?: string;
   initialPrixMax?: string;
   initialNoteMin?: string;
   initialDispo?: string;
@@ -60,6 +62,7 @@ function FilterChip({
 export default function SearchFilters({
   initialMetier,
   initialVille,
+  initialAdresse,
   initialPrixMax,
   initialNoteMin,
   initialDispo,
@@ -78,7 +81,7 @@ export default function SearchFilters({
   const [clientLat, setClientLat] = useState("");
   const [clientLng, setClientLng] = useState("");
   const [rayon, setRayon] = useState("20");
-  const [adresseLabel, setAdresseLabel] = useState(initialVille ?? "");
+  const [adresseLabel, setAdresseLabel] = useState(initialAdresse ?? initialVille ?? "");
   const [prixMax, setPrixMax] = useState(initialPrixMax ?? "");
   const [noteMin, setNoteMin] = useState(initialNoteMin ?? "0");
   const [dispo, setDispo] = useState(initialDispo === "true");
@@ -101,8 +104,8 @@ export default function SearchFilters({
       const r = overrides.rayon !== undefined ? overrides.rayon : rayon;
       const qs = new URLSearchParams();
       if (m) qs.set("metier", m);
-      if (v.trim()) qs.set("ville", v.trim());
-      if (lat) { qs.set("lat", lat); qs.set("lng", lng); qs.set("rayon", r); }
+      if (lat) { qs.set("lat", lat); qs.set("lng", lng); qs.set("rayon", r); const al = overrides.adresse !== undefined ? overrides.adresse : adresseLabel; if (al) qs.set("adresse", al); }
+      else if (v.trim()) qs.set("ville", v.trim());
       if (pm) qs.set("prix_max", pm);
       if (nm && nm !== "0") qs.set("note_min", nm);
       if (d) qs.set("dispo", "true");

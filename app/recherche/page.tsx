@@ -41,6 +41,7 @@ interface SearchParams {
   lat?: string;
   lng?: string;
   rayon?: string;
+  adresse?: string;
   prix_max?: string;
   note_min?: string;
   dispo?: string;
@@ -389,6 +390,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
         <SearchFilters
           initialMetier={params.metier}
           initialVille={params.ville}
+          initialAdresse={params.adresse}
           initialPrixMax={params.prix_max}
           initialNoteMin={params.note_min}
           initialDispo={params.dispo}
