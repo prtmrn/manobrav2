@@ -18,6 +18,8 @@ interface FilterOverrides {
   noteMin?: string;
   dispo?: boolean;
   vue?: "grille" | "carte";
+  tri?: string;
+  ordre?: string;
 }
 
 interface SearchFiltersProps {
