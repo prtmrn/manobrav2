@@ -227,7 +227,6 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   const vue = params.vue === "carte" ? "carte" : "grille";
   const tri = ["note", "distance", "prix", "pertinence"].includes(params.tri ?? "") ? params.tri! : "pertinence";
   const ordre = params.ordre === "asc" ? "asc" : "desc";
-  console.log("[DEBUG] tri=", tri, "ordre=", ordre, "params.tri=", params.tri);
 
   const admin = createAdminClient();
 
