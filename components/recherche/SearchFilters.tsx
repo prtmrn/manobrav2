@@ -24,6 +24,8 @@ interface SearchFiltersProps {
   initialMetier?: string;
   initialVille?: string;
   initialAdresse?: string;
+  initialTri?: string;
+  initialOrdre?: string;
   initialPrixMax?: string;
   initialNoteMin?: string;
   initialDispo?: string;
@@ -63,6 +65,8 @@ export default function SearchFilters({
   initialMetier,
   initialVille,
   initialAdresse,
+  initialTri,
+  initialOrdre,
   initialPrixMax,
   initialNoteMin,
   initialDispo,
@@ -87,6 +91,8 @@ export default function SearchFilters({
   const [dispo, setDispo] = useState(initialDispo === "true");
   const [dispoMode, setDispoMode] = useState("");
   const [dispoDate, setDispoDate] = useState("");
+  const [tri, setTri] = useState(initialTri ?? "note");
+  const [ordre, setOrdre] = useState(initialOrdre ?? "desc");
   const [vue, setVue] = useState<"grille" | "carte">(initialVue);
 
   // ── URL push ─────────────────────────────────────────────────────────────
@@ -110,6 +116,12 @@ export default function SearchFilters({
       if (nm && nm !== "0") qs.set("note_min", nm);
       if (d) qs.set("dispo", "true");
       if (vu !== "grille") qs.set("vue", vu);
+      const t = (overrides as any).tri !== undefined ? (overrides as any).tri : tri;
+      const o = (overrides as any).ordre !== undefined ? (overrides as any).ordre : ordre;
+      if (t !== "note") qs.set("tri", t);
+      if (o !== "desc") qs.set("ordre", o);
+      if (tri !== "note") qs.set("tri", tri);
+      if (ordre !== "desc") qs.set("ordre", ordre);
       // Always reset to page 1 on filter change
 
       startTransition(() => {
@@ -126,6 +138,8 @@ export default function SearchFilters({
     setClientLng("");
     setRayon("20");
     setAdresseLabel("");
+    setTri("note");
+    setOrdre("desc");
     setPrixMax("");
     setNoteMin("0");
     setDispo(false);
@@ -209,6 +223,33 @@ export default function SearchFilters({
           </select>
         </div>
 
+        {/* Tri */}
+        <div className="flex items-center gap-1 rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <select
+            value={tri}
+            onChange={(e) => { setTri(e.target.value); applyFilters({ tri: e.target.value } as any); }}
+            className="px-2 py-2.5 text-xs font-medium text-gray-600 bg-transparent border-none focus:outline-none cursor-pointer"
+          >
+            <option value="note">Note</option>
+            <option value="distance">Distance</option>
+            <option value="prix">Prix</option>
+          </select>
+          <button
+            onClick={() => { const o = ordre === "desc" ? "asc" : "desc"; setOrdre(o); applyFilters({ ordre: o } as any); }}
+            className="px-2 py-2.5 text-gray-500 hover:text-brand-600 transition-colors border-l border-gray-100"
+            title={ordre === "desc" ? "Décroissant" : "Croissant"}
+          >
+            {ordre === "desc" ? (
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+              </svg>
+            ) : (
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
+              </svg>
+            )}
+          </button>
+        </div>
         {/* Advanced filters toggle */}
         <button
           onClick={() => setShowFilters(!showFilters)}

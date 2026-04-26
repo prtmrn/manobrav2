@@ -47,6 +47,8 @@ interface SearchParams {
   dispo?: string;
   page?: string;
   vue?: string;
+  tri?: string;
+  ordre?: string;
 }
 
 interface PageProps {
@@ -223,6 +225,8 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   const dispoFilter = params.dispo === "true";
   const page = Math.max(1, parseInt(params.page ?? "1") || 1);
   const vue = params.vue === "carte" ? "carte" : "grille";
+  const tri = ["note", "distance", "prix"].includes(params.tri ?? "") ? params.tri! : "note";
+  const ordre = params.ordre === "asc" ? "asc" : "desc";
 
   const admin = createAdminClient();
 
@@ -300,8 +304,20 @@ export default async function RecherchePage({ searchParams }: PageProps) {
     return true;
   });
 
-  // Sort by relevance descending
-  filtered.sort((a, b) => b.relevance - a.relevance);
+  // Sort selon le critere choisi
+  filtered.sort((a, b) => {
+    let diff = 0;
+    if (tri === "note") diff = (b.note_moyenne ?? 0) - (a.note_moyenne ?? 0);
+    else if (tri === "prix") diff = (a.prixMin ?? 9999) - (b.prixMin ?? 9999);
+    else if (tri === "distance" && clientLat !== null && clientLng !== null) {
+      const da = (a.latitude !== null && a.longitude !== null) ? haversine(clientLat, clientLng, a.latitude, a.longitude) : 9999;
+      const db = (b.latitude !== null && b.longitude !== null) ? haversine(clientLat, clientLng, b.latitude, b.longitude) : 9999;
+      diff = da - db;
+    } else {
+      diff = (b.note_moyenne ?? 0) - (a.note_moyenne ?? 0);
+    }
+    return ordre === "asc" ? diff : -diff;
+  });
 
   const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
@@ -390,6 +406,8 @@ export default async function RecherchePage({ searchParams }: PageProps) {
         <SearchFilters
           initialMetier={params.metier}
           initialVille={params.ville}
+          initialTri={tri}
+          initialOrdre={ordre}
           initialAdresse={params.adresse}
           initialPrixMax={params.prix_max}
           initialNoteMin={params.note_min}
