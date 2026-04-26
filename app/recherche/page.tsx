@@ -319,7 +319,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
       diff = (b.note_moyenne ?? 0) - (a.note_moyenne ?? 0);
     }
     console.log("[SORT] compare", a.nom, a.note_moyenne, "vs", b.nom, b.note_moyenne, "diff=", diff, "result=", ordre === "asc" ? diff : -diff);
-    return ordre === "asc" ? diff : -diff;
+    return ordre === "asc" ? -diff : diff;
   });
 
   const total = filtered.length;
