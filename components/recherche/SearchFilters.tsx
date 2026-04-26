@@ -2,7 +2,7 @@
 import AddressAutocomplete from "@/components/ui/AddressAutocomplete";
 
 import { useRouter, usePathname } from "next/navigation";
-import { useTransition, useState, useCallback } from "react";
+import { useTransition, useState, useCallback, useRef, useEffect } from "react";
 import { METIER_LIST, METIER_CONFIG } from "@/components/map/metier-config";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -99,20 +99,26 @@ export default function SearchFilters({
   const triLabel = triLabels[tri] ?? "Pertinence";
   const [ordre, setOrdre] = useState(initialOrdre ?? "desc");
   const [vue, setVue] = useState<"grille" | "carte">(initialVue);
+  // Refs pour capturer les valeurs courantes dans applyFilters
+  const stateRef = useRef({ metier, ville, prixMax, noteMin, dispo, vue, clientLat, clientLng, rayon, tri, ordre, adresseLabel });
+  useEffect(() => {
+    stateRef.current = { metier, ville, prixMax, noteMin, dispo, vue, clientLat, clientLng, rayon, tri, ordre, adresseLabel };
+  });
 
   // ── URL push ─────────────────────────────────────────────────────────────
   const applyFilters = useCallback(
     (overrides: FilterOverrides = {}) => {
-      const m = overrides.metier !== undefined ? overrides.metier : metier;
-      const v = overrides.ville !== undefined ? overrides.ville : ville;
-      const pm = overrides.prixMax !== undefined ? overrides.prixMax : prixMax;
-      const nm = overrides.noteMin !== undefined ? overrides.noteMin : noteMin;
-      const d = overrides.dispo !== undefined ? overrides.dispo : dispo;
-      const vu = overrides.vue !== undefined ? overrides.vue : vue;
+      const cur = stateRef.current;
+      const m = overrides.metier !== undefined ? overrides.metier : cur.metier;
+      const v = overrides.ville !== undefined ? overrides.ville : cur.ville;
+      const pm = overrides.prixMax !== undefined ? overrides.prixMax : cur.prixMax;
+      const nm = overrides.noteMin !== undefined ? overrides.noteMin : cur.noteMin;
+      const d = overrides.dispo !== undefined ? overrides.dispo : cur.dispo;
+      const vu = overrides.vue !== undefined ? overrides.vue : cur.vue;
 
-      const lat = overrides.lat !== undefined ? overrides.lat : clientLat;
-      const lng = overrides.lng !== undefined ? overrides.lng : clientLng;
-      const r = overrides.rayon !== undefined ? overrides.rayon : rayon;
+      const lat = overrides.lat !== undefined ? overrides.lat : cur.clientLat;
+      const lng = overrides.lng !== undefined ? overrides.lng : cur.clientLng;
+      const r = overrides.rayon !== undefined ? overrides.rayon : cur.rayon;
       const qs = new URLSearchParams();
       if (m) qs.set("metier", m);
       if (lat) { qs.set("lat", lat); qs.set("lng", lng); qs.set("rayon", r); const al = overrides.adresse !== undefined ? overrides.adresse : adresseLabel; if (al) qs.set("adresse", al); }
@@ -121,8 +127,8 @@ export default function SearchFilters({
       if (nm && nm !== "0") qs.set("note_min", nm);
       if (d) qs.set("dispo", "true");
       if (vu !== "grille") qs.set("vue", vu);
-      const t = overrides.tri !== undefined ? overrides.tri : tri;
-      const o = overrides.ordre !== undefined ? overrides.ordre : ordre;
+      const t = overrides.tri !== undefined ? overrides.tri : cur.tri;
+      const o = overrides.ordre !== undefined ? overrides.ordre : cur.ordre;
       if (t && t !== "pertinence") qs.set("tri", t);
       if (o && o !== "desc") qs.set("ordre", o);
       if (tri !== "note") qs.set("tri", tri);
@@ -133,7 +139,7 @@ export default function SearchFilters({
         router.push(`${pathname}?${qs.toString()}`);
       });
     },
-    [metier, ville, prixMax, noteMin, dispo, vue, pathname, router, clientLat, clientLng, rayon, tri, ordre, adresseLabel]
+    [pathname, router]
   );
 
   const resetFilters = () => {
