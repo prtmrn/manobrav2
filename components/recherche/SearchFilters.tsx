@@ -119,10 +119,10 @@ export default function SearchFilters({
       if (nm && nm !== "0") qs.set("note_min", nm);
       if (d) qs.set("dispo", "true");
       if (vu !== "grille") qs.set("vue", vu);
-      const t = (overrides as any).tri !== undefined ? (overrides as any).tri : tri;
-      const o = (overrides as any).ordre !== undefined ? (overrides as any).ordre : ordre;
-      if (t !== "note") qs.set("tri", t);
-      if (o !== "desc") qs.set("ordre", o);
+      const t = overrides.tri !== undefined ? overrides.tri : tri;
+      const o = overrides.ordre !== undefined ? overrides.ordre : ordre;
+      if (t && t !== "pertinence") qs.set("tri", t);
+      if (o && o !== "desc") qs.set("ordre", o);
       if (tri !== "note") qs.set("tri", tri);
       if (ordre !== "desc") qs.set("ordre", ordre);
       // Always reset to page 1 on filter change
@@ -131,7 +131,7 @@ export default function SearchFilters({
         router.push(`${pathname}?${qs.toString()}`);
       });
     },
-    [metier, ville, prixMax, noteMin, dispo, vue, pathname, router, clientLat, clientLng, rayon]
+    [metier, ville, prixMax, noteMin, dispo, vue, pathname, router, clientLat, clientLng, rayon, tri, ordre, adresseLabel]
   );
 
   const resetFilters = () => {
@@ -252,11 +252,11 @@ export default function SearchFilters({
                     if (tri === value) {
                       const o = ordre === "desc" ? "asc" : "desc";
                       setOrdre(o);
-                      applyFilters({ ordre: o } as any);
+                      setTimeout(() => applyFilters({ ordre: o } as any), 0);
                     } else {
                       setTri(value);
                       setOrdre("desc");
-                      applyFilters({ tri: value, ordre: "desc" } as any);
+                      setTimeout(() => applyFilters({ tri: value, ordre: "desc" } as any), 0);
                     }
                     setShowTri(false);
                   }}
