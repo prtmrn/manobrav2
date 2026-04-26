@@ -247,9 +247,9 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
   const queryParams = new URLSearchParams({
-    select: "id,nom,prenom,metier,ville,code_postal,photo_url,note_moyenne,nombre_avis,abonnement_pro,latitude,longitude",
+    select: "id,nom,prenom,metier,ville,code_postal,photo_url,note_moyenne,nombre_avis,abonnement_pro,latitude,longitude,zone_intervention_km,services(prix)",
     actif: "eq.true",
-    order: "note_moyenne.desc",
+    order: "id.asc",
   });
   if (metierFilter) queryParams.append("metier", `cs.{${metierFilter}}`);
   // Filtre ville remplace par distance cote JS
