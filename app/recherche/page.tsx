@@ -225,7 +225,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   const dispoFilter = params.dispo === "true";
   const page = Math.max(1, parseInt(params.page ?? "1") || 1);
   const vue = params.vue === "carte" ? "carte" : "grille";
-  const tri = ["note", "distance", "prix"].includes(params.tri ?? "") ? params.tri! : "note";
+  const tri = ["note", "distance", "prix", "pertinence"].includes(params.tri ?? "") ? params.tri! : "pertinence";
   const ordre = params.ordre === "asc" ? "asc" : "desc";
 
   const admin = createAdminClient();
@@ -307,7 +307,8 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   // Sort selon le critere choisi
   filtered.sort((a, b) => {
     let diff = 0;
-    if (tri === "note") diff = (b.note_moyenne ?? 0) - (a.note_moyenne ?? 0);
+    if (tri === "pertinence") diff = (b.relevance ?? 0) - (a.relevance ?? 0);
+    else if (tri === "note") diff = (b.note_moyenne ?? 0) - (a.note_moyenne ?? 0);
     else if (tri === "prix") diff = (a.prixMin ?? 9999) - (b.prixMin ?? 9999);
     else if (tri === "distance" && clientLat !== null && clientLng !== null) {
       const da = (a.latitude !== null && a.longitude !== null) ? haversine(clientLat, clientLng, a.latitude, a.longitude) : 9999;

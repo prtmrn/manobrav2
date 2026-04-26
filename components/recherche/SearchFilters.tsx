@@ -91,7 +91,10 @@ export default function SearchFilters({
   const [dispo, setDispo] = useState(initialDispo === "true");
   const [dispoMode, setDispoMode] = useState("");
   const [dispoDate, setDispoDate] = useState("");
-  const [tri, setTri] = useState(initialTri ?? "note");
+  const [tri, setTri] = useState(initialTri ?? "pertinence");
+  const [showTri, setShowTri] = useState(false);
+  const triLabels: Record<string, string> = { pertinence: "Pertinence", note: "Note", prix: "Prix", distance: "Distance" };
+  const triLabel = triLabels[tri] ?? "Pertinence";
   const [ordre, setOrdre] = useState(initialOrdre ?? "desc");
   const [vue, setVue] = useState<"grille" | "carte">(initialVue);
 
@@ -224,31 +227,49 @@ export default function SearchFilters({
         </div>
 
         {/* Tri */}
-        <div className="flex items-center gap-1 rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-          <select
-            value={tri}
-            onChange={(e) => { setTri(e.target.value); applyFilters({ tri: e.target.value } as any); }}
-            className="px-2 py-2.5 text-xs font-medium text-gray-600 bg-transparent border-none focus:outline-none cursor-pointer"
-          >
-            <option value="note">Note</option>
-            <option value="distance">Distance</option>
-            <option value="prix">Prix</option>
-          </select>
+        <div className="relative">
           <button
-            onClick={() => { const o = ordre === "desc" ? "asc" : "desc"; setOrdre(o); applyFilters({ ordre: o } as any); }}
-            className="px-2 py-2.5 text-gray-500 hover:text-brand-600 transition-colors border-l border-gray-100"
-            title={ordre === "desc" ? "Décroissant" : "Croissant"}
+            onClick={() => setShowTri(!showTri)}
+            className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-white shadow-sm text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap"
           >
-            {ordre === "desc" ? (
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-              </svg>
-            ) : (
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
-              </svg>
-            )}
+            <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+            </svg>
+            <span className="hidden sm:inline">Trier par</span> {triLabel}
+            {ordre === "asc" ? " ↑" : " ↓"}
           </button>
+          {showTri && (
+            <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 min-w-[160px] py-1">
+              {[
+                { value: "pertinence", label: "Pertinence" },
+                { value: "note", label: "Note" },
+                { value: "prix", label: "Prix" },
+                { value: "distance", label: "Distance" },
+              ].map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => {
+                    if (tri === value) {
+                      const o = ordre === "desc" ? "asc" : "desc";
+                      setOrdre(o);
+                      applyFilters({ ordre: o } as any);
+                    } else {
+                      setTri(value);
+                      setOrdre("desc");
+                      applyFilters({ tri: value, ordre: "desc" } as any);
+                    }
+                    setShowTri(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center justify-between ${
+                    tri === value ? "text-brand-600 font-semibold bg-brand-50" : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  {label}
+                  {tri === value && <span className="text-xs">{ordre === "desc" ? "↓" : "↑"}</span>}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         {/* Advanced filters toggle */}
         <button
