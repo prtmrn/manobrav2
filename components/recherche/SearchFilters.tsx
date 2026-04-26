@@ -260,11 +260,14 @@ export default function SearchFilters({
                     if (tri === value) {
                       const o = ordre === "desc" ? "asc" : "desc";
                       setOrdre(o);
-                      setTimeout(() => applyFilters({ ordre: o } as any), 0);
+                      stateRef.current.ordre = o;
+                      applyFilters({ ordre: o });
                     } else {
                       setTri(value);
                       setOrdre("desc");
-                      setTimeout(() => applyFilters({ tri: value, ordre: "desc" } as any), 0);
+                      stateRef.current.tri = value;
+                      stateRef.current.ordre = "desc";
+                      applyFilters({ tri: value, ordre: "desc" });
                     }
                     setShowTri(false);
                   }}
