@@ -131,8 +131,6 @@ export default function SearchFilters({
       const o = overrides.ordre !== undefined ? overrides.ordre : cur.ordre;
       if (t && t !== "pertinence") qs.set("tri", t);
       if (o && o !== "desc") qs.set("ordre", o);
-      if (tri !== "note") qs.set("tri", tri);
-      if (ordre !== "desc") qs.set("ordre", ordre);
       // Always reset to page 1 on filter change
 
       startTransition(() => {
@@ -240,10 +238,7 @@ export default function SearchFilters({
             onClick={() => setShowTri(!showTri)}
             className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-white shadow-sm text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap"
           >
-            <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-            </svg>
-            <span className="hidden sm:inline">Trier par</span> {triLabel}
+            <span>Trier par</span> {triLabel}
             {ordre === "asc" ? " ↑" : " ↓"}
           </button>
           {showTri && (
