@@ -100,6 +100,16 @@ export default function SearchFilters({
   const [serviceTag, setServiceTag] = useState(initialServiceTag ?? "");
   const [showServices, setShowServices] = useState(false);
   const servicesRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!showServices) return;
+    function handle(e: MouseEvent) {
+      if (servicesRef.current && !servicesRef.current.contains(e.target as Node)) {
+        setShowServices(false);
+      }
+    }
+    window.addEventListener("click", handle);
+    return () => window.removeEventListener("click", handle);
+  }, [showServices]);
   const [tri, setTri] = useState(initialTri ?? "pertinence");
   const [showTri, setShowTri] = useState(false);
   const triLabels: Record<string, string> = { pertinence: "Pertinence", note: "Note", prix: "Prix", distance: "Distance" };
@@ -267,11 +277,8 @@ export default function SearchFilters({
 
         {/* Services */}
         <div className="relative flex-shrink-0 w-40 sm:w-48">
-          {showServices && (
-            <div className="fixed inset-0 z-40" onClick={() => setShowServices(false)} />
-          )}
           <button
-            onClick={() => { console.log("click services", showServices); setShowServices(prev => !prev); }}
+            onClick={() => setShowServices(prev => !prev)}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border text-sm shadow-sm transition-colors ${
               serviceTag ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-500 hover:bg-gray-50"
             }`}
