@@ -193,7 +193,7 @@ export default function DashboardShell({
 
   const roleMeta =
     role === "artisan"
-      ? { label: "artisan", color: "bg-brand-600", pillClass: "bg-brand-50 text-brand-700 ring-1 ring-brand-200" }
+      ? { label: "Artisan", color: "bg-brand-600", pillClass: "bg-brand-50 text-brand-700 ring-1 ring-brand-200" }
       : { label: "Client", color: "bg-blue-600", pillClass: "bg-blue-50 text-blue-700 ring-1 ring-blue-200" };
 
   return (
@@ -292,7 +292,7 @@ export default function DashboardShell({
       {/* ═══════════════════════════════════════════════════════════════
           BODY (sidebar + contenu)
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex h-[calc(100vh-4rem)] overflow-hidden sticky top-16">
 
         {/* Overlay mobile */}
         {sidebarOpen && (
@@ -311,7 +311,7 @@ export default function DashboardShell({
             "bg-white border-r border-gray-200",
             "flex flex-col",
             "transition-transform duration-200 ease-in-out",
-            "lg:sticky lg:translate-x-0",
+            "lg:relative lg:top-0 lg:h-full lg:translate-x-0",
             sidebarOpen ? "translate-x-0 shadow-xl" : "-translate-x-full",
           ].join(" ")}
         >
