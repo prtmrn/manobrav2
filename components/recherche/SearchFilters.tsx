@@ -100,15 +100,6 @@ export default function SearchFilters({
   const [serviceTag, setServiceTag] = useState(initialServiceTag ?? "");
   const [showServices, setShowServices] = useState(false);
   const servicesRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (servicesRef.current && !servicesRef.current.contains(e.target as Node)) {
-        setShowServices(false);
-      }
-    }
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
   const [tri, setTri] = useState(initialTri ?? "pertinence");
   const [showTri, setShowTri] = useState(false);
   const triLabels: Record<string, string> = { pertinence: "Pertinence", note: "Note", prix: "Prix", distance: "Distance" };
@@ -275,7 +266,7 @@ export default function SearchFilters({
         </div>
 
         {/* Services */}
-        <div className="relative flex-shrink-0 w-40 sm:w-48" ref={servicesRef}>
+        <div className="relative flex-shrink-0 w-40 sm:w-48" ref={servicesRef} onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setShowServices(false); }} tabIndex={-1}>
           {(() => {
             const selectedService = SERVICES_STANDARDISES.find(s => s.id === serviceTag);
             const grouped = METIER_LIST.map(m => ({
@@ -285,7 +276,7 @@ export default function SearchFilters({
             return (
               <>
                 <button
-                  onClick={(e) => { e.stopPropagation(); setShowServices(prev => !prev); }}
+                  onClick={() => setShowServices(prev => !prev)}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border text-sm shadow-sm transition-colors ${
                     serviceTag ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-500 hover:bg-gray-50"
                   }`}
