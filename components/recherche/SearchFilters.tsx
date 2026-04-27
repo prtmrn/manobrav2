@@ -279,7 +279,7 @@ export default function SearchFilters({
         {/* Services */}
         <div className="relative flex-shrink-0 w-40 sm:w-48">
           <button
-            onClick={() => setShowServices(prev => !prev)}
+            onClick={() => { const next = !showServices; console.log("services click, showServices sera:", next); setShowServices(next); }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border text-sm shadow-sm transition-colors ${
               serviceTag ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-500 hover:bg-gray-50"
             }`}
