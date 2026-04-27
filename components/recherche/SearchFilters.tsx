@@ -99,6 +99,16 @@ export default function SearchFilters({
   const [dispoDate, setDispoDate] = useState("");
   const [serviceTag, setServiceTag] = useState(initialServiceTag ?? "");
   const [showServices, setShowServices] = useState(false);
+  const servicesRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (servicesRef.current && !servicesRef.current.contains(e.target as Node)) {
+        setShowServices(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   const [tri, setTri] = useState(initialTri ?? "pertinence");
   const [showTri, setShowTri] = useState(false);
   const triLabels: Record<string, string> = { pertinence: "Pertinence", note: "Note", prix: "Prix", distance: "Distance" };
@@ -219,7 +229,7 @@ export default function SearchFilters({
           <div className="flex rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
             <button
               onClick={() => { setVue("grille"); applyFilters({ vue: "grille" }); }}
-              className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-semibold transition-colors ${
+              className={`flex items-center gap-1 px-2.5 py-2 text-xs font-semibold transition-colors ${
                 vue === "grille" ? "bg-brand-600 text-white" : "text-gray-500 hover:bg-gray-50"
               }`}
             >
@@ -230,7 +240,7 @@ export default function SearchFilters({
             </button>
             <button
               onClick={() => { setVue("carte"); applyFilters({ vue: "carte" }); }}
-              className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-semibold transition-colors border-l border-gray-200 ${
+              className={`flex items-center gap-1 px-2.5 py-2 text-xs font-semibold transition-colors border-l border-gray-200 ${
                 vue === "carte" ? "bg-brand-600 text-white" : "text-gray-500 hover:bg-gray-50"
               }`}
             >
@@ -244,9 +254,9 @@ export default function SearchFilters({
       </div>
 
       {/* ── Ligne filtres ─────────────────────────────────────────────────── */}
-      <div className="flex flex-wrap sm:flex-nowrap gap-2">
+      <div className="flex flex-nowrap gap-2 overflow-x-auto">
         {/* Métier */}
-        <div className="w-full sm:w-40">
+        <div className="flex-shrink-0 w-36 sm:w-40">
           <select
             value={metier}
             onChange={(e) => {
@@ -265,7 +275,7 @@ export default function SearchFilters({
         </div>
 
         {/* Services */}
-        <div className="relative w-full sm:w-48">
+        <div className="relative flex-shrink-0 w-40 sm:w-48" ref={servicesRef}>
           {(() => {
             const selectedService = SERVICES_STANDARDISES.find(s => s.id === serviceTag);
             const grouped = METIER_LIST.map(m => ({
@@ -343,7 +353,7 @@ export default function SearchFilters({
         <div className="relative">
           <button
             onClick={() => setShowTri(!showTri)}
-            className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-white shadow-sm text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-white shadow-sm text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap"
           >
             <span className="hidden sm:inline">Trier par</span> {triLabel}
             {ordre === "asc" ? " ↑" : " ↓"}
