@@ -266,63 +266,55 @@ export default function SearchFilters({
         </div>
 
         {/* Services */}
-        <div className="relative flex-shrink-0 w-40 sm:w-48" ref={servicesRef}>
-          {(() => {
-            const selectedService = SERVICES_STANDARDISES.find(s => s.id === serviceTag);
-            const grouped = METIER_LIST.map(m => ({
-              metier: m,
-              services: SERVICES_STANDARDISES.filter(s => s.metier === m && (!metier || m === metier))
-            })).filter(g => g.services.length > 0);
-            return (
-              <>
-                {showServices && (
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setShowServices(false)}
-                  />
-                )}
-                <button
-                  onClick={() => setShowServices(prev => !prev)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border text-sm shadow-sm transition-colors ${
-                    serviceTag ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-500 hover:bg-gray-50"
-                  }`}
-                >
-                  <span className="truncate">{selectedService ? selectedService.label : "Tous les services"}</span>
-                  <svg className="w-4 h-4 flex-shrink-0 ml-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {showServices && (
-                  <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 w-72 max-h-80 overflow-y-auto py-1">
-                    <button
-                      onClick={() => { setServiceTag(""); stateRef.current.serviceTag = ""; applyFilters({ serviceTag: "" }); setShowServices(false); }}
-                      className={`w-full text-left px-4 py-2 text-sm transition-colors ${!serviceTag ? "text-brand-600 font-semibold bg-brand-50" : "text-gray-600 hover:bg-gray-50"}`}
-                    >
-                      Tous les services
-                    </button>
-                    {grouped.map(g => (
-                      <div key={g.metier}>
-                        {!metier && (
-                          <div className="px-4 py-1.5 text-xs font-bold text-gray-400 uppercase tracking-wide border-t border-gray-100 mt-1">
-                            {g.metier}
-                          </div>
-                        )}
-                        {g.services.map(svc => (
-                          <button
-                            key={svc.id}
-                            onClick={() => { setServiceTag(svc.id); stateRef.current.serviceTag = svc.id; applyFilters({ serviceTag: svc.id }); setShowServices(false); }}
-                            className={`w-full text-left px-4 py-2 text-sm transition-colors ${serviceTag === svc.id ? "text-brand-600 font-semibold bg-brand-50" : "text-gray-700 hover:bg-gray-50"}`}
-                          >
-                            {svc.label}
-                          </button>
-                        ))}
+        <div className="relative flex-shrink-0 w-40 sm:w-48">
+          {showServices && (
+            <div className="fixed inset-0 z-40" onClick={() => setShowServices(false)} />
+          )}
+          <button
+            onClick={() => setShowServices(prev => !prev)}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border text-sm shadow-sm transition-colors ${
+              serviceTag ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-500 hover:bg-gray-50"
+            }`}
+          >
+            <span className="truncate">
+              {SERVICES_STANDARDISES.find(s => s.id === serviceTag)?.label ?? "Tous les services"}
+            </span>
+            <svg className="w-4 h-4 flex-shrink-0 ml-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {showServices && (
+            <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 w-72 max-h-80 overflow-y-auto py-1">
+              <button
+                onClick={() => { setServiceTag(""); stateRef.current.serviceTag = ""; applyFilters({ serviceTag: "" }); setShowServices(false); }}
+                className={`w-full text-left px-4 py-2 text-sm transition-colors ${!serviceTag ? "text-brand-600 font-semibold bg-brand-50" : "text-gray-600 hover:bg-gray-50"}`}
+              >
+                Tous les services
+              </button>
+              {METIER_LIST.map(m => {
+                const svcs = SERVICES_STANDARDISES.filter(s => s.metier === m && (!metier || m === metier));
+                if (svcs.length === 0) return null;
+                return (
+                  <div key={m}>
+                    {!metier && (
+                      <div className="px-4 py-1.5 text-xs font-bold text-gray-400 uppercase tracking-wide border-t border-gray-100 mt-1">
+                        {m}
                       </div>
+                    )}
+                    {svcs.map(svc => (
+                      <button
+                        key={svc.id}
+                        onClick={() => { setServiceTag(svc.id); stateRef.current.serviceTag = svc.id; applyFilters({ serviceTag: svc.id }); setShowServices(false); }}
+                        className={`w-full text-left px-4 py-2 text-sm transition-colors ${serviceTag === svc.id ? "text-brand-600 font-semibold bg-brand-50" : "text-gray-700 hover:bg-gray-50"}`}
+                      >
+                        {svc.label}
+                      </button>
                     ))}
                   </div>
-                )}
-              </>
-            );
-          })()}
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Filtres avancés */}
