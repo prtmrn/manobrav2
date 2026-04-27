@@ -183,7 +183,7 @@ export default function SearchFilters({
 
   // ── Render ─────────────────────────────────────────────────────────────
   return (
-    <div className={`transition-opacity duration-200 ${isPending ? "opacity-50 pointer-events-none" : ""}`}>
+    <div className={`transition-opacity duration-200 ${isPending ? "opacity-50" : ""}`}>
 
       {/* ── Ligne adresse ─────────────────────────────────────────────────── */}
       <div className="flex gap-2 mb-2">
