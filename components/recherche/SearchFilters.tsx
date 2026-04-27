@@ -106,8 +106,8 @@ export default function SearchFilters({
         setShowServices(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
   const [tri, setTri] = useState(initialTri ?? "pertinence");
   const [showTri, setShowTri] = useState(false);
