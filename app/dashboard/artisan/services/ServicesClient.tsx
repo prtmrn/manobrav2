@@ -1,6 +1,6 @@
 "use client";
 import { METIER_LIST } from "@/components/map/metier-config";
-import { getServicesForMetier } from "@/lib/services-standardises";
+import { getServicesForMetiers, normalizeStr, SERVICES_STANDARDISES } from "@/lib/services-standardises";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -37,6 +37,8 @@ export default function ServicesClient({ userId, services: initial, metiers }: P
     metier: "",
     tags: [] as string[],
   });
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showEditSuggestions, setShowEditSuggestions] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
     titre: "",
@@ -46,6 +48,18 @@ export default function ServicesClient({ userId, services: initial, metiers }: P
     metier: "",
     tags: [] as string[],
   });
+
+  const suggestions = form.titre.length >= 3
+    ? getServicesForMetiers(metiers).filter(s =>
+        normalizeStr(s.label).includes(normalizeStr(form.titre))
+      ).slice(0, 8)
+    : [];
+
+  const editSuggestions = editForm.titre.length >= 3
+    ? getServicesForMetiers(metiers).filter(s =>
+        normalizeStr(s.label).includes(normalizeStr(editForm.titre))
+      ).slice(0, 8)
+    : [];
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -168,7 +182,7 @@ export default function ServicesClient({ userId, services: initial, metiers }: P
         <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Nouveau service</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
+            <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Titre <span className="text-red-500">*</span>
               </label>
@@ -176,10 +190,32 @@ export default function ServicesClient({ userId, services: initial, metiers }: P
                 type="text"
                 placeholder="Ex : Débouchage canalisation"
                 value={form.titre}
-                onChange={(e) => setForm({ ...form, titre: e.target.value })}
+                onChange={(e) => { setForm({ ...form, titre: e.target.value, tags: [] }); setShowSuggestions(true); }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
                 className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 required
+                autoComplete="off"
               />
+              {showSuggestions && suggestions.length > 0 && (
+                <ul className="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-56 overflow-y-auto">
+                  {suggestions.map(opt => (
+                    <li key={opt.id}>
+                      <button
+                        type="button"
+                        onMouseDown={() => {
+                          setForm(f => ({ ...f, titre: opt.label, tags: [opt.id] }));
+                          setShowSuggestions(false);
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-50 hover:text-brand-700 transition-colors"
+                      >
+                        {opt.label}
+                        <span className="ml-2 text-xs text-gray-400">{opt.metier}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
             {metiers.length > 1 && (
             <div>
@@ -194,41 +230,7 @@ export default function ServicesClient({ userId, services: initial, metiers }: P
               </select>
             </div>
             )}
-            {(form.metier || metiers.length === 1) && (() => {
-              const metierPourTags = form.metier || metiers[0];
-              const options = getServicesForMetier(metierPourTags);
-              if (options.length === 0) return null;
-              return (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Tags de recherche
-                    <span className="ml-1 text-xs text-gray-400 font-normal">(aide les clients à vous trouver)</span>
-                  </label>
-                  <div className="flex flex-wrap gap-2 p-3 border border-gray-300 rounded-lg bg-gray-50">
-                    {options.map(opt => {
-                      const selected = form.tags.includes(opt.id);
-                      return (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => setForm(f => ({
-                            ...f,
-                            tags: selected ? f.tags.filter(t => t !== opt.id) : [...f.tags, opt.id]
-                          }))}
-                          className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
-                            selected
-                              ? "bg-brand-600 text-white border-brand-600"
-                              : "bg-white text-gray-600 border-gray-300 hover:border-brand-400"
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })()}
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
               <textarea
@@ -311,8 +313,36 @@ export default function ServicesClient({ userId, services: initial, metiers }: P
             <div key={service.id} className="bg-white border border-gray-200 rounded-xl px-5 py-4">
               {editingId === service.id ? (
                 <div className="space-y-3">
-                  <input value={editForm.titre} onChange={e => setEditForm(f => ({...f, titre: e.target.value}))}
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="Titre" />
+                  <div className="relative">
+                    <input
+                      value={editForm.titre}
+                      onChange={e => { setEditForm(f => ({...f, titre: e.target.value, tags: []})); setShowEditSuggestions(true); }}
+                      onFocus={() => setShowEditSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowEditSuggestions(false), 150)}
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                      placeholder="Titre"
+                      autoComplete="off"
+                    />
+                    {showEditSuggestions && editSuggestions.length > 0 && (
+                      <ul className="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                        {editSuggestions.map(opt => (
+                          <li key={opt.id}>
+                            <button
+                              type="button"
+                              onMouseDown={() => {
+                                setEditForm(f => ({ ...f, titre: opt.label, tags: [opt.id] }));
+                                setShowEditSuggestions(false);
+                              }}
+                              className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-brand-50 hover:text-brand-700 transition-colors"
+                            >
+                              {opt.label}
+                              <span className="ml-2 text-xs text-gray-400">{opt.metier}</span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                   <input value={editForm.description} onChange={e => setEditForm(f => ({...f, description: e.target.value}))}
                     className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="Description" />
                   <div className="flex gap-2">
@@ -326,39 +356,7 @@ export default function ServicesClient({ userId, services: initial, metiers }: P
                     <option value="">Sélectionner un métier</option>
                     {METIER_LIST.map(m => <option key={m} value={m}>{m}</option>)}
                   </select>
-                  {editForm.metier && (() => {
-                    const options = getServicesForMetier(editForm.metier);
-                    if (options.length === 0) return null;
-                    return (
-                      <div>
-                        <p className="text-xs font-medium text-gray-600 mb-1.5">
-                          Tags de recherche <span className="text-gray-400 font-normal">(aide les clients à vous trouver)</span>
-                        </p>
-                        <div className="flex flex-wrap gap-1.5 p-2.5 border border-gray-200 rounded-lg bg-gray-50">
-                          {options.map(opt => {
-                            const selected = (editForm.tags ?? []).includes(opt.id);
-                            return (
-                              <button
-                                key={opt.id}
-                                type="button"
-                                onClick={() => setEditForm(f => ({
-                                  ...f,
-                                  tags: selected ? (f.tags ?? []).filter(t => t !== opt.id) : [...(f.tags ?? []), opt.id]
-                                }))}
-                                className={`px-2 py-0.5 rounded-full text-xs font-medium border transition-colors ${
-                                  selected
-                                    ? "bg-brand-600 text-white border-brand-600"
-                                    : "bg-white text-gray-600 border-gray-300 hover:border-brand-400"
-                                }`}
-                              >
-                                {opt.label}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })()}
+
                   <div className="flex gap-2">
                     <button onClick={() => setEditingId(null)}
                       className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50">

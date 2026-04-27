@@ -107,6 +107,10 @@ export function getServicesForMetier(metier: string): ServiceStandardise[] {
   return SERVICES_STANDARDISES.filter((s) => s.metier === metier);
 }
 
+export function getServicesForMetiers(metiers: string[]): ServiceStandardise[] {
+  return SERVICES_STANDARDISES.filter((s) => metiers.includes(s.metier));
+}
+
 export function normalizeStr(s: string): string {
   return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 }
