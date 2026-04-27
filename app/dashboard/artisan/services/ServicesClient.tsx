@@ -243,16 +243,19 @@ export default function ServicesClient({ userId, services: initial, metiers }: P
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Prix indicatif (€)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="Ex : 80"
-                  value={form.prix}
-                  onChange={(e) => setForm({ ...form, prix: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Prix indicatif</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="Ex : 80"
+                    value={form.prix}
+                    onChange={(e) => setForm({ ...form, prix: e.target.value })}
+                    className="w-full rounded-lg border border-gray-300 pl-3.5 pr-8 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">€</span>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Durée (minutes)</label>
@@ -346,8 +349,11 @@ export default function ServicesClient({ userId, services: initial, metiers }: P
                   <input value={editForm.description} onChange={e => setEditForm(f => ({...f, description: e.target.value}))}
                     className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="Description" />
                   <div className="flex gap-2">
-                    <input value={editForm.prix} onChange={e => setEditForm(f => ({...f, prix: e.target.value}))}
-                      className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="Prix (€)" type="number" />
+                    <div className="relative flex-1">
+                      <input value={editForm.prix} onChange={e => setEditForm(f => ({...f, prix: e.target.value}))}
+                        className="w-full rounded-lg border border-gray-200 pl-3 pr-7 py-2 text-sm" placeholder="Prix" type="number" />
+                      <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">€</span>
+                    </div>
                     <input value={editForm.duree_minutes} onChange={e => setEditForm(f => ({...f, duree_minutes: e.target.value}))}
                       className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="Durée (min)" type="number" />
                   </div>
@@ -387,7 +393,7 @@ export default function ServicesClient({ userId, services: initial, metiers }: P
                       <p className="text-xs text-gray-500 mt-0.5 truncate">{service.description}</p>
                     )}
                     <div className="flex items-center gap-3 mt-1">
-                      {service.prix && <span className="text-xs text-gray-600 font-medium">{service.prix} €</span>}
+                      {service.prix !== null && service.prix !== undefined && <span className="text-xs text-gray-900 font-semibold">{service.prix} €</span>}
                       {service.duree_minutes && <span className="text-xs text-gray-400">{service.duree_minutes} min</span>}
                     </div>
                   </div>
