@@ -285,7 +285,7 @@ export default function SearchFilters({
             return (
               <>
                 <button
-                  onClick={() => setShowServices(!showServices)}
+                  onClick={(e) => { e.stopPropagation(); setShowServices(prev => !prev); }}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border text-sm shadow-sm transition-colors ${
                     serviceTag ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-500 hover:bg-gray-50"
                   }`}
