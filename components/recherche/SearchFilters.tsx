@@ -271,7 +271,7 @@ export default function SearchFilters({
             <div className="fixed inset-0 z-40" onClick={() => setShowServices(false)} />
           )}
           <button
-            onClick={() => setShowServices(prev => !prev)}
+            onClick={() => { console.log("click services", showServices); setShowServices(prev => !prev); }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border text-sm shadow-sm transition-colors ${
               serviceTag ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-500 hover:bg-gray-50"
             }`}
