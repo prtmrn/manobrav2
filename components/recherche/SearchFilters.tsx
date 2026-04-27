@@ -4,6 +4,7 @@ import AddressAutocomplete from "@/components/ui/AddressAutocomplete";
 import { useRouter, usePathname } from "next/navigation";
 import { useTransition, useState, useCallback, useRef, useEffect } from "react";
 import { METIER_LIST, METIER_CONFIG } from "@/components/map/metier-config";
+import { SERVICES_STANDARDISES } from "@/lib/services-standardises";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -20,6 +21,7 @@ interface FilterOverrides {
   vue?: "grille" | "carte";
   tri?: string;
   ordre?: string;
+  serviceTag?: string;
 }
 
 interface SearchFiltersProps {
@@ -28,6 +30,7 @@ interface SearchFiltersProps {
   initialAdresse?: string;
   initialTri?: string;
   initialOrdre?: string;
+  initialServiceTag?: string;
   initialPrixMax?: string;
   initialNoteMin?: string;
   initialDispo?: string;
@@ -69,6 +72,7 @@ export default function SearchFilters({
   initialAdresse,
   initialTri,
   initialOrdre,
+  initialServiceTag,
   initialPrixMax,
   initialNoteMin,
   initialDispo,
@@ -93,6 +97,8 @@ export default function SearchFilters({
   const [dispo, setDispo] = useState(initialDispo === "true");
   const [dispoMode, setDispoMode] = useState("");
   const [dispoDate, setDispoDate] = useState("");
+  const [serviceTag, setServiceTag] = useState(initialServiceTag ?? "");
+  const [showServices, setShowServices] = useState(false);
   const [tri, setTri] = useState(initialTri ?? "pertinence");
   const [showTri, setShowTri] = useState(false);
   const triLabels: Record<string, string> = { pertinence: "Pertinence", note: "Note", prix: "Prix", distance: "Distance" };
@@ -100,9 +106,9 @@ export default function SearchFilters({
   const [ordre, setOrdre] = useState(initialOrdre ?? "desc");
   const [vue, setVue] = useState<"grille" | "carte">(initialVue);
   // Refs pour capturer les valeurs courantes dans applyFilters
-  const stateRef = useRef({ metier, ville, prixMax, noteMin, dispo, vue, clientLat, clientLng, rayon, tri, ordre, adresseLabel });
+  const stateRef = useRef({ metier, ville, prixMax, noteMin, dispo, vue, clientLat, clientLng, rayon, tri, ordre, adresseLabel, serviceTag });
   useEffect(() => {
-    stateRef.current = { metier, ville, prixMax, noteMin, dispo, vue, clientLat, clientLng, rayon, tri, ordre, adresseLabel };
+    stateRef.current = { metier, ville, prixMax, noteMin, dispo, vue, clientLat, clientLng, rayon, tri, ordre, adresseLabel, serviceTag };
   });
 
   // ── URL push ─────────────────────────────────────────────────────────────
@@ -131,6 +137,8 @@ export default function SearchFilters({
       const o = overrides.ordre !== undefined ? overrides.ordre : cur.ordre;
       if (t && t !== "pertinence") qs.set("tri", t);
       if (o && o !== "desc") qs.set("ordre", o);
+      const st = overrides.serviceTag !== undefined ? overrides.serviceTag : cur.serviceTag;
+      if (st) qs.set("service", st);
       // Always reset to page 1 on filter change
 
       startTransition(() => {
@@ -176,10 +184,8 @@ export default function SearchFilters({
   return (
     <div className={`transition-opacity duration-200 ${isPending ? "opacity-50 pointer-events-none" : ""}`}>
 
-      {/* ── Search bar row ────────────────────────────────────────────────── */}
-      <div className="flex flex-wrap sm:flex-nowrap gap-2">
-
-        {/* Adresse input */}
+      {/* ── Ligne adresse ─────────────────────────────────────────────────── */}
+      <div className="flex gap-2 mb-2">
         <div className="flex-1 min-w-0 relative">
           <AddressAutocomplete
             value={adresseLabel}
@@ -190,24 +196,17 @@ export default function SearchFilters({
               setVille(result.ville);
               setClientLat(String(result.latitude));
               setClientLng(String(result.longitude));
+              stateRef.current.clientLat = String(result.latitude);
+              stateRef.current.clientLng = String(result.longitude);
               applyFilters({ ville: result.ville, lat: String(result.latitude), lng: String(result.longitude) });
             }}
           />
         </div>
-
-        {/* Slider distance inline */}
         {clientLat && (
-          <div className="flex items-center gap-2 min-w-[140px]">
+          <div className="flex items-center gap-2 min-w-[130px]">
             <input
-              type="range"
-              min="1"
-              max="49"
-              step="1"
-              value={rayon}
-              onChange={(e) => {
-                setRayon(e.target.value);
-                applyFilters({ lat: clientLat, lng: clientLng, rayon: e.target.value });
-              }}
+              type="range" min="1" max="49" step="1" value={rayon}
+              onChange={(e) => { setRayon(e.target.value); applyFilters({ lat: clientLat, lng: clientLng, rayon: e.target.value }); }}
               className="flex-1 accent-brand-600"
             />
             <span className="text-xs font-semibold text-brand-600 whitespace-nowrap">
@@ -215,13 +214,46 @@ export default function SearchFilters({
             </span>
           </div>
         )}
-        {/* Métier quick select (visible on sm+) */}
-        <div className="hidden sm:block w-44">
+        {/* Toggle Liste/Carte */}
+        <div className="flex-shrink-0 flex items-center">
+          <div className="flex rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+            <button
+              onClick={() => { setVue("grille"); applyFilters({ vue: "grille" }); }}
+              className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-semibold transition-colors ${
+                vue === "grille" ? "bg-brand-600 text-white" : "text-gray-500 hover:bg-gray-50"
+              }`}
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+              <span className="hidden sm:inline">Liste</span>
+            </button>
+            <button
+              onClick={() => { setVue("carte"); applyFilters({ vue: "carte" }); }}
+              className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-semibold transition-colors border-l border-gray-200 ${
+                vue === "carte" ? "bg-brand-600 text-white" : "text-gray-500 hover:bg-gray-50"
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+              <span className="hidden sm:inline">Carte</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Ligne filtres ─────────────────────────────────────────────────── */}
+      <div className="flex flex-wrap sm:flex-nowrap gap-2">
+        {/* Métier */}
+        <div className="w-full sm:w-40">
           <select
             value={metier}
             onChange={(e) => {
               setMetier(e.target.value);
-              applyFilters({ metier: e.target.value });
+              setServiceTag("");
+              stateRef.current.serviceTag = "";
+              applyFilters({ metier: e.target.value, serviceTag: "" });
             }}
             className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
           >
@@ -232,13 +264,88 @@ export default function SearchFilters({
           </select>
         </div>
 
-        {/* Tri */}
+        {/* Services */}
+        <div className="relative w-full sm:w-48">
+          {(() => {
+            const selectedService = SERVICES_STANDARDISES.find(s => s.id === serviceTag);
+            const grouped = METIER_LIST.map(m => ({
+              metier: m,
+              services: SERVICES_STANDARDISES.filter(s => s.metier === m && (!metier || m === metier))
+            })).filter(g => g.services.length > 0);
+            return (
+              <>
+                <button
+                  onClick={() => setShowServices(!showServices)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border text-sm shadow-sm transition-colors ${
+                    serviceTag ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-500 hover:bg-gray-50"
+                  }`}
+                >
+                  <span className="truncate">{selectedService ? selectedService.label : "Tous les services"}</span>
+                  <svg className="w-4 h-4 flex-shrink-0 ml-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {showServices && (
+                  <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 w-72 max-h-80 overflow-y-auto py-1">
+                    <button
+                      onClick={() => { setServiceTag(""); stateRef.current.serviceTag = ""; applyFilters({ serviceTag: "" }); setShowServices(false); }}
+                      className={`w-full text-left px-4 py-2 text-sm transition-colors ${!serviceTag ? "text-brand-600 font-semibold bg-brand-50" : "text-gray-600 hover:bg-gray-50"}`}
+                    >
+                      Tous les services
+                    </button>
+                    {grouped.map(g => (
+                      <div key={g.metier}>
+                        {!metier && (
+                          <div className="px-4 py-1.5 text-xs font-bold text-gray-400 uppercase tracking-wide border-t border-gray-100 mt-1">
+                            {g.metier}
+                          </div>
+                        )}
+                        {g.services.map(svc => (
+                          <button
+                            key={svc.id}
+                            onClick={() => { setServiceTag(svc.id); stateRef.current.serviceTag = svc.id; applyFilters({ serviceTag: svc.id }); setShowServices(false); }}
+                            className={`w-full text-left px-4 py-2 text-sm transition-colors ${serviceTag === svc.id ? "text-brand-600 font-semibold bg-brand-50" : "text-gray-700 hover:bg-gray-50"}`}
+                          >
+                            {svc.label}
+                          </button>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            );
+          })()}
+        </div>
+
+        {/* Filtres avancés */}
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors shadow-sm ${
+            hasActiveFilters
+              ? "border-brand-400 bg-brand-50 text-brand-700"
+              : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+          }`}
+        >
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M3 4a1 1 0 011-1h16a1 1 0 010 2H4a1 1 0 01-1-1zm3 5a1 1 0 011-1h10a1 1 0 010 2H7a1 1 0 01-1-1zm4 5a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1z" />
+          </svg>
+          <span className="hidden sm:inline">Filtres</span>
+          {activeCount > 0 && (
+            <span className="w-5 h-5 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center">
+              {activeCount}
+            </span>
+          )}
+        </button>
+
+        {/* Trier par */}
         <div className="relative">
           <button
             onClick={() => setShowTri(!showTri)}
             className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-white shadow-sm text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap"
           >
-            <span>Trier par</span> {triLabel}
+            <span className="hidden sm:inline">Trier par</span> {triLabel}
             {ordre === "asc" ? " ↑" : " ↓"}
           </button>
           {showTri && (
@@ -277,61 +384,27 @@ export default function SearchFilters({
             </div>
           )}
         </div>
-        {/* Advanced filters toggle */}
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors shadow-sm ${
-            hasActiveFilters
-              ? "border-brand-400 bg-brand-50 text-brand-700"
-              : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
-          }`}
-        >
-          <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M3 4a1 1 0 011-1h16a1 1 0 010 2H4a1 1 0 01-1-1zm3 5a1 1 0 011-1h10a1 1 0 010 2H7a1 1 0 01-1-1zm4 5a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1z" />
-          </svg>
-          <span className="hidden sm:inline">Filtres</span>
-          {activeCount > 0 && (
-            <span className="w-5 h-5 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center">
-              {activeCount}
-            </span>
-          )}
-        </button>
 
-        {/* Search button */}
+        {/* Appliquer desktop */}
         <button
           onClick={() => applyFilters()}
-          className="px-5 py-2.5 rounded-xl bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700 active:scale-95 transition-all shadow-sm"
+          className="px-5 py-2.5 rounded-xl bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700 active:scale-95 transition-all shadow-sm sm:ml-auto"
         >
-          Rechercher
+          Appliquer
         </button>
+      </div>
 
-        {/* View toggle */}
+      {/* Bouton flottant mobile */}
+      <div className="sm:hidden fixed bottom-5 right-5 z-40">
         <button
-          onClick={() => {
-            const newVue = vue === "carte" ? "grille" : "carte";
-            setVue(newVue);
-            applyFilters({ vue: newVue });
-          }}
-          className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 bg-white shadow-sm text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+          onClick={() => applyFilters()}
+          className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-brand-600 text-white text-sm font-bold shadow-xl hover:bg-brand-700 active:scale-95 transition-all"
         >
-          {vue === "carte" ? (
-            <>
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-              </svg>
-              <span className="hidden sm:inline">Afficher la liste</span>
-            </>
-          ) : (
-            <>
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-              </svg>
-              <span className="hidden sm:inline">Afficher la carte</span>
-            </>
-          )}
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          Appliquer
         </button>
-
       </div>
       {/* ── Advanced filter panel ─────────────────────────────────────────── */}
       {showFilters && (

@@ -49,6 +49,7 @@ interface SearchParams {
   vue?: string;
   tri?: string;
   ordre?: string;
+  service?: string;
 }
 
 interface PageProps {
@@ -227,6 +228,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   const vue = params.vue === "carte" ? "carte" : "grille";
   const tri = ["note", "distance", "prix", "pertinence"].includes(params.tri ?? "") ? params.tri! : "pertinence";
   const ordre = params.ordre === "asc" ? "asc" : "desc";
+  const serviceTag = params.service ?? "";
 
   const admin = createAdminClient();
 
@@ -411,6 +413,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
           initialVille={params.ville}
           initialTri={tri}
           initialOrdre={ordre}
+          initialServiceTag={serviceTag}
           initialAdresse={params.adresse}
           initialPrixMax={params.prix_max}
           initialNoteMin={params.note_min}
