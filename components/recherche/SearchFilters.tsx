@@ -256,7 +256,7 @@ export default function SearchFilters({
       </div>
 
       {/* ── Ligne filtres ─────────────────────────────────────────────────── */}
-      <div className="flex flex-nowrap gap-2 overflow-x-auto">
+      <div className="flex flex-nowrap gap-2 overflow-visible">
         {/* Métier */}
         <div className="flex-shrink-0 w-36 sm:w-40">
           <select
