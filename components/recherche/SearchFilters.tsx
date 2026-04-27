@@ -266,7 +266,7 @@ export default function SearchFilters({
         </div>
 
         {/* Services */}
-        <div className="relative flex-shrink-0 w-40 sm:w-48" ref={servicesRef} onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setShowServices(false); }} tabIndex={-1}>
+        <div className="relative flex-shrink-0 w-40 sm:w-48" ref={servicesRef}>
           {(() => {
             const selectedService = SERVICES_STANDARDISES.find(s => s.id === serviceTag);
             const grouped = METIER_LIST.map(m => ({
@@ -275,6 +275,12 @@ export default function SearchFilters({
             })).filter(g => g.services.length > 0);
             return (
               <>
+                {showServices && (
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowServices(false)}
+                  />
+                )}
                 <button
                   onClick={() => setShowServices(prev => !prev)}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border text-sm shadow-sm transition-colors ${
