@@ -204,7 +204,7 @@ export default function ServicesClient({ userId, services: initial, metiers }: P
                       <button
                         type="button"
                         onMouseDown={() => {
-                          setForm(f => ({ ...f, titre: opt.label, tags: [opt.id] }));
+                          setForm(f => ({ ...f, titre: opt.label, tags: [opt.id], metier: opt.metier }));
                           setShowSuggestions(false);
                         }}
                         className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-50 hover:text-brand-700 transition-colors"
@@ -330,7 +330,7 @@ export default function ServicesClient({ userId, services: initial, metiers }: P
                             <button
                               type="button"
                               onMouseDown={() => {
-                                setEditForm(f => ({ ...f, titre: opt.label, tags: [opt.id] }));
+                                setEditForm(f => ({ ...f, titre: opt.label, tags: [opt.id], metier: opt.metier }));
                                 setShowEditSuggestions(false);
                               }}
                               className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-brand-50 hover:text-brand-700 transition-colors"
