@@ -4,7 +4,8 @@ import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { METIER_LIST, getMetierConfig } from "@/components/map/metier-config";
 import SearchFilters from "@/components/recherche/SearchFilters";
-import SearchMapView from "@/components/recherche/SearchMapView";
+import nextDynamic from "next/dynamic";
+const SearchMapView = nextDynamic(() => import("@/components/recherche/SearchMapView"), { ssr: false });
 
 export const dynamic = "force-dynamic";
 

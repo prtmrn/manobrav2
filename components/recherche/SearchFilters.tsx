@@ -115,8 +115,7 @@ export default function SearchFilters({
   const triLabels: Record<string, string> = { pertinence: "Pertinence", note: "Note", prix: "Prix", distance: "Distance" };
   const triLabel = triLabels[tri] ?? "Pertinence";
   const [ordre, setOrdre] = useState(initialOrdre ?? "desc");
-  const [vue, setVue] = useState<"grille" | "carte">("grille");
-  useEffect(() => { setVue(initialVue); }, []);
+  const [vue, setVue] = useState<"grille" | "carte">(initialVue);
   // Refs pour capturer les valeurs courantes dans applyFilters
   const stateRef = useRef({ metier, ville, prixMax, noteMin, dispo, vue, clientLat, clientLng, rayon, tri, ordre, adresseLabel, serviceTag });
   useEffect(() => {
