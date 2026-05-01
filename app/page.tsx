@@ -5,7 +5,6 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { METIER_CONFIG, METIER_LIST } from "@/components/map/metier-config";
 import HowItWorksTabs from "@/components/landing/HowItWorksTabs";
 import NavbarLanding from "@/components/landing/NavbarLanding";
-import HeroSearch from "@/components/landing/HeroSearch";
 import HeroCTA from "@/components/landing/HeroCTA";
 
 // ─── Cache 24 h (ISR) | les avis et stats changent peu ───────────────────────
@@ -345,7 +344,6 @@ export default async function HomePage() {
             </p>
 
             {/* Double CTA */}
-            <HeroSearch />
             <HeroCTA />
             {/* Reassurance */}
             <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
