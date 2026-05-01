@@ -358,7 +358,7 @@ export default function SearchFilters({
               {[
                 { value: "pertinence", label: "Pertinence" },
                 { value: "note", label: "Note" },
-                { value: "prix", label: "Prix" },
+                ...(serviceTag ? [{ value: "prix", label: "Prix" }] : []),
                 { value: "distance", label: "Distance" },
               ].map(({ value, label }) => (
                 <button
