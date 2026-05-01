@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 interface UrgenceWidgetProps {
@@ -17,6 +18,7 @@ export default function UrgenceWidget({
   delaiEntreInterventions: initialDelai,
   artisanId,
 }: UrgenceWidgetProps) {
+  const router = useRouter();
   const [actif, setActif] = useState(initialActif);
   const [fin, setFin] = useState(initialFin);
   const [heureChoix, setHeureChoix] = useState("");
@@ -54,6 +56,7 @@ export default function UrgenceWidget({
       setActif(false);
       setFin(null);
       setLoading(false);
+      router.refresh();
     } else {
       setShowConfig(true);
     }
@@ -71,6 +74,7 @@ export default function UrgenceWidget({
     setFin(finISO);
     setShowConfig(false);
     setLoading(false);
+    router.refresh();
   }
 
   async function saveDelai(val: number) {

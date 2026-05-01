@@ -323,7 +323,7 @@ export default async function DashboardartisanPage() {
         {/* Infos */}
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl font-bold text-gray-900 leading-tight">
-            {greeting}, {artisan?.prenom ?? fullName}&nbsp;👋
+            {greeting}, {artisan?.prenom ?? fullName}
           </h1>
           <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-2 flex-wrap">
             {artisan?.metier && (
@@ -421,8 +421,8 @@ export default async function DashboardartisanPage() {
               </svg>
             </div>
             <p className="text-2xl font-bold text-gray-900 tabular-nums">{fmtEuro(revenusCeMois)}</p>
-            <p className="text-xs font-medium text-gray-500 mt-0.5">Revenus nets</p>
-            <p className="text-[11px] text-gray-400 mt-0.5">après commission (90%)</p>
+            <p className="text-xs font-medium text-gray-500 mt-0.5">Revenus</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">interventions terminées</p>
           </div>
 
           {/* Note moyenne */}
