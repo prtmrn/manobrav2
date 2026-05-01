@@ -51,7 +51,7 @@ export default function UrgenceWidget({
     if (isSanctioned) return;
     if (actif) {
       setLoading(true);
-      fetch("/api/urgence", {
+      fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? "https://manobra.fr"}/api/urgence`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ actif: false, fin: null }),
@@ -66,7 +66,7 @@ export default function UrgenceWidget({
     setLoading(true);
     const today = new Date().toISOString().split("T")[0];
     const finISO = new Date(`${today}T${heureChoix}:00`).toISOString();
-    await fetch("/api/urgence", {
+    await fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? "https://manobra.fr"}/api/urgence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ actif: true, fin: finISO }),
