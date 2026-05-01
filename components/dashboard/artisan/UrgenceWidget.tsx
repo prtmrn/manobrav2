@@ -65,6 +65,7 @@ export default function UrgenceWidget({
   }
 
   async function activerUrgence() {
+    console.log("activerUrgence called, heureChoix:", heureChoix, "loading:", loading);
     if (!heureChoix) return;
     setLoading(true);
     const today = new Date().toISOString().split("T")[0];
