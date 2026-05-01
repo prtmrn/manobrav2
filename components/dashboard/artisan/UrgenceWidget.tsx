@@ -48,9 +48,6 @@ export default function UrgenceWidget({
   }, [actif, fin]);
 
   function toggleUrgence() {
-    if (toggleRef.current) return;
-    toggleRef.current = true;
-    setTimeout(() => { toggleRef.current = false; }, 300);
     console.log("toggleUrgence called", { isSanctioned, actif, loading, showConfig });
     if (isSanctioned) return;
     if (actif) {
@@ -64,7 +61,8 @@ export default function UrgenceWidget({
         router.refresh();
       });
     } else {
-      setShowConfig(true);
+      console.log("Setting showConfig to true");
+      setShowConfig(s => { console.log("showConfig state update:", s, "-> true"); return true; });
     }
   }
 
@@ -122,7 +120,7 @@ export default function UrgenceWidget({
           </div>
         </div>
         <button
-          onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); toggleUrgence(); }}
+          onClick={toggleUrgence}
           disabled={loading || isSanctioned}
           className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors disabled:opacity-50 ${actif ? "bg-red-500" : "bg-gray-200"}`}
         >
