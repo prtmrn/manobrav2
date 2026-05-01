@@ -328,8 +328,8 @@ export default async function artisanPage({ params }: PageProps) {
   const { id } = await params;
   const supabase = await createClient();
 
-  // Parallel fetch : profil + services + avis
-  const [profileRes, servicesRes, avisRes] = await Promise.all([
+  // Parallel fetch : profil + services + avis + disponibilites
+  const [profileRes, servicesRes, avisRes, dispoRes] = await Promise.all([
     supabase
       .from("profiles_artisans")
       .select("*")
@@ -349,6 +349,12 @@ export default async function artisanPage({ params }: PageProps) {
       .eq("artisan_id", id)
       .order("created_at", { ascending: false })
       .limit(20),
+    supabase
+      .from("disponibilites")
+      .select("jour_semaine, heure_debut, heure_fin")
+      .eq("artisan_id", id)
+      .eq("actif", true)
+      .order("jour_semaine", { ascending: true }),
   ]);
 
   const artisan = profileRes.data as artisan | null;
@@ -356,6 +362,7 @@ export default async function artisanPage({ params }: PageProps) {
 
   const services = (servicesRes.data ?? []) as Service[];
   const avis = (avisRes.data ?? []) as Avis[];
+  const disponibilites = (dispoRes.data ?? []) as { jour_semaine: number; heure_debut: string; heure_fin: string }[];
 
   // Dérivations
   const config = getMetierConfig(Array.isArray(artisan.metier) ? artisan.metier[0] : artisan.metier);
@@ -724,7 +731,40 @@ export default async function artisanPage({ params }: PageProps) {
                     {services.length} disponible{services.length !== 1 ? "s" : ""}
                   </dd>
                 </div>
+                {(artisan as any).zone_intervention_km && (
+                  <div className="flex justify-between">
+                    <dt className="text-gray-500">Rayon d&apos;intervention</dt>
+                    <dd className="font-medium text-gray-800">{(artisan as any).zone_intervention_km} km</dd>
+                  </div>
+                )}
+                {(artisan as any).temps_reponse_minutes && (
+                  <div className="flex justify-between">
+                    <dt className="text-gray-500">Temps de réponse</dt>
+                    <dd className="font-medium text-brand-600">
+                      {(artisan as any).temps_reponse_minutes < 60
+                        ? `~${(artisan as any).temps_reponse_minutes} min`
+                        : `~${Math.round((artisan as any).temps_reponse_minutes / 60)}h`}
+                    </dd>
+                  </div>
+                )}
               </dl>
+              {/* Disponibilités */}
+              {disponibilites.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Disponibilités</p>
+                  <div className="space-y-1.5">
+                    {disponibilites.map((d, i) => {
+                      const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+                      return (
+                        <div key={i} className="flex items-center justify-between text-xs">
+                          <span className="font-medium text-gray-700">{jours[d.jour_semaine]}</span>
+                          <span className="text-gray-500">{d.heure_debut.slice(0,5)} – {d.heure_fin.slice(0,5)}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* ── Mini-carte ────────────────────────────────────────────── */}
