@@ -63,7 +63,7 @@ export default function NavbarLanding() {
       const norm = normalizeStr(q);
       const results: Suggestion[] = [];
 
-      SERVICES_STANDARDISES.filter(s => normalizeStr(s.label).includes(norm)).slice(0, 4)
+      SERVICES_STANDARDISES.filter(s => normalizeStr(s.label).includes(norm)).slice(0, 6)
         .forEach(s => results.push({ type: "service", id: s.id, label: s.label, metier: s.metier }));
 
       METIER_LIST.filter(m => normalizeStr(m).includes(norm)).slice(0, 2)
@@ -72,7 +72,7 @@ export default function NavbarLanding() {
       try {
         const supabase = createClient();
         const { data } = await supabase.from("profiles_artisans").select("id, nom, prenom, metier")
-          .eq("actif", true).or(`nom.ilike.%${q}%,prenom.ilike.%${q}%`).limit(3);
+          .eq("actif", true).or(`nom.ilike.%${q}%,prenom.ilike.%${q}%`).limit(5);
         if (data) (data as any[]).forEach(a => results.push({
           type: "artisan", id: a.id,
           label: `${a.prenom ?? ""} ${a.nom ?? ""}`.trim(),
@@ -81,7 +81,7 @@ export default function NavbarLanding() {
       } catch {}
 
       try {
-        const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(q)}&type=municipality&limit=3`);
+        const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(q)}&type=municipality&limit=5`);
         const json = await res.json();
         (json.features ?? []).forEach((f: any) => results.push({
           type: "ville", label: f.properties.label,
@@ -164,7 +164,7 @@ export default function NavbarLanding() {
             autoComplete="off"
           />
           {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 overflow-hidden min-w-[320px]">
+            <div className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 overflow-y-auto max-h-80 min-w-[320px]">
               {grouped.map(group => {
                 return (
                   <div key={group.label}>
@@ -282,7 +282,7 @@ export default function NavbarLanding() {
             />
           </div>
           {showSuggestions && suggestions.length > 0 && (
-            <div className="mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden">
+            <div className="mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl overflow-y-auto max-h-64">
               {grouped.map(group => (
                 <div key={group.label}>
                   <div className="px-4 py-1.5 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50 border-b border-gray-100">
