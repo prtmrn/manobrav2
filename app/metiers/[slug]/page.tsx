@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { METIER_LIST, METIER_CONFIG } from "@/components/map/metier-config";
 import { SERVICES_STANDARDISES } from "@/lib/services-standardises";
 import NavbarLanding from "@/components/landing/NavbarLanding";
-import { slugify } from "../page";
+import { slugify } from "@/lib/metier-slug";
 
 function getMetierFromSlug(slug: string): string | null {
   return METIER_LIST.find(m => slugify(m) === slug) ?? null;

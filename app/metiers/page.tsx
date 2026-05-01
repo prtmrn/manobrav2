@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { slugify } from "@/lib/metier-slug";
 import type { Metadata } from "next";
 import { METIER_LIST, METIER_CONFIG } from "@/components/map/metier-config";
 import { SERVICES_STANDARDISES } from "@/lib/services-standardises";
@@ -9,13 +10,7 @@ export const metadata: Metadata = {
   description: "Découvrez tous les métiers disponibles sur Manobra : serrurier, plombier, électricien, chauffagiste, vitrier, ramoneur, frigoriste, dépanneur. Des professionnels vérifiés près de chez vous.",
 };
 
-export function slugify(metier: string): string {
-  return metier
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/\s+/g, "-");
-}
+
 
 export default function MetiersPage() {
   const metiers = METIER_LIST.filter(m => m !== "Autre");
