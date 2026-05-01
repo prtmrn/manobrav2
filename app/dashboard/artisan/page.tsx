@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import ReservationStatusButtons from "@/components/dashboard/artisan/ReservationStatusButtons";
 import OnboardingProgressBar from "@/components/dashboard/artisan/OnboardingProgressBar";
+import UrgenceWidget from "@/components/dashboard/artisan/UrgenceWidget";
 import type { OnboardingStatus } from "@/components/dashboard/artisan/OnboardingProgressBar";
 
 export const metadata: Metadata = { title: "Tableau de bord" };
@@ -182,7 +183,7 @@ export default async function DashboardartisanPage() {
     // 1. Profil + abonnement
     admin
       .from("profiles_artisans")
-      .select("nom, prenom, photo_url, bio, metier, ville, actif, note_moyenne, nombre_avis, plan_actif, subscription_status, subscription_end_date, stripe_onboarding_complete")
+      .select("nom, prenom, photo_url, bio, metier, ville, actif, note_moyenne, nombre_avis, plan_actif, subscription_status, subscription_end_date, stripe_onboarding_complete, urgence_actif, urgence_fin, urgence_sanction_fin, delai_entre_interventions_minutes")
       .eq("id", user.id)
       .single(),
 
@@ -379,6 +380,17 @@ export default async function DashboardartisanPage() {
           </div>
         </div>
       )}
+
+      {/* ════════════════════════════════════════════════════════════════════
+          MODE URGENCE
+          ════════════════════════════════════════════════════════════════════ */}
+      <UrgenceWidget
+        urgenceActif={(artisan as any)?.urgence_actif ?? false}
+        urgenceFin={(artisan as any)?.urgence_fin ?? null}
+        urgenceSanctionFin={(artisan as any)?.urgence_sanction_fin ?? null}
+        delaiEntreInterventions={(artisan as any)?.delai_entre_interventions_minutes ?? 60}
+        artisanId={user.id}
+      />
 
       {/* ════════════════════════════════════════════════════════════════════
           VUE D'ENSEMBLE
