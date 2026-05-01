@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
+import { SERVICES_STANDARDISES, serviceTitleMatchesStandard } from "@/lib/services-standardises";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { METIER_LIST, getMetierConfig } from "@/components/map/metier-config";
 import SearchFilters from "@/components/recherche/SearchFilters";
@@ -70,7 +71,7 @@ type Rawartisan = {
   abonnement_pro: boolean;
   latitude: number | null;
   longitude: number | null;
-  services?: { prix: number | null }[];
+  services?: { prix: number | null; titre: string | null; tags: string[] | null }[];
   siret?: string | null;
   bio?: string | null;
   disponible_urgence?: boolean;
@@ -78,6 +79,7 @@ type Rawartisan = {
 
 type Enrichedartisan = Rawartisan & {
   prixMin: number | null;
+  serviceMatch: boolean;
   relevance: number;
 };
 
@@ -250,7 +252,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
   const queryParams = new URLSearchParams({
-    select: "id,nom,prenom,metier,ville,code_postal,photo_url,note_moyenne,nombre_avis,abonnement_pro,latitude,longitude,zone_intervention_km,services(prix)",
+    select: "id,nom,prenom,metier,ville,code_postal,photo_url,note_moyenne,nombre_avis,abonnement_pro,latitude,longitude,zone_intervention_km,services(prix,titre,tags)",
     actif: "eq.true",
     order: "id.asc",
   });
@@ -290,7 +292,16 @@ export default async function RecherchePage({ searchParams }: PageProps) {
     const prixMin = prices.length > 0 ? Math.min(...prices) : null;
     // Relevance: weight note by log of review count to penalize artisans with few reviews
     const relevance = p.note_moyenne * Math.log1p(p.nombre_avis);
-    return { ...p, prixMin, relevance };
+    // Service match : tag direct ou titre contains
+    let serviceMatch = false;
+    if (serviceTag) {
+      const std = SERVICES_STANDARDISES.find(s => s.id === serviceTag);
+      serviceMatch = (p.services ?? []).some(svc =>
+        (svc.tags ?? []).includes(serviceTag) ||
+        (std && svc.titre ? serviceTitleMatchesStandard(svc.titre, std.label) : false)
+      );
+    }
+    return { ...p, prixMin, relevance, serviceMatch };
   });
 
   const filtered = enriched.filter((p) => {
