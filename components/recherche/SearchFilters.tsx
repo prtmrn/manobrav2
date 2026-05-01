@@ -22,6 +22,7 @@ interface FilterOverrides {
   tri?: string;
   ordre?: string;
   serviceTag?: string;
+  repondVite?: boolean;
 }
 
 interface SearchFiltersProps {
@@ -31,6 +32,7 @@ interface SearchFiltersProps {
   initialTri?: string;
   initialOrdre?: string;
   initialServiceTag?: string;
+  initialRepondVite?: boolean;
   initialPrixMax?: string;
   initialNoteMin?: string;
   initialDispo?: string;
@@ -73,6 +75,7 @@ export default function SearchFilters({
   initialTri,
   initialOrdre,
   initialServiceTag,
+  initialRepondVite,
   initialPrixMax,
   initialNoteMin,
   initialDispo,
@@ -98,6 +101,7 @@ export default function SearchFilters({
   const [dispoMode, setDispoMode] = useState("");
   const [dispoDate, setDispoDate] = useState("");
   const [serviceTag, setServiceTag] = useState(initialServiceTag ?? "");
+  const [repondVite, setRepondVite] = useState(initialRepondVite ?? false);
   const [showServices, setShowServices] = useState(false);
   const servicesRef = useRef<HTMLDivElement>(null);
   const [tri, setTri] = useState(initialTri ?? "pertinence");
@@ -116,9 +120,9 @@ export default function SearchFilters({
   const [ordre, setOrdre] = useState(initialOrdre ?? "desc");
   const [vue, setVue] = useState<"grille" | "carte">(initialVue);
   // Refs pour capturer les valeurs courantes dans applyFilters
-  const stateRef = useRef({ metier, ville, prixMax, noteMin, dispo, vue, clientLat, clientLng, rayon, tri, ordre, adresseLabel, serviceTag });
+  const stateRef = useRef({ metier, ville, prixMax, noteMin, dispo, vue, clientLat, clientLng, rayon, tri, ordre, adresseLabel, serviceTag, repondVite });
   useEffect(() => {
-    stateRef.current = { metier, ville, prixMax, noteMin, dispo, vue, clientLat, clientLng, rayon, tri, ordre, adresseLabel, serviceTag };
+    stateRef.current = { metier, ville, prixMax, noteMin, dispo, vue, clientLat, clientLng, rayon, tri, ordre, adresseLabel, serviceTag, repondVite };
   });
 
   // ── URL push ─────────────────────────────────────────────────────────────
@@ -149,6 +153,8 @@ export default function SearchFilters({
       if (o && o !== "desc") qs.set("ordre", o);
       const st = overrides.serviceTag !== undefined ? overrides.serviceTag : cur.serviceTag;
       if (st) qs.set("service", st);
+      const rv = overrides.repondVite !== undefined ? overrides.repondVite : cur.repondVite;
+      if (rv) qs.set("repond_vite", "true");
       // Always reset to page 1 on filter change
 
       startTransition(() => {
@@ -344,6 +350,18 @@ export default function SearchFilters({
           )}
         </button>
 
+        {/* Répond vite */}
+        <button
+          onClick={() => { const rv = !repondVite; setRepondVite(rv); stateRef.current.repondVite = rv; applyFilters({ repondVite: rv }); }}
+          className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-sm font-medium transition-colors shadow-sm whitespace-nowrap ${
+            repondVite ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+          }`}
+        >
+          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <span className="hidden sm:inline">Répond vite</span>
+        </button>
         {/* Trier par */}
         <div className="relative" ref={triRef}>
           <button

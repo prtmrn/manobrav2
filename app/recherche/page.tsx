@@ -52,6 +52,7 @@ interface SearchParams {
   tri?: string;
   ordre?: string;
   service?: string;
+  repond_vite?: string;
 }
 
 interface PageProps {
@@ -232,6 +233,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   const tri = ["note", "distance", "prix", "pertinence"].includes(params.tri ?? "") ? params.tri! : "pertinence";
   const ordre = params.ordre === "asc" ? "asc" : "desc";
   const serviceTag = params.service ?? "";
+  const repondVite = params.repond_vite === "true";
 
   const admin = createAdminClient();
 
@@ -252,7 +254,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
   const queryParams = new URLSearchParams({
-    select: "id,nom,prenom,metier,ville,code_postal,photo_url,note_moyenne,nombre_avis,abonnement_pro,latitude,longitude,zone_intervention_km,services(prix,titre,tags)",
+    select: "id,nom,prenom,metier,ville,code_postal,photo_url,note_moyenne,nombre_avis,abonnement_pro,latitude,longitude,zone_intervention_km,temps_reponse_minutes,services(prix,titre,tags)",
     actif: "eq.true",
     order: "id.asc",
   });
@@ -305,6 +307,8 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   });
 
   const filtered = enriched.filter((p) => {
+    // Filtre Répond vite (moins de 2h)
+    if (repondVite && (!(p as any).temps_reponse_minutes || (p as any).temps_reponse_minutes > 120)) return false;
     // Prix max filter (only when artisan has a known price)
     if (prixMax !== null && p.prixMin !== null && p.prixMin > prixMax)
       return false;
@@ -426,6 +430,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
           initialTri={tri}
           initialOrdre={ordre}
           initialServiceTag={serviceTag}
+          initialRepondVite={repondVite}
           initialAdresse={params.adresse}
           initialPrixMax={params.prix_max}
           initialNoteMin={params.note_min}
