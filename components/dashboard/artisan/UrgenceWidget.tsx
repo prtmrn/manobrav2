@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -19,6 +19,7 @@ export default function UrgenceWidget({
   artisanId,
 }: UrgenceWidgetProps) {
   const router = useRouter();
+  const toggleRef = useRef(false);
   const [actif, setActif] = useState(initialActif);
   const [fin, setFin] = useState(initialFin);
   const [heureChoix, setHeureChoix] = useState("");
@@ -47,6 +48,9 @@ export default function UrgenceWidget({
   }, [actif, fin]);
 
   function toggleUrgence() {
+    if (toggleRef.current) return;
+    toggleRef.current = true;
+    setTimeout(() => { toggleRef.current = false; }, 300);
     console.log("toggleUrgence called", { isSanctioned, actif, loading, showConfig });
     if (isSanctioned) return;
     if (actif) {
