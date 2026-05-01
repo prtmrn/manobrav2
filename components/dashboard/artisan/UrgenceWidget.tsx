@@ -65,7 +65,6 @@ export default function UrgenceWidget({
   }
 
   async function activerUrgence() {
-    console.log("activerUrgence called, heureChoix:", heureChoix, "loading:", loading);
     if (!heureChoix) return;
     setLoading(true);
     const today = new Date().toISOString().split("T")[0];
@@ -146,11 +145,11 @@ export default function UrgenceWidget({
             </select>
           )}
           <div className="flex gap-2">
-            <button onClick={() => setShowConfig(false)}
+            <button onClick={(e) => { e.stopPropagation(); setShowConfig(false); }}
               className="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50">
               Annuler
             </button>
-            <button onClick={activerUrgence} disabled={!heureChoix || loading}
+            <button onClick={(e) => { e.stopPropagation(); activerUrgence(); }} disabled={!heureChoix || loading}
               className="flex-1 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-semibold disabled:opacity-50">
               {loading ? "..." : "Activer"}
             </button>
