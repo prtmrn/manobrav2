@@ -100,16 +100,6 @@ export default function SearchFilters({
   const [serviceTag, setServiceTag] = useState(initialServiceTag ?? "");
   const [showServices, setShowServices] = useState(false);
   const servicesRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!showServices) return;
-    function handle(e: MouseEvent) {
-      if (servicesRef.current && !servicesRef.current.contains(e.target as Node)) {
-        setShowServices(false);
-      }
-    }
-    window.addEventListener("click", handle);
-    return () => window.removeEventListener("click", handle);
-  }, [showServices]);
   const [tri, setTri] = useState(initialTri ?? "pertinence");
   const [showTri, setShowTri] = useState(false);
   const triLabels: Record<string, string> = { pertinence: "Pertinence", note: "Note", prix: "Prix", distance: "Distance" };
