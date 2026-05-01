@@ -464,7 +464,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
         {/* ── Map view ─────────────────────────────────────────────────────── */}
         {vue === "carte" ? (
           <div className="h-[calc(100vh-260px)] min-h-[400px] rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
-            <SearchMapView artisans={mapartisans} />
+            <SearchMapView artisans={mapartisans} clientLat={clientLat} clientLng={clientLng} />
           </div>
         ) : (
           <>

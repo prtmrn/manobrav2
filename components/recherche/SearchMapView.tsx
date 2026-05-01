@@ -25,6 +25,8 @@ export interface ArtisanCard {
 interface SearchMapViewProps {
   artisans: ArtisanCard[];
   modeUrgence?: boolean;
+  clientLat?: number | null;
+  clientLng?: number | null;
 }
 
 function StarRow({ note }: { note: number }) {
@@ -179,7 +181,7 @@ function ArtisanDetail({ artisan, onBack }: { artisan: ArtisanCard; onBack: () =
   );
 }
 
-export default function SearchMapView({ artisans, modeUrgence = false }: SearchMapViewProps) {
+export default function SearchMapView({ artisans, modeUrgence = false, clientLat, clientLng }: SearchMapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
@@ -272,9 +274,23 @@ export default function SearchMapView({ artisans, modeUrgence = false }: SearchM
         markersRef.current.push(marker);
       });
 
-      if (artisansAvecCoords.length > 0) {
-        const bounds = L.latLngBounds(artisansAvecCoords.map(a => [a.latitude!, a.longitude!]));
+      if (artisansAvecCoords.length > 0 || (clientLat && clientLng)) {
+        const points: [number, number][] = artisansAvecCoords.map(a => [a.latitude!, a.longitude!]);
+        if (clientLat && clientLng) {
+          points.push([clientLat, clientLng]);
+          // Marker client
+          const clientIcon = L.divIcon({
+            html: `<div style="width:14px;height:14px;border-radius:50%;background:#2563eb;border:3px solid white;box-shadow:0 0 0 2px #2563eb"></div>`,
+            iconSize: [14, 14],
+            iconAnchor: [7, 7],
+            className: "",
+          });
+          L.marker([clientLat, clientLng], { icon: clientIcon }).addTo(map).bindPopup("Votre adresse");
+        }
+        const bounds = L.latLngBounds(points);
         map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+      } else if (clientLat && clientLng) {
+        map.setView([clientLat, clientLng], 13);
       }
     });
 
