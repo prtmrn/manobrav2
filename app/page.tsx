@@ -6,6 +6,7 @@ import { METIER_CONFIG, METIER_LIST } from "@/components/map/metier-config";
 import HowItWorksTabs from "@/components/landing/HowItWorksTabs";
 import NavbarLanding from "@/components/landing/NavbarLanding";
 import HeroSearch from "@/components/landing/HeroSearch";
+import HeroCTA from "@/components/landing/HeroCTA";
 
 // ─── Cache 24 h (ISR) | les avis et stats changent peu ───────────────────────
 export const revalidate = 86400;
@@ -345,6 +346,7 @@ export default async function HomePage() {
 
             {/* Double CTA */}
             <HeroSearch />
+            <HeroCTA />
             {/* Reassurance */}
             <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
               <span className="flex items-center gap-2 text-sm text-gray-500"><svg className="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Sans engagement</span>
