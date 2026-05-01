@@ -76,7 +76,6 @@ export default function UrgenceWidget({
     setFin(finISO);
     setShowConfig(false);
     setLoading(false);
-    router.refresh();
   }
 
   async function saveDelai(val: number) {
@@ -89,9 +88,10 @@ export default function UrgenceWidget({
   const heuresDispos = () => {
     const opts = [];
     const now = new Date();
-    const h = now.getHours();
-    const m = now.getMinutes() < 30 ? 30 : 60;
-    for (let total = h * 60 + m; total < 24 * 60; total += 30) {
+    const totalNow = now.getHours() * 60 + now.getMinutes();
+    const start = totalNow + 30 - (totalNow % 30);
+    const end = Math.min(23 * 60 + 30, Math.max(start + 60, 20 * 60));
+    for (let total = start; total <= end; total += 30) {
       const hh = Math.floor(total / 60);
       const mm = total % 60;
       opts.push(`${hh.toString().padStart(2, "0")}:${mm.toString().padStart(2, "0")}`);
