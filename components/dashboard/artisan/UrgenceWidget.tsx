@@ -47,6 +47,7 @@ export default function UrgenceWidget({
   }, [actif, fin]);
 
   async function toggleUrgence() {
+    console.log("toggleUrgence called", { isSanctioned, actif, loading, showConfig });
     if (isSanctioned) return;
     if (actif) {
       setLoading(true);
