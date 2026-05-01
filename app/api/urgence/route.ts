@@ -10,11 +10,9 @@ export async function POST(request: Request) {
   const { actif, fin } = await request.json();
   const admin = createAdminClient();
 
-  // @ts-ignore
-  await admin.from("profiles_artisans").update({
-    urgence_actif: actif,
-    urgence_fin: fin ?? null,
-  }).eq("id", user.id);
+  await (admin.from("profiles_artisans") as any)
+    .update({ urgence_actif: actif, urgence_fin: fin ?? null })
+    .eq("id", user.id);
 
   return NextResponse.json({ ok: true });
 }
