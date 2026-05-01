@@ -122,7 +122,7 @@ export default function UrgenceWidget({
           </div>
         </div>
         <button
-          onClick={(e) => { e.stopPropagation(); toggleUrgence(); }}
+          onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); toggleUrgence(); }}
           disabled={loading || isSanctioned}
           className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors disabled:opacity-50 ${actif ? "bg-red-500" : "bg-gray-200"}`}
         >
