@@ -5,7 +5,6 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function HeroCTA() {
   const [role, setRole] = useState<string | null | undefined>(undefined);
-
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -50,7 +49,7 @@ export default function HeroCTA() {
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
-        Je cherche un artisan
+        Trouver un artisan
       </Link>
       <Link
         href="https://artisan.manobra.fr/auth/login"

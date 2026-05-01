@@ -352,6 +352,13 @@ export default async function HomePage() {
               <span className="flex items-center gap-2 text-sm text-gray-500"><svg className="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12" /></svg>Devis avant intervention</span>
               <span className="flex items-center gap-2 text-sm text-gray-500"><svg className="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>Avis certifiés</span>
             </div>
+            {/* CTA artisan discret */}
+            <p className="mt-6 text-sm text-gray-400">
+              Vous êtes artisan ?{" "}
+              <a href="https://artisan.manobra.fr/auth/login" className="text-brand-600 hover:text-brand-700 font-medium transition-colors">
+                Rejoignez Manobra →
+              </a>
+            </p>
 
 
           </div>
@@ -423,6 +430,131 @@ export default async function HomePage() {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════ */}
+        {/*  COMMENT ÇA MARCHE                                                */}
+        {/* ══════════════════════════════════════════════════════════════════ */}
+        <section className="py-20 bg-white">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-3">
+                Comment ça marche ?
+              </h2>
+              <p className="text-gray-500 text-base max-w-xl mx-auto">
+                Trouvez et réservez un artisan en moins de 2 minutes.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+              <div className="hidden md:block absolute top-8 left-1/3 right-1/3 h-0.5 bg-brand-100" style={{zIndex:0}} />
+              {/* Étape 1 */}
+              <div className="relative flex flex-col items-center text-center gap-4" style={{zIndex:1}}>
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-2xl bg-brand-50 border-2 border-brand-100 flex items-center justify-center shadow-sm">
+                    <svg className="w-6 h-6 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-brand-600 text-white text-xs font-bold flex items-center justify-center shadow">1</span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 text-base mb-2">Décrivez votre besoin</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">Recherchez par métier, service ou adresse. Filtrez par disponibilité, note ou prix.</p>
+                </div>
+              </div>
+              {/* Étape 2 */}
+              <div className="relative flex flex-col items-center text-center gap-4" style={{zIndex:1}}>
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-2xl bg-brand-50 border-2 border-brand-100 flex items-center justify-center shadow-sm">
+                    <svg className="w-6 h-6 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    </svg>
+                  </div>
+                  <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-brand-600 text-white text-xs font-bold flex items-center justify-center shadow">2</span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 text-base mb-2">Choisissez un artisan</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">Consultez les profils, les avis certifiés et les tarifs indicatifs. Comparez en un coup d&apos;œil.</p>
+                </div>
+              </div>
+              {/* Étape 3 */}
+              <div className="relative flex flex-col items-center text-center gap-4" style={{zIndex:1}}>
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-2xl bg-brand-50 border-2 border-brand-100 flex items-center justify-center shadow-sm">
+                    <svg className="w-6 h-6 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+                    </svg>
+                  </div>
+                  <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-brand-600 text-white text-xs font-bold flex items-center justify-center shadow">3</span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 text-base mb-2">Réservez en ligne</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">Sélectionnez un créneau dans l&apos;agenda de l&apos;artisan. Confirmation instantanée, sans appel.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════════════════════ */}
+        {/*  NOS MÉTIERS                                                      */}
+        {/* ══════════════════════════════════════════════════════════════════ */}
+        <section className="py-20 bg-gray-50">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-3">
+                Nos métiers
+              </h2>
+              <p className="text-gray-500 text-base max-w-xl mx-auto">
+                Des professionnels vérifiés pour tous vos besoins à domicile.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {METIER_LIST.filter(m => m !== "Autre").map((metier) => {
+                const config = METIER_CONFIG[metier];
+                const topServices: Record<string, string[]> = {
+                  "Serrurier": ["Ouverture de porte", "Changement de serrure", "Blindage de porte"],
+                  "Plombier": ["Débouchage", "Fuite robinet", "Chauffe-eau"],
+                  "Chauffagiste": ["Entretien chaudière", "Pompe à chaleur", "Dépannage chauffage"],
+                  "Électricien": ["Tableau électrique", "Installation prise", "Dépannage panne"],
+                  "Vitrier": ["Vitre cassée", "Double vitrage", "Porte-fenêtre"],
+                  "Ramoneur": ["Ramonage cheminée", "Poêle à bois", "Insert"],
+                  "Frigoriste": ["Climatisation", "Entretien clim", "Dépannage clim"],
+                  "Dépanneur": ["Panne véhicule", "Remorquage", "Démarrage batterie"],
+                };
+                return (
+                  <Link
+                    key={metier}
+                    href={`/metiers/${metier.toLowerCase().replace(/[éèê]/g, "e").replace(/[àâ]/g, "a").replace(/\s+/g, "-")}`}
+                    className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-brand-200 hover:-translate-y-0.5 transition-all duration-200 p-5 flex flex-col gap-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-xl"
+                        style={{ backgroundColor: config?.color + "20" }}
+                      >
+                        <svg className="w-5 h-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l5.653-4.655m5.8-5.8l2.496-3.03c.317-.384.74-.626 1.208-.766m0 0a3 3 0 015.656 2.614l-2.496 3.03m-6.36-5.644a3 3 0 00-5.656 2.614" />
+                      </svg>
+                      </div>
+                      <h3 className="font-bold text-gray-900 text-sm">{metier}</h3>
+                    </div>
+                    <ul className="space-y-1">
+                      {(topServices[metier] ?? []).map(svc => (
+                        <li key={svc} className="text-xs text-gray-500 flex items-center gap-1.5">
+                          <span className="w-1 h-1 rounded-full bg-brand-300 flex-shrink-0" />
+                          {svc}
+                        </li>
+                      ))}
+                    </ul>
+                    <span className="text-xs font-semibold text-brand-600 group-hover:text-brand-700 transition-colors mt-auto">
+                      Voir les artisans →
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════════════════════ */}
         {/*  CTA FINAL                                                        */}
         {/* ══════════════════════════════════════════════════════════════════ */}
         <section className="py-24 bg-white">
@@ -464,13 +596,13 @@ export default async function HomePage() {
                     Trouver un artisan
                   </Link>
                   <Link
-                    href="/auth/register"
+                    href="https://artisan.manobra.fr/auth/login"
                     className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold px-8 py-4 rounded-2xl text-base transition-all duration-200 hover:-translate-y-0.5"
                   >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
-                    Devenir artisan
+                    Je suis artisan
                   </Link>
                 </div>
 

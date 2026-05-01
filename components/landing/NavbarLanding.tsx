@@ -7,7 +7,6 @@ import { METIER_LIST } from "@/components/map/metier-config";
 import { SERVICES_STANDARDISES, normalizeStr } from "@/lib/services-standardises";
 
 const NAV_LINKS = [
-  { href: "/recherche", label: "Trouver un artisan" },
   { href: "/metiers", label: "Nos métiers" },
   { href: "/qui-sommes-nous", label: "Qui sommes-nous" },
   { href: "/blog", label: "Blog" },
