@@ -102,6 +102,15 @@ export default function SearchFilters({
   const servicesRef = useRef<HTMLDivElement>(null);
   const [tri, setTri] = useState(initialTri ?? "pertinence");
   const [showTri, setShowTri] = useState(false);
+  const triRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!showTri) return;
+    function handle(e: MouseEvent) {
+      if (triRef.current && !triRef.current.contains(e.target as Node)) setShowTri(false);
+    }
+    window.addEventListener("click", handle);
+    return () => window.removeEventListener("click", handle);
+  }, [showTri]);
   const triLabels: Record<string, string> = { pertinence: "Pertinence", note: "Note", prix: "Prix", distance: "Distance" };
   const triLabel = triLabels[tri] ?? "Pertinence";
   const [ordre, setOrdre] = useState(initialOrdre ?? "desc");
@@ -336,9 +345,9 @@ export default function SearchFilters({
         </button>
 
         {/* Trier par */}
-        <div className="relative">
+        <div className="relative" ref={triRef}>
           <button
-            onClick={() => setShowTri(!showTri)}
+            onClick={(e) => { e.stopPropagation(); setShowTri(prev => !prev); }}
             className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-gray-200 bg-white shadow-sm text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap"
           >
             <span className="hidden sm:inline">Trier par</span> {triLabel}
