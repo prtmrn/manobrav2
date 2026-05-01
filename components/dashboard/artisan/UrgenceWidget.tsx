@@ -69,13 +69,12 @@ export default function UrgenceWidget({
     setLoading(true);
     const today = new Date().toISOString().split("T")[0];
     const finISO = new Date(`${today}T${heureChoix}:00`).toISOString();
-    const supabase = createClient();
-    // @ts-ignore
-    await supabase.from("profiles_artisans").update({ urgence_actif: true, urgence_fin: finISO }).eq("id", artisanId);
-    setActif(true);
-    setFin(finISO);
-    setShowConfig(false);
-    setLoading(false);
+    await fetch("/api/urgence", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ actif: true, fin: finISO }),
+    });
+    window.location.reload();
   }
 
   async function saveDelai(val: number) {
