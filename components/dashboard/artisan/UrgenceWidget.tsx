@@ -51,14 +51,11 @@ export default function UrgenceWidget({
     if (isSanctioned) return;
     if (actif) {
       setLoading(true);
-      const supabase = createClient();
-      // @ts-ignore
-      supabase.from("profiles_artisans").update({ urgence_actif: false, urgence_fin: null }).eq("id", artisanId).then(() => {
-        setActif(false);
-        setFin(null);
-        setLoading(false);
-        router.refresh();
-      });
+      fetch("/api/urgence", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ actif: false, fin: null }),
+      }).then(() => window.location.reload());
     } else {
       setShowConfig(true);
     }
