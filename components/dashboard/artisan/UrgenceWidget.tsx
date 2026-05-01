@@ -48,7 +48,6 @@ export default function UrgenceWidget({
   }, [actif, fin]);
 
   function toggleUrgence() {
-    console.log("toggleUrgence called", { isSanctioned, actif, loading, showConfig });
     if (isSanctioned) return;
     if (actif) {
       setLoading(true);
@@ -61,8 +60,7 @@ export default function UrgenceWidget({
         router.refresh();
       });
     } else {
-      console.log("Setting showConfig to true");
-      setShowConfig(s => { console.log("showConfig state update:", s, "-> true"); return true; });
+      setShowConfig(true);
     }
   }
 
