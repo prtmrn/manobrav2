@@ -46,18 +46,19 @@ export default function UrgenceWidget({
     return () => clearInterval(t);
   }, [actif, fin]);
 
-  async function toggleUrgence() {
+  function toggleUrgence() {
     console.log("toggleUrgence called", { isSanctioned, actif, loading, showConfig });
     if (isSanctioned) return;
     if (actif) {
       setLoading(true);
       const supabase = createClient();
       // @ts-ignore
-      await supabase.from("profiles_artisans").update({ urgence_actif: false, urgence_fin: null }).eq("id", artisanId);
-      setActif(false);
-      setFin(null);
-      setLoading(false);
-      router.refresh();
+      supabase.from("profiles_artisans").update({ urgence_actif: false, urgence_fin: null }).eq("id", artisanId).then(() => {
+        setActif(false);
+        setFin(null);
+        setLoading(false);
+        router.refresh();
+      });
     } else {
       setShowConfig(true);
     }
