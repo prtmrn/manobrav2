@@ -987,7 +987,7 @@ export default function PlanningClient({
                 </button>
               </div>
             ) : (
-              
+              <a
                 href="/api/auth/google-calendar"
                 className="flex items-center gap-2 text-xs font-semibold text-gray-600 bg-white border border-gray-200 hover:border-brand-300 hover:text-brand-600 px-3 py-1.5 rounded-lg transition-colors shadow-sm"
               >
