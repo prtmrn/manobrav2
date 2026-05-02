@@ -153,12 +153,11 @@ function SlotCard({
         ? "bg-red-50 border-red-200"
         : "bg-green-50 border-green-200"
     }`}>
-      <div className={`font-bold tabular-nums ${(dispo as any).type === "urgence" ? "text-red-800" : "text-green-800"}`}>
+      <div className={`font-bold tabular-nums text-[10px] whitespace-nowrap flex items-center gap-1 ${(dispo as any).type === "urgence" ? "text-red-800" : "text-green-800"}`}>
         {formatHeure(dispo.heure_debut)} – {formatHeure(dispo.heure_fin)}
-        {(dispo as any).type === "urgence" && <span className="ml-1 text-[10px]">⚡</span>}
-        {(dispo as any).recurrence_id && <span className="ml-1 text-[9px] font-bold text-brand-500">RÉC</span>}
+
       </div>
-      <div className={`mt-0.5 flex items-center gap-1 ${(dispo as any).type === "urgence" ? "text-red-600" : "text-green-600"}`}>
+      <div className={`mt-0.5 flex items-center gap-1 text-[9px] ${(dispo as any).type === "urgence" ? "text-red-600" : "text-green-600"}`}>
         <IconClock className="w-3 h-3" />
         {duree % 1 === 0 ? `${duree}h` : `${Math.floor(duree)}h${Math.round((duree % 1) * 60)}`}
       </div>
