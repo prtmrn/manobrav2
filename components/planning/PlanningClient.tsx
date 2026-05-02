@@ -407,34 +407,6 @@ function AddSlotModal({
             </button>
           </div>
 
-          {/* Ponctuel */}
-          <div className="flex items-center justify-between p-3 rounded-xl border border-gray-200 bg-gray-50">
-            <div>
-              <p className="text-xs font-semibold text-gray-700">Créneau ponctuel</p>
-              <p className="text-[11px] text-gray-400">Disponible une seule fois (sinon récurrent chaque semaine)</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setPonctuel(p => !p)}
-              className={`relative inline-flex h-6 w-10 items-center rounded-full transition-colors ${ponctuel ? "bg-amber-500" : "bg-gray-200"}`}
-            >
-              <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${ponctuel ? "translate-x-5" : "translate-x-1"}`} />
-            </button>
-          </div>
-          {ponctuel && (
-            <div>
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-1.5">Date</label>
-              <input
-                type="date"
-                value={dateSpecifique}
-                onChange={e => setDateSpecifique(e.target.value)}
-                min={new Date().toISOString().split("T")[0]}
-                required={ponctuel}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-400"
-              />
-            </div>
-          )}
-
           {/* Preview durée */}
           {isValid ? (
             <div className="bg-brand-50 border border-brand-100 rounded-lg px-3 py-2 text-sm text-brand-700 flex items-center gap-2">
