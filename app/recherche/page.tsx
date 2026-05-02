@@ -53,6 +53,7 @@ interface SearchParams {
   ordre?: string;
   service?: string;
   repond_vite?: string;
+  dispo_maintenant?: string;
 }
 
 interface PageProps {
@@ -237,6 +238,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   const ordre = params.ordre === "asc" ? "asc" : "desc";
   const serviceTag = params.service ?? "";
   const repondVite = params.repond_vite === "true";
+  const dispoMaintenant = params.dispo_maintenant === "true";
 
   const admin = createAdminClient();
 
@@ -313,6 +315,8 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   });
 
   const filtered = enriched.filter((p) => {
+    // Filtre Dispo maintenant
+    if (dispoMaintenant && !p.urgenceActif) return false;
     // Filtre Répond vite (moins de 2h)
     if (repondVite && (!(p as any).temps_reponse_minutes || (p as any).temps_reponse_minutes > 120)) return false;
     // Prix max filter (only when artisan has a known price)
@@ -437,6 +441,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
           initialOrdre={ordre}
           initialServiceTag={serviceTag}
           initialRepondVite={repondVite}
+          initialDispoMaintenant={dispoMaintenant}
           initialAdresse={params.adresse}
           initialPrixMax={params.prix_max}
           initialNoteMin={params.note_min}

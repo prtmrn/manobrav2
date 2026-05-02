@@ -23,6 +23,7 @@ interface FilterOverrides {
   ordre?: string;
   serviceTag?: string;
   repondVite?: boolean;
+  dispoMaintenant?: boolean;
 }
 
 interface SearchFiltersProps {
@@ -33,6 +34,7 @@ interface SearchFiltersProps {
   initialOrdre?: string;
   initialServiceTag?: string;
   initialRepondVite?: boolean;
+  initialDispoMaintenant?: boolean;
   initialPrixMax?: string;
   initialNoteMin?: string;
   initialDispo?: string;
@@ -76,6 +78,7 @@ export default function SearchFilters({
   initialOrdre,
   initialServiceTag,
   initialRepondVite,
+  initialDispoMaintenant,
   initialPrixMax,
   initialNoteMin,
   initialDispo,
@@ -102,6 +105,7 @@ export default function SearchFilters({
   const [dispoDate, setDispoDate] = useState("");
   const [serviceTag, setServiceTag] = useState(initialServiceTag ?? "");
   const [repondVite, setRepondVite] = useState(initialRepondVite ?? false);
+  const [dispoMaintenant, setDispoMaintenant] = useState(initialDispoMaintenant ?? false);
   const [showServices, setShowServices] = useState(false);
   const servicesRef = useRef<HTMLDivElement>(null);
   const [tri, setTri] = useState(initialTri ?? "pertinence");
@@ -120,9 +124,9 @@ export default function SearchFilters({
   const [ordre, setOrdre] = useState(initialOrdre ?? "desc");
   const [vue, setVue] = useState<"grille" | "carte">(initialVue);
   // Refs pour capturer les valeurs courantes dans applyFilters
-  const stateRef = useRef({ metier, ville, prixMax, noteMin, dispo, vue, clientLat, clientLng, rayon, tri, ordre, adresseLabel, serviceTag, repondVite });
+  const stateRef = useRef({ metier, ville, prixMax, noteMin, dispo, vue, clientLat, clientLng, rayon, tri, ordre, adresseLabel, serviceTag, repondVite, dispoMaintenant });
   useEffect(() => {
-    stateRef.current = { metier, ville, prixMax, noteMin, dispo, vue, clientLat, clientLng, rayon, tri, ordre, adresseLabel, serviceTag, repondVite };
+    stateRef.current = { metier, ville, prixMax, noteMin, dispo, vue, clientLat, clientLng, rayon, tri, ordre, adresseLabel, serviceTag, repondVite, dispoMaintenant };
   });
 
   // ── URL push ─────────────────────────────────────────────────────────────
@@ -155,6 +159,8 @@ export default function SearchFilters({
       if (st) qs.set("service", st);
       const rv = overrides.repondVite !== undefined ? overrides.repondVite : cur.repondVite;
       if (rv) qs.set("repond_vite", "true");
+      const dm = overrides.dispoMaintenant !== undefined ? overrides.dispoMaintenant : cur.dispoMaintenant;
+      if (dm) qs.set("dispo_maintenant", "true");
       // Always reset to page 1 on filter change
 
       startTransition(() => {
@@ -350,6 +356,16 @@ export default function SearchFilters({
           )}
         </button>
 
+        {/* Dispo maintenant */}
+        <button
+          onClick={() => { const dm = !dispoMaintenant; setDispoMaintenant(dm); stateRef.current.dispoMaintenant = dm; applyFilters({ dispoMaintenant: dm }); }}
+          className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-sm font-medium transition-colors shadow-sm whitespace-nowrap ${
+            dispoMaintenant ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+          }`}
+        >
+          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${dispoMaintenant ? "bg-red-500 animate-pulse" : "bg-gray-300"}`} />
+          <span className="hidden sm:inline">Dispo maintenant</span>
+        </button>
         {/* Trier par */}
         <div className="relative" ref={triRef}>
           <button
