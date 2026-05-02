@@ -289,7 +289,7 @@ function AddSlotModal({
 }: {
   jourId: number;
   onClose: () => void;
-  onSave: (data: { jours: number[]; heure_debut: string; heure_fin: string; type: "normal" | "urgence"; recurrent: boolean }) => void;
+  onSave: (data: { jours: number[]; heure_debut: string; heure_fin: string; type: "normal" | "urgence"; date_specifique: string | null }) => void;
   loading: boolean;
   error: string | null;
 }) {
@@ -297,7 +297,8 @@ function AddSlotModal({
   const [heureFin, setHeureFin] = useState("17:00");
   const [selectedJours, setSelectedJours] = useState<number[]>([jourId]);
   const [typeUrgence, setTypeUrgence] = useState(false);
-  const [recurrent, setRecurrent] = useState(false);
+  const [ponctuel, setPonctuel] = useState(false);
+  const [dateSpecifique, setDateSpecifique] = useState("");
   const duree = dureeHeures(heureDebut, heureFin);
   const isValid = duree > 0 && selectedJours.length > 0;
   function toggleJour(id: number) {
@@ -308,7 +309,7 @@ function AddSlotModal({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!isValid) return;
-    onSave({ jours: selectedJours, heure_debut: heureDebut, heure_fin: heureFin, type: typeUrgence ? "urgence" : "normal", recurrent });
+    onSave({ jours: selectedJours, heure_debut: heureDebut, heure_fin: heureFin, type: typeUrgence ? "urgence" : "normal", date_specifique: ponctuel && dateSpecifique ? dateSpecifique : null });
   }
 
   return (
@@ -406,20 +407,33 @@ function AddSlotModal({
             </button>
           </div>
 
-          {/* Récurrent */}
+          {/* Ponctuel */}
           <div className="flex items-center justify-between p-3 rounded-xl border border-gray-200 bg-gray-50">
             <div>
-              <p className="text-xs font-semibold text-gray-700">Créneau récurrent</p>
-              <p className="text-[11px] text-gray-400">Se répète chaque semaine automatiquement</p>
+              <p className="text-xs font-semibold text-gray-700">Créneau ponctuel</p>
+              <p className="text-[11px] text-gray-400">Disponible une seule fois (sinon récurrent chaque semaine)</p>
             </div>
             <button
               type="button"
-              onClick={() => setRecurrent(r => !r)}
-              className={`relative inline-flex h-6 w-10 items-center rounded-full transition-colors ${recurrent ? "bg-brand-500" : "bg-gray-200"}`}
+              onClick={() => setPonctuel(p => !p)}
+              className={`relative inline-flex h-6 w-10 items-center rounded-full transition-colors ${ponctuel ? "bg-amber-500" : "bg-gray-200"}`}
             >
-              <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${recurrent ? "translate-x-5" : "translate-x-1"}`} />
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${ponctuel ? "translate-x-5" : "translate-x-1"}`} />
             </button>
           </div>
+          {ponctuel && (
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-1.5">Date</label>
+              <input
+                type="date"
+                value={dateSpecifique}
+                onChange={e => setDateSpecifique(e.target.value)}
+                min={new Date().toISOString().split("T")[0]}
+                required={ponctuel}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-400"
+              />
+            </div>
+          )}
 
           {/* Preview durée */}
           {isValid ? (
@@ -700,7 +714,7 @@ export default function PlanningClient({
     heure_debut: string;
     heure_fin: string;
     type: "normal" | "urgence";
-    recurrent: boolean;
+    date_specifique: string | null;
   }) {
     setModalLoading(true);
     setModalError(null);
@@ -732,9 +746,6 @@ export default function PlanningClient({
       }
     }
 
-    const recurrenceId = data.recurrent
-      ? crypto.randomUUID()
-      : null;
     const rows = data.jours.map((jour_semaine) => ({
       artisan_id: userId,
       jour_semaine,
@@ -742,7 +753,7 @@ export default function PlanningClient({
       heure_fin: data.heure_fin,
       actif: true,
       type: data.type ?? "normal",
-      recurrence_id: recurrenceId,
+      date_specifique: data.date_specifique ?? null,
     }));
     const { data: inserted, error } = await supabase
       .from("disponibilites")
