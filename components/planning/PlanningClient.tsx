@@ -156,6 +156,7 @@ function SlotCard({
       <div className={`font-bold tabular-nums ${(dispo as any).type === "urgence" ? "text-red-800" : "text-green-800"}`}>
         {formatHeure(dispo.heure_debut)} – {formatHeure(dispo.heure_fin)}
         {(dispo as any).type === "urgence" && <span className="ml-1 text-[10px]">⚡</span>}
+        {(dispo as any).recurrence_id && <span className="ml-1 text-[9px] font-bold text-brand-500">RÉC</span>}
       </div>
       <div className={`mt-0.5 flex items-center gap-1 ${(dispo as any).type === "urgence" ? "text-red-600" : "text-green-600"}`}>
         <IconClock className="w-3 h-3" />
@@ -289,7 +290,7 @@ function AddSlotModal({
 }: {
   jourId: number;
   onClose: () => void;
-  onSave: (data: { jours: number[]; heure_debut: string; heure_fin: string; type: "normal" | "urgence" }) => void;
+  onSave: (data: { jours: number[]; heure_debut: string; heure_fin: string; type: "normal" | "urgence"; recurrent: boolean }) => void;
   loading: boolean;
   error: string | null;
 }) {
@@ -297,6 +298,7 @@ function AddSlotModal({
   const [heureFin, setHeureFin] = useState("17:00");
   const [selectedJours, setSelectedJours] = useState<number[]>([jourId]);
   const [typeUrgence, setTypeUrgence] = useState(false);
+  const [recurrent, setRecurrent] = useState(false);
   const duree = dureeHeures(heureDebut, heureFin);
   const isValid = duree > 0 && selectedJours.length > 0;
   function toggleJour(id: number) {
@@ -307,7 +309,7 @@ function AddSlotModal({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!isValid) return;
-    onSave({ jours: selectedJours, heure_debut: heureDebut, heure_fin: heureFin, type: typeUrgence ? "urgence" : "normal" });
+    onSave({ jours: selectedJours, heure_debut: heureDebut, heure_fin: heureFin, type: typeUrgence ? "urgence" : "normal", recurrent });
   }
 
   return (
@@ -402,6 +404,21 @@ function AddSlotModal({
               className={`relative inline-flex h-6 w-10 items-center rounded-full transition-colors ${typeUrgence ? "bg-red-500" : "bg-gray-200"}`}
             >
               <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${typeUrgence ? "translate-x-5" : "translate-x-1"}`} />
+            </button>
+          </div>
+
+          {/* Récurrent */}
+          <div className="flex items-center justify-between p-3 rounded-xl border border-gray-200 bg-gray-50">
+            <div>
+              <p className="text-xs font-semibold text-gray-700">Créneau récurrent</p>
+              <p className="text-[11px] text-gray-400">Se répète chaque semaine automatiquement</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setRecurrent(r => !r)}
+              className={`relative inline-flex h-6 w-10 items-center rounded-full transition-colors ${recurrent ? "bg-brand-500" : "bg-gray-200"}`}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${recurrent ? "translate-x-5" : "translate-x-1"}`} />
             </button>
           </div>
 
@@ -684,6 +701,7 @@ export default function PlanningClient({
     heure_debut: string;
     heure_fin: string;
     type: "normal" | "urgence";
+    recurrent: boolean;
   }) {
     setModalLoading(true);
     setModalError(null);
@@ -715,6 +733,9 @@ export default function PlanningClient({
       }
     }
 
+    const recurrenceId = data.recurrent
+      ? crypto.randomUUID()
+      : null;
     const rows = data.jours.map((jour_semaine) => ({
       artisan_id: userId,
       jour_semaine,
@@ -722,6 +743,7 @@ export default function PlanningClient({
       heure_fin: data.heure_fin,
       actif: true,
       type: data.type ?? "normal",
+      recurrence_id: recurrenceId,
     }));
     const { data: inserted, error } = await supabase
       .from("disponibilites")
