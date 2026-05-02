@@ -73,6 +73,8 @@ type Rawartisan = {
   latitude: number | null;
   longitude: number | null;
   services?: { prix: number | null; titre: string | null; tags: string[] | null }[];
+  urgence_actif?: boolean;
+  urgence_fin?: string | null;
   siret?: string | null;
   bio?: string | null;
   disponible_urgence?: boolean;
@@ -81,6 +83,7 @@ type Rawartisan = {
 type Enrichedartisan = Rawartisan & {
   prixMin: number | null;
   serviceMatch: boolean;
+  urgenceActif: boolean;
   relevance: number;
 };
 
@@ -254,7 +257,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
   const queryParams = new URLSearchParams({
-    select: "id,nom,prenom,metier,ville,code_postal,photo_url,note_moyenne,nombre_avis,abonnement_pro,latitude,longitude,zone_intervention_km,temps_reponse_minutes,services(prix,titre,tags)",
+    select: "id,nom,prenom,metier,ville,code_postal,photo_url,note_moyenne,nombre_avis,abonnement_pro,latitude,longitude,zone_intervention_km,temps_reponse_minutes,urgence_actif,urgence_fin,services(prix,titre,tags)",
     actif: "eq.true",
     order: "id.asc",
   });
@@ -303,7 +306,10 @@ export default async function RecherchePage({ searchParams }: PageProps) {
         (std && svc.titre ? serviceTitleMatchesStandard(svc.titre, std.label) : false)
       );
     }
-    return { ...p, prixMin, relevance, serviceMatch };
+    const urgenceActif = p.urgence_actif === true &&
+      !!p.urgence_fin &&
+      new Date(p.urgence_fin) > new Date();
+    return { ...p, prixMin, relevance, serviceMatch, urgenceActif };
   });
 
   const filtered = enriched.filter((p) => {
@@ -363,7 +369,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
       latitude: p.latitude!,
       longitude: p.longitude!,
       prixMin: p.prixMin ?? null,
-      disponible_urgence: p.disponible_urgence ?? false,
+      disponible_urgence: p.urgenceActif ?? false,
       siret: (p as any).siret ?? null,
       bio: (p as any).bio ?? null,
     }));
@@ -501,6 +507,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: config.color + "20" }} />
                               )}
+                              {p.urgenceActif && <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-0.5"><span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />Dispo maintenant</span>}
                               {p.abonnement_pro && <span className="absolute top-2 right-2 bg-amber-400 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">PRO ✦</span>}
                               {p.note_moyenne > 0 && (
                                 <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/50 backdrop-blur-sm rounded-full px-2 py-0.5">
