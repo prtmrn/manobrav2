@@ -810,7 +810,7 @@ export default function PlanningClient({
   // ─────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="space-y-6 py-5 max-w-full">
+    <div className="space-y-6 py-5 px-4">
 
       {/* ── Toast notification ──────────────────────────────────────────────── */}
       {toast && (
