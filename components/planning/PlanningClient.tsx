@@ -148,11 +148,16 @@ function SlotCard({
 }) {
   const duree = dureeHeures(dispo.heure_debut, dispo.heure_fin);
   return (
-    <div className="group relative bg-brand-50 border border-brand-200 rounded-lg px-2.5 py-2 text-xs">
-      <div className="font-bold text-brand-800 tabular-nums">
+    <div className={`group relative rounded-lg px-2.5 py-2 text-xs border ${
+      (dispo as any).type === "urgence"
+        ? "bg-red-50 border-red-200"
+        : "bg-green-50 border-green-200"
+    }`}>
+      <div className={`font-bold tabular-nums ${(dispo as any).type === "urgence" ? "text-red-800" : "text-green-800"}`}>
         {formatHeure(dispo.heure_debut)} – {formatHeure(dispo.heure_fin)}
+        {(dispo as any).type === "urgence" && <span className="ml-1 text-[10px]">⚡</span>}
       </div>
-      <div className="text-brand-600 mt-0.5 flex items-center gap-1">
+      <div className={`mt-0.5 flex items-center gap-1 ${(dispo as any).type === "urgence" ? "text-red-600" : "text-green-600"}`}>
         <IconClock className="w-3 h-3" />
         {duree % 1 === 0 ? `${duree}h` : `${Math.floor(duree)}h${Math.round((duree % 1) * 60)}`}
       </div>
@@ -680,6 +685,34 @@ export default function PlanningClient({
   }) {
     setModalLoading(true);
     setModalError(null);
+
+    // Validation anti-chevauchement
+    function toMin(t: string) {
+      const [h, m] = t.split(":").map(Number);
+      return h * 60 + m;
+    }
+    const debutMin = toMin(data.heure_debut);
+    const finMin = toMin(data.heure_fin);
+
+    for (const jour_semaine of data.jours) {
+      const existing = dispos.filter(d => d.jour_semaine === jour_semaine && d.actif);
+      for (const d of existing) {
+        const dDebut = toMin(d.heure_debut);
+        const dFin = toMin(d.heure_fin);
+        const chevauche = debutMin < dFin && finMin > dDebut;
+        if (!chevauche) continue;
+        // Urgence peut chevaucher normal et vice-versa
+        if (data.type === "urgence" && (d as any).type !== "urgence") continue;
+        if (data.type === "normal" && (d as any).type === "urgence") continue;
+        // Deux urgences ne peuvent pas se chevaucher
+        // Deux normaux ne peuvent pas se chevaucher
+        const jourNom = JOURS.find(j => j.id === jour_semaine)?.long ?? "ce jour";
+        setModalError(`Chevauchement détecté le ${jourNom} avec ${d.heure_debut.slice(0,5)}–${d.heure_fin.slice(0,5)}`);
+        setModalLoading(false);
+        return;
+      }
+    }
+
     const rows = data.jours.map((jour_semaine) => ({
       artisan_id: userId,
       jour_semaine,
@@ -815,13 +848,7 @@ export default function PlanningClient({
             Gérez vos créneaux de disponibilité et vos congés.
           </p>
         </div>
-        <button
-          onClick={() => setShowIndispoForm(true)}
-          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-sm transition-colors"
-        >
-          <IconCalendar />
-          Ajouter une indisponibilité
-        </button>
+
       </div>
 
       {/* ── KPI cards ───────────────────────────────────────────────────────── */}
