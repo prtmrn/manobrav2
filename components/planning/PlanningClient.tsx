@@ -181,6 +181,73 @@ function SlotCard({
   );
 }
 
+// ─── Composant : modale duplication ──────────────────────────────────────────
+function DuplicateDayModal({
+  sourceJour,
+  sourceDispos,
+  onClose,
+  onDuplicate,
+}: {
+  sourceJour: number;
+  sourceDispos: Dispo[];
+  onClose: () => void;
+  onDuplicate: (targetJours: number[]) => Promise<void>;
+}) {
+  const [selected, setSelected] = useState<number[]>([]);
+  const [loading, setLoading] = useState(false);
+  const jourNom = JOURS.find(j => j.id === sourceJour)?.long ?? "";
+
+  async function handleSubmit() {
+    if (selected.length === 0) return;
+    setLoading(true);
+    await onDuplicate(selected);
+    setLoading(false);
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl border border-gray-100 w-full max-w-sm p-6">
+        <h3 className="text-lg font-bold text-gray-900 mb-1">Dupliquer {jourNom}</h3>
+        <p className="text-sm text-gray-500 mb-4">
+          Copier {sourceDispos.length} créneau{sourceDispos.length > 1 ? "x" : ""} vers :
+        </p>
+        <div className="grid grid-cols-7 gap-1 mb-4">
+          {JOURS.map(j => (
+            <button
+              key={j.id}
+              type="button"
+              disabled={j.id === sourceJour}
+              onClick={() => setSelected(prev =>
+                prev.includes(j.id) ? prev.filter(x => x !== j.id) : [...prev, j.id]
+              )}
+              className={`py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+                selected.includes(j.id)
+                  ? "bg-brand-600 text-white shadow-sm"
+                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+              }`}
+            >
+              {j.court}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors">
+            Annuler
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={selected.length === 0 || loading}
+            className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors disabled:opacity-50"
+          >
+            {loading ? "..." : `Dupliquer vers ${selected.length} jour${selected.length > 1 ? "s" : ""}`}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Composant : colonne d'un jour ────────────────────────────────────────────
 
 function DayColumn({
@@ -190,6 +257,7 @@ function DayColumn({
   indispoActive,
   onAddClick,
   onDelete,
+  onDuplicate,
   loadingId,
 }: {
   jour: (typeof JOURS)[number];
@@ -198,6 +266,7 @@ function DayColumn({
   indispoActive: boolean;
   onAddClick: (jourId: number) => void;
   onDelete: (id: string) => void;
+  onDuplicate: (jourId: number) => void;
   loadingId: string | null;
 }) {
   const isToday = toISODate(date) === toISODate(new Date());
@@ -236,7 +305,17 @@ function DayColumn({
         {isToday && (
           <div className="w-1.5 h-1.5 rounded-full bg-brand-500 mx-auto mt-0.5" />
         )}
-        {/* Indispo badge */}
+        {/* Bouton dupliquer */}
+        {dispos.length > 0 && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onDuplicate(jour.id); }}
+            className="mt-1 text-[10px] font-semibold text-gray-400 hover:text-brand-600 transition-colors"
+            title="Dupliquer ce jour"
+          >
+            Dupliquer
+          </button>
+        )}
+      {/* Indispo badge */}
         {indispoActive && (
           <span className="mt-1 inline-block text-[10px] font-semibold bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded-full">
             Indispo
@@ -545,6 +624,7 @@ export default function PlanningClient({
   // Modal ajout créneau
   const [modalJour, setModalJour] = useState<number | null>(null);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [duplicateSource, setDuplicateSource] = useState<number | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
 
@@ -833,6 +913,43 @@ export default function PlanningClient({
       )}
 
       {/* ── Modal ajout créneau ─────────────────────────────────────────────── */}
+      {/* Modale duplication */}
+      {duplicateSource !== null && (
+        <DuplicateDayModal
+          sourceJour={duplicateSource}
+          sourceDispos={dispos.filter(d => d.jour_semaine === duplicateSource)}
+          onClose={() => setDuplicateSource(null)}
+          onDuplicate={async (targetJours) => {
+            const sourceDispos = dispos.filter(d => d.jour_semaine === duplicateSource);
+            for (const targetJour of targetJours) {
+              for (const d of sourceDispos) {
+                // Vérif anti-chevauchement
+                const existing = dispos.filter(e => e.jour_semaine === targetJour && e.actif);
+                const toMin2 = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
+                const skip = existing.some(e => {
+                  const eType = (e as any).type ?? "normal";
+                  const dType = (d as any).type ?? "normal";
+                  if (eType !== dType) return false;
+                  return toMin2(d.heure_debut) < toMin2(e.heure_fin) && toMin2(d.heure_fin) > toMin2(e.heure_debut);
+                });
+                if (skip) continue;
+                await supabase.from("disponibilites").insert({
+                  artisan_id: userId,
+                  jour_semaine: targetJour,
+                  heure_debut: d.heure_debut,
+                  heure_fin: d.heure_fin,
+                  actif: true,
+                  type: (d as any).type ?? "normal",
+                } as any);
+              }
+            }
+            const { data } = await supabase.from("disponibilites").select("*").eq("artisan_id", userId).order("jour_semaine").order("heure_debut");
+            if (data) setDispos(data as Dispo[]);
+            setDuplicateSource(null);
+            showToast("Créneaux dupliqués", "success");
+          }}
+        />
+      )}
       {modalJour !== null && (
         <AddSlotModal
           jourId={modalJour}
@@ -970,6 +1087,7 @@ export default function PlanningClient({
                   date={weekDates[idx]}
                   dispos={dayDispos}
                   indispoActive={joursIndispoSet.has(idx)}
+                  onDuplicate={(id) => setDuplicateSource(id)}
                   onAddClick={(id) => {
                     setModalJour(id);
                     setModalError(null);
