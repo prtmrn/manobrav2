@@ -28,6 +28,12 @@ export default async function PlanningPage() {
   // Fetch disponibilités + indisponibilités en parallèle
   const today = new Date().toISOString().split("T")[0];
 
+  const { data: artisanProfile } = await supabase
+    .from("profiles_artisans")
+    .select("google_calendar_connected")
+    .eq("artisan_id", user.id)
+    .maybeSingle();
+
   const [dispoRes, indispoRes] = await Promise.all([
     supabase
       .from("disponibilites")
@@ -47,6 +53,7 @@ export default async function PlanningPage() {
   return (
     <PlanningClient
       userId={user.id}
+      googleCalendarConnected={(artisanProfile as any)?.google_calendar_connected ?? false}
       initialDispos={(dispoRes.data ?? []) as import("@/types").Tables<"disponibilites">[]}
       initialIndispos={(indispoRes.data ?? []) as import("@/types").Tables<"indisponibilites">[]}
     />
