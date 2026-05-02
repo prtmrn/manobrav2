@@ -51,11 +51,11 @@ export default function UrgenceWidget({
     if (isSanctioned) return;
     if (actif) {
       setLoading(true);
-      fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? "https://manobra.fr"}/api/urgence`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ actif: false, fin: null }),
-      }).then(() => window.location.reload());
+      const supabase = createClient();
+      (supabase.from("profiles_artisans") as any)
+        .update({ urgence_actif: false, urgence_fin: null })
+        .eq("id", artisanId)
+        .then(() => window.location.reload());
     } else {
       setShowConfig(true);
     }
@@ -66,11 +66,10 @@ export default function UrgenceWidget({
     setLoading(true);
     const today = new Date().toISOString().split("T")[0];
     const finISO = new Date(`${today}T${heureChoix}:00`).toISOString();
-    await fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? "https://manobra.fr"}/api/urgence`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ actif: true, fin: finISO }),
-    });
+    const supabase = createClient();
+    await (supabase.from("profiles_artisans") as any)
+      .update({ urgence_actif: true, urgence_fin: finISO })
+      .eq("id", artisanId);
     window.location.reload();
   }
 
