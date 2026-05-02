@@ -283,13 +283,14 @@ function AddSlotModal({
 }: {
   jourId: number;
   onClose: () => void;
-  onSave: (data: { jours: number[]; heure_debut: string; heure_fin: string }) => void;
+  onSave: (data: { jours: number[]; heure_debut: string; heure_fin: string; type: "normal" | "urgence" }) => void;
   loading: boolean;
   error: string | null;
 }) {
   const [heureDebut, setHeureDebut] = useState("09:00");
   const [heureFin, setHeureFin] = useState("17:00");
   const [selectedJours, setSelectedJours] = useState<number[]>([jourId]);
+  const [typeUrgence, setTypeUrgence] = useState(false);
   const duree = dureeHeures(heureDebut, heureFin);
   const isValid = duree > 0 && selectedJours.length > 0;
   function toggleJour(id: number) {
@@ -300,7 +301,7 @@ function AddSlotModal({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!isValid) return;
-    onSave({ jours: selectedJours, heure_debut: heureDebut, heure_fin: heureFin });
+    onSave({ jours: selectedJours, heure_debut: heureDebut, heure_fin: heureFin, type: typeUrgence ? "urgence" : "normal" });
   }
 
   return (
@@ -381,6 +382,21 @@ function AddSlotModal({
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               />
             </div>
+          </div>
+
+          {/* Type urgence */}
+          <div className="flex items-center justify-between p-3 rounded-xl border border-gray-200 bg-gray-50">
+            <div>
+              <p className="text-xs font-semibold text-gray-700">Créneau urgence</p>
+              <p className="text-[11px] text-gray-400">Active le mode urgence automatiquement</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setTypeUrgence(t => !t)}
+              className={`relative inline-flex h-6 w-10 items-center rounded-full transition-colors ${typeUrgence ? "bg-red-500" : "bg-gray-200"}`}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${typeUrgence ? "translate-x-5" : "translate-x-1"}`} />
+            </button>
           </div>
 
           {/* Preview durée */}
@@ -660,6 +676,7 @@ export default function PlanningClient({
     jours: number[];
     heure_debut: string;
     heure_fin: string;
+    type: "normal" | "urgence";
   }) {
     setModalLoading(true);
     setModalError(null);
@@ -669,6 +686,7 @@ export default function PlanningClient({
       heure_debut: data.heure_debut,
       heure_fin: data.heure_fin,
       actif: true,
+      type: data.type ?? "normal",
     }));
     const { data: inserted, error } = await supabase
       .from("disponibilites")
