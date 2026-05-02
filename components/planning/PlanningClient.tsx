@@ -208,13 +208,14 @@ function DayColumn({
 
   return (
     <div
-      className={`flex flex-col gap-2 min-w-[130px] flex-1 rounded-xl border-2 p-3 transition-colors ${
+      className={`flex flex-col gap-2 min-w-[130px] flex-1 rounded-xl border-2 p-3 transition-colors cursor-pointer hover:shadow-sm ${
         indispoActive
           ? "border-orange-200 bg-orange-50"
           : isToday
           ? "border-brand-300 bg-brand-50/30"
-          : "border-gray-100 bg-white"
+          : "border-gray-100 bg-white hover:border-brand-200"
       }`}
+      onClick={() => onAddClick(jour.id)}
     >
       {/* En-tête du jour */}
       <div className="text-center">
@@ -541,6 +542,7 @@ export default function PlanningClient({
 
   // Modal ajout créneau
   const [modalJour, setModalJour] = useState<number | null>(null);
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
 
