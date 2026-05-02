@@ -369,6 +369,17 @@ export default async function artisanPage({ params }: PageProps) {
   const fullName =
     `${artisan.prenom ?? ""} ${artisan.nom ?? ""}`.trim() ||
     "artisan";
+  const urgenceActif = (artisan as any).urgence_actif === true &&
+    (artisan as any).urgence_fin &&
+    new Date((artisan as any).urgence_fin) > new Date();
+
+  const urgenceTimeLeft = urgenceActif ? (() => {
+    const diff = new Date((artisan as any).urgence_fin).getTime() - Date.now();
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    return h > 0 ? `${h}h${m.toString().padStart(2, "0")}` : `${m} min`;
+  })() : null;
+
   const location = artisan.ville
     ? artisan.code_postal
       ? `${artisan.ville} (${artisan.code_postal})`
@@ -461,6 +472,14 @@ export default async function artisanPage({ params }: PageProps) {
 
                   {/* Badges */}
                   <div className="flex flex-wrap gap-2 mb-1">
+                    {urgenceActif && (
+                      <span className="inline-flex items-center gap-1 bg-red-50 text-red-700 border border-red-200 text-xs font-bold px-2.5 py-1 rounded-full animate-pulse">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Disponible maintenant{urgenceTimeLeft ? ` · encore ${urgenceTimeLeft}` : ""}
+                      </span>
+                    )}
                     {(artisan as { plan_actif?: string }).plan_actif === "pro" && (
                       <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold px-2.5 py-1 rounded-full">
                         <svg
