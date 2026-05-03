@@ -186,7 +186,7 @@ export default function PlanningClient({
   const hiddenCategories = new Set(categories.filter(c => !c.visible).map(c => c.system_key ?? c.id));
   const [selectedEvent, setSelectedEvent] = useState<CalEvent | null>(null);
   const [quickAdd, setQuickAdd] = useState<{ date: string; heure: string } | null>(null);
-  const [createModal, setCreateModal] = useState<{ date: string; heure: string; heureFin?: string } | null>(null);
+  const [createModal, setCreateModal] = useState<{ date: string; heure: string; heureFin?: string; x?: number; y?: number } | null>(null);
   const savedScrollTop = useRef(0);
   const [editDispo, setEditDispo] = useState<Dispo | null>(null);
   const [dragging, setDragging] = useState<{ ev: CalEvent; offsetY: number } | null>(null);
@@ -487,7 +487,9 @@ export default function PlanningClient({
       }
     }
 
-    function onMouseUp() {
+    let lastMousePos = { x: 0, y: 0 };
+    function onMMPos(e: MouseEvent) { lastMousePos = { x: e.clientX, y: e.clientY }; }
+    function onMouseUp(e: MouseEvent) {
       const ds = drawStartRef.current;
       const dc = drawCurrentRef.current;
       if (ds) {
@@ -496,21 +498,23 @@ export default function PlanningClient({
         if (dragDistance > minToPx(14) && dc) {
           const debut = pxToTime(ds.top);
           const fin = pxToTime(dc);
-          setCreateModal({ date: ds.date, heure: debut.slice(0,5), heureFin: fin.slice(0,5) } as any);
+          setCreateModal({ date: ds.date, heure: debut.slice(0,5), heureFin: fin.slice(0,5), x: e.clientX, y: e.clientY } as any);
         } else {
           const debut = pxToTime(ds.top);
-          setCreateModal({ date: ds.date, heure: debut.slice(0,5) } as any);
+          setCreateModal({ date: ds.date, heure: debut.slice(0,5), x: e.clientX, y: e.clientY } as any);
         }
       }
       drawStartRef.current = null;
       drawCurrentRef.current = null;
       setDrawGhost(null);
     }
+    window.addEventListener("mousemove", onMMPos);
 
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mousemove", onMMPos);
       window.removeEventListener("mouseup", onMouseUp);
     };
   }, []);
@@ -1191,6 +1195,8 @@ export default function PlanningClient({
           date={createModal.date}
           heure={createModal.heure}
           heureFin={createModal.heureFin}
+          x={createModal.x}
+          y={createModal.y}
           categories={categories}
           onClose={() => setCreateModal(null)}
           onCreateDispo={(date, heure) => { addQuickSlot(date, heure); setCreateModal(null); }}
@@ -1367,11 +1373,13 @@ export default function PlanningClient({
 
 // ─── Modal Création (Dispo / Événement / Indispo) ─────────────────────────────
 function CreateEventModal({
-  date, heure, heureFin, onClose, onCreateDispo, onCreateEvenement, onCreateIndispo, categories,
+  date, heure, heureFin, x, y, onClose, onCreateDispo, onCreateEvenement, onCreateIndispo, categories,
 }: {
   date: string;
   heure: string;
   heureFin?: string;
+  x?: number;
+  y?: number;
   onClose: () => void;
   onCreateDispo: (date: string, heure: string) => void;
   onCreateEvenement: (ev: {
@@ -1472,7 +1480,13 @@ function CreateEventModal({
   ] as const;
 
   return (
-    <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-40" onClick={onClose}>
+      <div style={{
+        position: "fixed",
+        top: Math.min((y ?? window.innerHeight / 2) + 10, window.innerHeight - 520),
+        left: Math.min((x ?? window.innerWidth / 2) - 200, window.innerWidth - 420),
+        zIndex: 41,
+      }} onClick={e => e.stopPropagation()}>
       <div className="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-2xl shadow-2xl border border-gray-100 max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 flex-shrink-0">
           <div>
@@ -1709,6 +1723,7 @@ function CreateEventModal({
             </>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
