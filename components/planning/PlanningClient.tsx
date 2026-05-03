@@ -200,7 +200,7 @@ export default function PlanningClient({
   const hiddenCategories = new Set(categories.filter(c => !c.visible).map(c => c.system_key ?? c.id));
   const [selectedEvent, setSelectedEvent] = useState<CalEvent | null>(null);
   const [quickAdd, setQuickAdd] = useState<{ date: string; heure: string } | null>(null);
-  const [createModal, setCreateModal] = useState<{ date: string; heure: string } | null>(null);
+  const [createModal, setCreateModal] = useState<{ date: string; heure: string; heureFin?: string } | null>(null);
   const [editDispo, setEditDispo] = useState<Dispo | null>(null);
   const [dragging, setDragging] = useState<{ ev: CalEvent; offsetY: number } | null>(null);
   const [dragOver, setDragOver] = useState<{ date: string; top: number } | null>(null);
@@ -374,6 +374,88 @@ export default function PlanningClient({
   }
 
   function goToday() { setCurrentDate(new Date()); }
+
+  // ── Gestion souris centralisée ───────────────────────────────────────────
+  useEffect(() => {
+    function onMouseMove(e: MouseEvent) {
+      if (dragging && scrollRef.current) {
+        const scrollEl = scrollRef.current;
+        const rect = scrollEl.getBoundingClientRect();
+        const cols = scrollEl.querySelectorAll("[data-col]") as NodeListOf<HTMLElement>;
+        let targetDate = dragging.ev.date;
+        cols.forEach(col => {
+          const cr = col.getBoundingClientRect();
+          if (e.clientX >= cr.left && e.clientX <= cr.right) {
+            targetDate = col.dataset.col ?? dragging.ev.date;
+          }
+        });
+        const scrollTop = scrollEl.scrollTop;
+        const relY = e.clientY - rect.top + scrollTop - dragging.offsetY;
+        setDragOver({ date: targetDate, top: Math.max(0, relY) });
+      }
+      if (resizing && scrollRef.current) {
+        const delta = e.clientY - resizing.startY;
+        const startTop = topPx(resizing.startFin);
+        const newTop = Math.max(startTop + 20, startTop + delta);
+        const newFin = pxToTime(newTop);
+        setResizing(prev => prev ? { ...prev, currentFin: newFin } as any : null);
+      }
+    }
+
+    function onMouseUp() {
+      if (dragging && dragOver) {
+        handleDrop(dragging.ev, dragOver.date, pxToTime(dragOver.top));
+      } else if (dragging) {
+        setDragging(null);
+        setDragOver(null);
+      }
+      if (resizing) {
+        const r = resizing as any;
+        if (r.currentFin) handleResize(resizing.ev, r.currentFin);
+        else setResizing(null);
+      }
+    }
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+  }, [dragging, dragOver, resizing]);
+
+  // ── Drag to create ────────────────────────────────────────────────────────
+  const [drawStart, setDrawStart] = useState<{ date: string; top: number } | null>(null);
+  const [drawCurrent, setDrawCurrent] = useState<number | null>(null);
+
+  useEffect(() => {
+    function onMouseMove(e: MouseEvent) {
+      if (!drawStart || !scrollRef.current) return;
+      const rect = scrollRef.current.getBoundingClientRect();
+      const scrollTop = scrollRef.current.scrollTop;
+      const y = e.clientY - rect.top + scrollTop;
+      setDrawCurrent(Math.max(drawStart.top + minToPx(15), y));
+    }
+
+    function onMouseUp() {
+      if (drawStart && drawCurrent && scrollRef.current) {
+        const debut = pxToTime(drawStart.top);
+        const fin = pxToTime(drawCurrent);
+        if (timeToMin(debut.slice(0,5)) < timeToMin(fin.slice(0,5))) {
+          setCreateModal({ date: drawStart.date, heure: debut.slice(0,5), heureFin: fin.slice(0,5) } as any);
+        }
+      }
+      setDrawStart(null);
+      setDrawCurrent(null);
+    }
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+  }, [drawStart, drawCurrent]);
 
   // ── Drag & Drop ───────────────────────────────────────────────────────────
   function pxToTime(px: number): string {
@@ -570,15 +652,17 @@ export default function PlanningClient({
                 <div key={dayIdx}
                   className={`flex-1 relative border-l border-gray-100 ${isT ? "bg-blue-50/20" : ""} ${dragOver?.date === iso ? "bg-blue-50/40" : ""}`}
                   data-col={iso}
-                  onClick={(e) => {
-                    if (dragging) return;
+                  onMouseDown={(e) => {
+                    if (dragging || resizing || (e.target as HTMLElement).closest("[data-event]")) return;
+                    e.preventDefault();
+                    const scrollTop = scrollRef.current?.scrollTop ?? 0;
                     const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-                    const y = e.clientY - rect.top;
-                    const totalMin = Math.floor(y / HOUR_HEIGHT) * 60 + START_HOUR * 60;
-                    const clamped = Math.max(START_HOUR * 60, Math.min((END_HOUR - 1) * 60, totalMin));
-                    const h = String(Math.floor(clamped / 60)).padStart(2, "0");
-                    const m = String(Math.round((clamped % 60) / 15) * 15 % 60).padStart(2, "0");
-                    setCreateModal({ date: iso, heure: `${h}:${m}` });
+                    const y = e.clientY - rect.top + scrollTop;
+                    setDrawStart({ date: iso, top: y });
+                    setDrawCurrent(null);
+                  }}
+                  onClick={(e) => {
+                    if (dragging || drawStart) return;
                   }}
                 >
                   {/* Lignes heures */}
@@ -627,6 +711,7 @@ export default function PlanningClient({
                       const left = totalNonDisp > 1 ? `${(colI / totalNonDisp) * 100}%` : "2px";
                       return (
                         <div key={ev.id}
+                          data-event="true"
                           className={`absolute rounded-lg border px-1.5 py-0.5 overflow-hidden cursor-grab active:cursor-grabbing z-10 transition-opacity ${dragging?.ev.id === ev.id ? "opacity-40" : "hover:opacity-90"}`}
                           style={{
                             top: `${top}px`, height: `${height}px`, left, width,
@@ -663,6 +748,19 @@ export default function PlanningClient({
                     })
                   )}
 
+                  {/* Draw to create */}
+                  {drawStart?.date === iso && drawCurrent !== null && (
+                    <div className="absolute inset-x-0.5 rounded-lg bg-blue-200/60 border-2 border-blue-400 border-dashed z-20 pointer-events-none"
+                      style={{
+                        top: `${drawStart.top}px`,
+                        height: `${Math.max(drawCurrent - drawStart.top, minToPx(15))}px`,
+                      }}
+                    >
+                      <div className="text-[9px] font-bold text-blue-700 px-1 py-0.5">
+                        {pxToTime(drawStart.top).slice(0,5)} – {pxToTime(drawCurrent).slice(0,5)}
+                      </div>
+                    </div>
+                  )}
                   {/* Ghost drag */}
                   {dragging && dragOver?.date === iso && (
                     <div className="absolute inset-x-0.5 rounded-lg border-2 border-blue-400 border-dashed bg-blue-50/50 z-20 pointer-events-none"
@@ -926,47 +1024,7 @@ export default function PlanningClient({
   // RENDU PRINCIPAL
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div
-      className="flex flex-col h-[calc(100vh-4rem)] bg-white"
-      onMouseMove={(e) => {
-        if (dragging && scrollRef.current) {
-          const scrollEl = scrollRef.current;
-          const rect = scrollEl.getBoundingClientRect();
-          const cols = scrollEl.querySelectorAll("[data-col]");
-          let targetDate = dragging.ev.date;
-          cols.forEach((col) => {
-            const cr = col.getBoundingClientRect();
-            if (e.clientX >= cr.left && e.clientX <= cr.right) {
-              targetDate = (col as HTMLElement).dataset.col ?? dragging.ev.date;
-            }
-          });
-          const scrollTop = scrollEl.scrollTop;
-          const relY = e.clientY - rect.top + scrollTop - dragging.offsetY;
-          setDragOver({ date: targetDate, top: Math.max(0, relY) });
-        }
-        if (resizing && scrollRef.current) {
-          const scrollEl = scrollRef.current;
-          const rect = scrollEl.getBoundingClientRect();
-          const scrollTop = scrollEl.scrollTop;
-          const startTop = topPx(resizing.startFin);
-          const delta = e.clientY - resizing.startY;
-          const newTop = startTop + delta;
-          const newFinTime = pxToTime(newTop);
-          setResizing(prev => prev ? { ...prev, currentFin: newFinTime } as any : null);
-        }
-      }}
-      onMouseUp={(e) => {
-        if (dragging && dragOver) {
-          const newDebut = pxToTime(dragOver.top);
-          handleDrop(dragging.ev, dragOver.date, newDebut);
-        }
-        if (resizing) {
-          const r = resizing as any;
-          if (r.currentFin) handleResize(resizing.ev, r.currentFin);
-          else setResizing(null);
-        }
-      }}
-    >
+    <div className="flex flex-col h-[calc(100vh-4rem)] bg-white">
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold border ${
@@ -1078,6 +1136,7 @@ export default function PlanningClient({
         <CreateEventModal
           date={createModal.date}
           heure={createModal.heure}
+          heureFin={createModal.heureFin}
           categories={categories}
           onClose={() => setCreateModal(null)}
           onCreateDispo={(date, heure) => { addQuickSlot(date, heure); setCreateModal(null); }}
@@ -1254,10 +1313,11 @@ export default function PlanningClient({
 
 // ─── Modal Création (Dispo / Événement / Indispo) ─────────────────────────────
 function CreateEventModal({
-  date, heure, onClose, onCreateDispo, onCreateEvenement, onCreateIndispo, categories,
+  date, heure, heureFin, onClose, onCreateDispo, onCreateEvenement, onCreateIndispo, categories,
 }: {
   date: string;
   heure: string;
+  heureFin?: string;
   onClose: () => void;
   onCreateDispo: (date: string, heure: string) => void;
   onCreateEvenement: (ev: {
@@ -1269,7 +1329,7 @@ function CreateEventModal({
   onCreateIndispo: (dateDebut: string, dateFin: string, motif: string) => void;
   categories: Category[];
 }) {
-  const [type, setType] = useState<"choix" | "dispo" | "evenement" | "indispo">("choix");
+  const [type, setType] = useState<"choix" | "dispo" | "evenement" | "indispo">(heureFin ? "evenement" : "choix");
   const dateLabel = new Date(date + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
 
   // Calcul heure de fin par défaut
@@ -1282,7 +1342,7 @@ function CreateEventModal({
   // Formulaire événement
   const [titre, setTitre] = useState("");
   const [debut, setDebut] = useState(heure);
-  const [fin, setFin] = useState(defaultFin);
+  const [fin, setFin] = useState(heureFin ?? defaultFin());
   const [description, setDescription] = useState("");
   const [couleur, setCouleur] = useState("#6366f1");
   const [lieu, setLieu] = useState("");
@@ -1301,7 +1361,7 @@ function CreateEventModal({
 
   // Formulaire dispo
   const [dispoDebut, setDispoDebut] = useState(heure);
-  const [dispoFin, setDispoFin] = useState(defaultFin);
+  const [dispoFin, setDispoFin] = useState(heureFin ?? defaultFin());
 
   // Formulaire indispo
   const [indispoFin, setIndispoFin] = useState(date);
