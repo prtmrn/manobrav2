@@ -193,6 +193,7 @@ export default function PlanningClient({
   const [dragOver, setDragOver] = useState<{ date: string; top: number } | null>(null);
   const [resizing, setResizing] = useState<{ ev: CalEvent; startY: number; startFin: string } | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  const weekGridRef = useRef<HTMLDivElement>(null);
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState("");
@@ -377,6 +378,19 @@ export default function PlanningClient({
   }
 
   function goToday() { setCurrentDate(new Date()); }
+
+  // ── Bloquer scroll natif sur la grille ───────────────────────────────────
+  useEffect(() => {
+    const el = weekGridRef.current;
+    if (!el) return;
+    const handler = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest("[data-event]")) return;
+      e.preventDefault();
+    };
+    el.addEventListener("mousedown", handler, { passive: false });
+    return () => el.removeEventListener("mousedown", handler);
+  }, []);
 
   // ── Gestion souris centralisée ───────────────────────────────────────────
   useEffect(() => {
@@ -629,7 +643,7 @@ export default function PlanningClient({
 
         {/* Grille */}
         <div className="flex-1 overflow-y-auto" ref={scrollRef}>
-          <div className="flex" style={{ minHeight: `${(END_HOUR - START_HOUR) * HOUR_HEIGHT}px` }}>
+          <div ref={weekGridRef} className="flex" style={{ minHeight: `${(END_HOUR - START_HOUR) * HOUR_HEIGHT}px` }}>
             {/* Heures */}
             <div className="w-14 flex-shrink-0 relative">
               {VISIBLE_HOURS.map(h => (
@@ -674,7 +688,6 @@ export default function PlanningClient({
                   data-col={iso}
                   onMouseDown={(e) => {
                     if (dragging || resizing || (e.target as HTMLElement).closest("[data-event]")) return;
-                    e.preventDefault();
                     const scrollTop = scrollRef.current?.scrollTop ?? 0;
                     const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
                     const y = e.clientY - rect.top + scrollTop;
