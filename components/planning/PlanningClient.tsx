@@ -40,6 +40,7 @@ type CalEvent = {
   couleur: string;
   type: "dispo" | "indispo" | "resa";
   raw: Dispo | Indispo | Reservation;
+  isBg?: boolean;
 };
 
 type View = "jour" | "semaine" | "mois" | "liste";
