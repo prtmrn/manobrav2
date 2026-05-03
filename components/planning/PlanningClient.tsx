@@ -674,6 +674,7 @@ export default function PlanningClient({
                   data-col={iso}
                   onMouseDown={(e) => {
                     if (dragging || resizing || (e.target as HTMLElement).closest("[data-event]")) return;
+                    e.preventDefault();
                     const scrollTop = scrollRef.current?.scrollTop ?? 0;
                     const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
                     const y = e.clientY - rect.top + scrollTop;
