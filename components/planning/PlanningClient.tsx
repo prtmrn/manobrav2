@@ -759,8 +759,8 @@ export default function PlanningClient({
         {/* Légende */}
         <div className="mt-4 space-y-1.5 border-t border-gray-100 pt-3">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Légende</p>
-<button onClick={() => setShowLegendModal(true)} className="text-[10px] font-semibold text-blue-500 hover:text-blue-600 transition-colors">Modifier</button>
+            <p className="text-[10px] font-bold text-gray-800 uppercase tracking-wide">Légende</p>
+<button onClick={() => setShowLegendModal(true)} className="text-[10px] font-semibold text-gray-400 hover:text-gray-600 transition-colors">Modifier</button>
           </div>
           {[
             { couleur: "green", label: "Disponible" },
