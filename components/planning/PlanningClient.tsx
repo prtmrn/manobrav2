@@ -161,6 +161,16 @@ export default function PlanningClient({
     }
     return {};
   });
+
+  const DEFAULT_COLORS: Record<string, string> = {
+    confirme: "#3b82f6",
+    en_cours: "#1d4ed8",
+    en_attente: "#f59e0b",
+    dispo: "#22c55e",
+    urgence: "#ef4444",
+    indispo: "#f97316",
+  };
+  const colors = { ...DEFAULT_COLORS, ...customColors };
   const [selectedEvent, setSelectedEvent] = useState<CalEvent | null>(null);
   const [quickAdd, setQuickAdd] = useState<{ date: string; heure: string } | null>(null);
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
