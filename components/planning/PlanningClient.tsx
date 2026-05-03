@@ -49,7 +49,7 @@ type CalEvent = {
   titre: string;
   couleur: string;
   type: "dispo" | "indispo" | "resa";
-  raw: Dispo | Indispo | Reservation;
+  raw: Dispo | Indispo | Reservation | Evenement;
   isBg?: boolean;
   customColor?: string;
 };
