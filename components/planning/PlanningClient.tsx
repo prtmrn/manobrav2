@@ -379,6 +379,22 @@ export default function PlanningClient({
 
   function goToday() { setCurrentDate(new Date()); }
 
+  // ── Désactiver sélection texte pendant drag/draw ─────────────────────────
+  useEffect(() => {
+    const style = document.body.style;
+    if (dragging || drawGhost) {
+      style.userSelect = "none";
+      style.webkitUserSelect = "none";
+    } else {
+      style.userSelect = "";
+      style.webkitUserSelect = "";
+    }
+    return () => {
+      style.userSelect = "";
+      style.webkitUserSelect = "";
+    };
+  }, [dragging, drawGhost]);
+
   // ── Bloquer scroll natif sur la grille ───────────────────────────────────
   useEffect(() => {
     const el = weekGridRef.current;
@@ -1062,7 +1078,7 @@ export default function PlanningClient({
   // RENDU PRINCIPAL
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] bg-white">
+    <div className="flex flex-col h-[calc(100vh-4rem)] bg-white" style={{ userSelect: drawGhost || dragging ? "none" : "auto" }}>
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold border ${
