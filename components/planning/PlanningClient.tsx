@@ -438,11 +438,17 @@ export default function PlanningClient({
     }
 
     function onMouseUp() {
-      if (drawStart && drawCurrent && scrollRef.current) {
-        const debut = pxToTime(drawStart.top);
-        const fin = pxToTime(drawCurrent);
-        if (timeToMin(debut.slice(0,5)) < timeToMin(fin.slice(0,5))) {
+      if (drawStart && scrollRef.current) {
+        const dragDistance = drawCurrent ? Math.abs(drawCurrent - drawStart.top) : 0;
+        if (dragDistance > minToPx(14)) {
+          // Vrai drag — ouvrir formulaire avec durée
+          const debut = pxToTime(drawStart.top);
+          const fin = pxToTime(drawCurrent!);
           setCreateModal({ date: drawStart.date, heure: debut.slice(0,5), heureFin: fin.slice(0,5) } as any);
+        } else {
+          // Simple clic — ouvrir formulaire sans durée pré-remplie
+          const debut = pxToTime(drawStart.top);
+          setCreateModal({ date: drawStart.date, heure: debut.slice(0,5) } as any);
         }
       }
       setDrawStart(null);
@@ -654,12 +660,11 @@ export default function PlanningClient({
                   data-col={iso}
                   onMouseDown={(e) => {
                     if (dragging || resizing || (e.target as HTMLElement).closest("[data-event]")) return;
-                    e.preventDefault();
                     const scrollTop = scrollRef.current?.scrollTop ?? 0;
                     const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
                     const y = e.clientY - rect.top + scrollTop;
                     setDrawStart({ date: iso, top: y });
-                    setDrawCurrent(null);
+                    setDrawCurrent(y + minToPx(15));
                   }}
                   onClick={(e) => {
                     if (dragging || drawStart) return;
@@ -749,7 +754,7 @@ export default function PlanningClient({
                   )}
 
                   {/* Draw to create */}
-                  {drawStart?.date === iso && drawCurrent !== null && (
+                  {drawStart?.date === iso && drawCurrent !== null && Math.abs(drawCurrent - drawStart.top) > minToPx(10) && (
                     <div className="absolute inset-x-0.5 rounded-lg bg-blue-200/60 border-2 border-blue-400 border-dashed z-20 pointer-events-none"
                       style={{
                         top: `${drawStart.top}px`,
