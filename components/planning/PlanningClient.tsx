@@ -425,34 +425,44 @@ export default function PlanningClient({
   }, [dragging, dragOver, resizing]);
 
   // ── Drag to create ────────────────────────────────────────────────────────
-  const [drawStart, setDrawStart] = useState<{ date: string; top: number } | null>(null);
-  const [drawCurrent, setDrawCurrent] = useState<number | null>(null);
+  const drawStartRef = useRef<{ date: string; top: number } | null>(null);
+  const drawCurrentRef = useRef<number | null>(null);
+  const [drawGhost, setDrawGhost] = useState<{ date: string; top: number; height: number } | null>(null);
 
   useEffect(() => {
     function onMouseMove(e: MouseEvent) {
-      if (!drawStart || !scrollRef.current) return;
+      if (!drawStartRef.current || !scrollRef.current) return;
       const rect = scrollRef.current.getBoundingClientRect();
       const scrollTop = scrollRef.current.scrollTop;
       const y = e.clientY - rect.top + scrollTop;
-      setDrawCurrent(Math.max(drawStart.top + minToPx(15), y));
+      drawCurrentRef.current = Math.max(drawStartRef.current.top + minToPx(15), y);
+      const distance = drawCurrentRef.current - drawStartRef.current.top;
+      if (distance > minToPx(10)) {
+        setDrawGhost({
+          date: drawStartRef.current.date,
+          top: drawStartRef.current.top,
+          height: distance,
+        });
+      }
     }
 
     function onMouseUp() {
-      if (drawStart && scrollRef.current) {
-        const dragDistance = drawCurrent ? Math.abs(drawCurrent - drawStart.top) : 0;
-        if (dragDistance > minToPx(14)) {
-          // Vrai drag — ouvrir formulaire avec durée
-          const debut = pxToTime(drawStart.top);
-          const fin = pxToTime(drawCurrent!);
-          setCreateModal({ date: drawStart.date, heure: debut.slice(0,5), heureFin: fin.slice(0,5) } as any);
+      const ds = drawStartRef.current;
+      const dc = drawCurrentRef.current;
+      if (ds) {
+        const dragDistance = dc ? Math.abs(dc - ds.top) : 0;
+        if (dragDistance > minToPx(14) && dc) {
+          const debut = pxToTime(ds.top);
+          const fin = pxToTime(dc);
+          setCreateModal({ date: ds.date, heure: debut.slice(0,5), heureFin: fin.slice(0,5) } as any);
         } else {
-          // Simple clic — ouvrir formulaire sans durée pré-remplie
-          const debut = pxToTime(drawStart.top);
-          setCreateModal({ date: drawStart.date, heure: debut.slice(0,5) } as any);
+          const debut = pxToTime(ds.top);
+          setCreateModal({ date: ds.date, heure: debut.slice(0,5) } as any);
         }
       }
-      setDrawStart(null);
-      setDrawCurrent(null);
+      drawStartRef.current = null;
+      drawCurrentRef.current = null;
+      setDrawGhost(null);
     }
 
     window.addEventListener("mousemove", onMouseMove);
@@ -461,7 +471,7 @@ export default function PlanningClient({
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
     };
-  }, [drawStart, drawCurrent]);
+  }, []);
 
   // ── Drag & Drop ───────────────────────────────────────────────────────────
   function pxToTime(px: number): string {
@@ -663,8 +673,8 @@ export default function PlanningClient({
                     const scrollTop = scrollRef.current?.scrollTop ?? 0;
                     const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
                     const y = e.clientY - rect.top + scrollTop;
-                    setDrawStart({ date: iso, top: y });
-                    setDrawCurrent(y + minToPx(15));
+                    drawStartRef.current = { date: iso, top: y };
+                    drawCurrentRef.current = null;
                   }}
                   onClick={(e) => {
                     if (dragging || drawStart) return;
@@ -754,15 +764,12 @@ export default function PlanningClient({
                   )}
 
                   {/* Draw to create */}
-                  {drawStart?.date === iso && drawCurrent !== null && Math.abs(drawCurrent - drawStart.top) > minToPx(10) && (
+                  {drawGhost?.date === iso && (
                     <div className="absolute inset-x-0.5 rounded-lg bg-blue-200/60 border-2 border-blue-400 border-dashed z-20 pointer-events-none"
-                      style={{
-                        top: `${drawStart.top}px`,
-                        height: `${Math.max(drawCurrent - drawStart.top, minToPx(15))}px`,
-                      }}
+                      style={{ top: `${drawGhost.top}px`, height: `${drawGhost.height}px` }}
                     >
                       <div className="text-[9px] font-bold text-blue-700 px-1 py-0.5">
-                        {pxToTime(drawStart.top).slice(0,5)} – {pxToTime(drawCurrent).slice(0,5)}
+                        {pxToTime(drawGhost.top).slice(0,5)} – {pxToTime(drawGhost.top + drawGhost.height).slice(0,5)}
                       </div>
                     </div>
                   )}
