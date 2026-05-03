@@ -1493,7 +1493,7 @@ function CreateEventModal({
                   </div>
                 </div>
                 <input type="text" value={titre} onChange={e => setTitre(e.target.value)}
-                  placeholder="Titre de l'événement" autoFocus
+                  placeholder="Titre de l'événement"
                   className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
               </div>
 
@@ -1543,7 +1543,7 @@ function CreateEventModal({
                     <input type="color" value={newCatCouleur} onChange={e => setNewCatCouleur(e.target.value)}
                       className="w-8 h-8 rounded border border-gray-200 cursor-pointer flex-shrink-0" />
                     <input type="text" value={newCatNom} onChange={e => setNewCatNom(e.target.value)}
-                      placeholder="Nom de la catégorie" autoFocus
+                      placeholder="Nom de la catégorie"
                       className="flex-1 border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-blue-400" />
                     <button onClick={handleCreateCategorie} className="text-xs font-bold text-blue-600 px-2">OK</button>
                     <button onClick={() => setShowNewCat(false)} className="text-xs text-gray-400 px-1">✕</button>
@@ -1880,7 +1880,7 @@ function LegendModal({
                 <input type="color" value={newCouleur} onChange={e => setNewCouleur(e.target.value)}
                   className="w-9 h-9 rounded border border-gray-200 cursor-pointer flex-shrink-0" />
                 <input type="text" value={newNom} onChange={e => setNewNom(e.target.value)}
-                  placeholder="Nom de la catégorie" autoFocus
+                  placeholder="Nom de la catégorie"
                   className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
               </div>
               <div className="flex gap-2">
