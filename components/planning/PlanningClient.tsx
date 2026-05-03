@@ -656,7 +656,7 @@ export default function PlanningClient({
               {showDate && (
                 <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mt-4 mb-2 first:mt-0">
                   {dateObj.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
-                  {JOURS_FERIES[ev.date] && <span className="ml-2 text-green-600 normal-case">{JOURS_FERIES[ev.date]}</span>}
+
                 </div>
               )}
               <div
