@@ -1116,40 +1116,102 @@ export default function PlanningClient({
 
 // ─── Modal Création (Dispo / Événement / Indispo) ─────────────────────────────
 function CreateEventModal({
-  date, heure, onClose, onCreateDispo, onCreateEvenement, onCreateIndispo,
+  date, heure, onClose, onCreateDispo, onCreateEvenement, onCreateIndispo, categories,
 }: {
   date: string;
   heure: string;
   onClose: () => void;
   onCreateDispo: (date: string, heure: string) => void;
-  onCreateEvenement: (ev: { titre: string; date: string; heure_debut: string; heure_fin: string; description: string; couleur: string }) => void;
+  onCreateEvenement: (ev: {
+    titre: string; date: string; heure_debut: string; heure_fin: string;
+    description: string; couleur: string; lieu: string; notes_internes: string;
+    statut: string; visibilite: string; invite_email: string; category_id: string | null;
+    pieces_jointes: string[];
+  }) => void;
   onCreateIndispo: (dateDebut: string, dateFin: string, motif: string) => void;
+  categories: Category[];
 }) {
   const [type, setType] = useState<"choix" | "dispo" | "evenement" | "indispo">("choix");
   const dateLabel = new Date(date + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
 
+  // Calcul heure de fin par défaut
+  const defaultFin = () => {
+    const [h, m] = heure.split(":").map(Number);
+    const endMin = h * 60 + m + 60;
+    return `${String(Math.floor(endMin/60)).padStart(2,"0")}:${String(endMin%60).padStart(2,"0")}`;
+  };
+
   // Formulaire événement
   const [titre, setTitre] = useState("");
   const [debut, setDebut] = useState(heure);
-  const [fin, setFin] = useState(() => {
-    const [h, m] = heure.split(":").map(Number);
-    const endMin = h * 60 + m + 60;
-    return `${String(Math.floor(endMin/60)).padStart(2,"0")}:${String(endMin%60).padStart(2,"0")}`;
-  });
+  const [fin, setFin] = useState(defaultFin);
   const [description, setDescription] = useState("");
   const [couleur, setCouleur] = useState("#6366f1");
+  const [lieu, setLieu] = useState("");
+  const [notesInternes, setNotesInternes] = useState("");
+  const [statut, setStatut] = useState("confirme");
+  const [visibilite, setVisibilite] = useState("prive");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [showNewCat, setShowNewCat] = useState(false);
+  const [newCatNom, setNewCatNom] = useState("");
+  const [newCatCouleur, setNewCatCouleur] = useState("#6366f1");
+  const [localCategories, setLocalCategories] = useState(categories);
+  const [fichiers, setFichiers] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   // Formulaire dispo
   const [dispoDebut, setDispoDebut] = useState(heure);
-  const [dispoFin, setDispoFin] = useState(() => {
-    const [h, m] = heure.split(":").map(Number);
-    const endMin = h * 60 + m + 60;
-    return `${String(Math.floor(endMin/60)).padStart(2,"0")}:${String(endMin%60).padStart(2,"0")}`;
-  });
+  const [dispoFin, setDispoFin] = useState(defaultFin);
 
   // Formulaire indispo
   const [indispoFin, setIndispoFin] = useState(date);
   const [motif, setMotif] = useState("");
+
+  function setDuree(mins: number) {
+    const [h, m] = debut.split(":").map(Number);
+    const endMin = Math.min(h * 60 + m + mins, 23 * 60 + 59);
+    setFin(`${String(Math.floor(endMin/60)).padStart(2,"0")}:${String(endMin%60).padStart(2,"0")}`);
+  }
+
+  async function handleCreateCategorie() {
+    if (!newCatNom.trim()) return;
+    const res = await fetch("/api/planning/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "create", nom: newCatNom, couleur: newCatCouleur }),
+    });
+    const data = await res.json();
+    setLocalCategories(prev => [...prev, data]);
+    setCategoryId(data.id);
+    setCouleur(data.couleur);
+    setShowNewCat(false);
+    setNewCatNom("");
+  }
+
+  async function handleSubmit() {
+    if (!titre) return;
+    setUploading(true);
+    const piecesJointes: string[] = [];
+
+    // Upload fichiers
+    for (const file of fichiers) {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/planning/upload", { method: "POST", body: formData });
+      const { url } = await res.json();
+      if (url) piecesJointes.push(url);
+    }
+
+    onCreateEvenement({
+      titre, date, heure_debut: debut, heure_fin: fin,
+      description, couleur, lieu, notes_internes: notesInternes,
+      statut, visibilite, invite_email: inviteEmail,
+      category_id: categoryId, pieces_jointes: piecesJointes,
+    });
+    setUploading(false);
+  }
 
   const choices = [
     { key: "dispo", label: "Disponibilité", desc: "Créneau où vous êtes disponible", color: "bg-green-50 border-green-200 text-green-700" },
@@ -1158,9 +1220,9 @@ function CreateEventModal({
   ] as const;
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 w-full max-w-sm" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+    <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={onClose}>
+      <div className="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-2xl shadow-2xl border border-gray-100 max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 flex-shrink-0">
           <div>
             <h3 className="font-bold text-gray-900">
               {type === "choix" ? "Créer" : type === "dispo" ? "Disponibilité" : type === "evenement" ? "Événement" : "Indisponibilité"}
@@ -1172,7 +1234,7 @@ function CreateEventModal({
           </button>
         </div>
 
-        <div className="p-5">
+        <div className="overflow-y-auto flex-1 p-5 space-y-3">
           {type === "choix" && (
             <div className="space-y-2">
               {choices.map(c => (
@@ -1186,17 +1248,17 @@ function CreateEventModal({
           )}
 
           {type === "dispo" && (
-            <div className="space-y-3">
+            <>
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="text-xs font-medium text-gray-500 block mb-1">Début</label>
                   <input type="time" value={dispoDebut} onChange={e => setDispoDebut(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-green-400" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 block mb-1">Fin</label>
                   <input type="time" value={dispoFin} onChange={e => setDispoFin(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-green-400" />
                 </div>
               </div>
               <div className="flex gap-2">
@@ -1204,18 +1266,41 @@ function CreateEventModal({
                 <button onClick={() => onCreateDispo(date, dispoDebut)}
                   className="flex-1 py-2 rounded-xl text-sm font-bold text-white bg-green-600 hover:bg-green-700">Créer</button>
               </div>
-            </div>
+            </>
           )}
 
           {type === "evenement" && (
-            <div className="space-y-3">
+            <>
+              {/* Titre + couleur */}
               <div className="flex gap-2">
-                <input type="color" value={couleur} onChange={e => setCouleur(e.target.value)}
-                  className="w-10 h-10 rounded-lg border border-gray-200 cursor-pointer flex-shrink-0" />
+                <div className="relative group/col flex-shrink-0">
+                  <input type="color" value={couleur} onChange={e => { setCouleur(e.target.value); setCategoryId(null); }}
+                    className="w-10 h-10 rounded-lg border border-gray-200 cursor-pointer opacity-0 absolute inset-0 z-10" />
+                  <div className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center" style={{ backgroundColor: couleur }}>
+                    <svg className="w-4 h-4 text-white opacity-0 group-hover/col:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </div>
+                </div>
                 <input type="text" value={titre} onChange={e => setTitre(e.target.value)}
                   placeholder="Titre de l'événement" autoFocus
                   className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
               </div>
+
+              {/* Durées rapides */}
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Durée rapide</label>
+                <div className="flex gap-1.5">
+                  {[30, 60, 120, 240].map(m => (
+                    <button key={m} onClick={() => setDuree(m)}
+                      className="flex-1 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg hover:border-blue-300 hover:text-blue-600 transition-colors text-gray-600">
+                      {m < 60 ? `${m}min` : `${m/60}h`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Heures */}
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="text-xs font-medium text-gray-500 block mb-1">Début</label>
@@ -1228,25 +1313,132 @@ function CreateEventModal({
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
                 </div>
               </div>
-              <textarea value={description} onChange={e => setDescription(e.target.value)}
-                placeholder="Description (optionnel)" rows={2}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400 resize-none" />
-              <div className="flex gap-2">
-                <button onClick={() => setType("choix")} className="flex-1 py-2 rounded-xl text-sm text-gray-600 border border-gray-200 hover:bg-gray-50">Retour</button>
-                <button onClick={() => titre && onCreateEvenement({ titre, date, heure_debut: debut, heure_fin: fin, description, couleur })}
-                  disabled={!titre}
-                  className="flex-1 py-2 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50">Créer</button>
+
+              {/* Catégorie */}
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Catégorie</label>
+                <div className="flex gap-2">
+                  <select value={categoryId ?? ""} onChange={e => {
+                    const cat = localCategories.find(c => c.id === e.target.value);
+                    setCategoryId(e.target.value || null);
+                    if (cat) setCouleur(cat.couleur);
+                  }} className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400">
+                    <option value="">Sans catégorie</option>
+                    {localCategories.map(c => <option key={c.id} value={c.id}>{c.nom}</option>)}
+                  </select>
+                  <button onClick={() => setShowNewCat(true)} className="px-3 py-2 border border-gray-200 rounded-lg text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors flex-shrink-0">+ Nouvelle</button>
+                </div>
+                {showNewCat && (
+                  <div className="mt-2 flex gap-2 items-center">
+                    <input type="color" value={newCatCouleur} onChange={e => setNewCatCouleur(e.target.value)}
+                      className="w-8 h-8 rounded border border-gray-200 cursor-pointer flex-shrink-0" />
+                    <input type="text" value={newCatNom} onChange={e => setNewCatNom(e.target.value)}
+                      placeholder="Nom de la catégorie" autoFocus
+                      className="flex-1 border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-blue-400" />
+                    <button onClick={handleCreateCategorie} className="text-xs font-bold text-blue-600 px-2">OK</button>
+                    <button onClick={() => setShowNewCat(false)} className="text-xs text-gray-400 px-1">✕</button>
+                  </div>
+                )}
               </div>
-            </div>
+
+              {/* Lieu */}
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Lieu</label>
+                <div className="relative">
+                  <input type="text" value={lieu} onChange={e => setLieu(e.target.value)}
+                    placeholder="Adresse ou lieu"
+                    className="w-full border border-gray-200 rounded-lg pl-3 pr-9 py-2 text-sm focus:outline-none focus:border-blue-400" />
+                  {lieu && (
+                    <a href={`https://maps.google.com/?q=${encodeURIComponent(lieu)}`} target="_blank" rel="noopener noreferrer"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Description publique */}
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Description</label>
+                <textarea value={description} onChange={e => setDescription(e.target.value)}
+                  placeholder="Description visible par les invités" rows={2}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400 resize-none" />
+              </div>
+
+              {/* Notes internes */}
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Notes internes <span className="text-gray-400 font-normal">(privées)</span></label>
+                <textarea value={notesInternes} onChange={e => setNotesInternes(e.target.value)}
+                  placeholder="Notes visibles uniquement par vous" rows={2}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400 resize-none bg-gray-50" />
+              </div>
+
+              {/* Statut + Visibilité */}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs font-medium text-gray-500 block mb-1">Statut</label>
+                  <select value={statut} onChange={e => setStatut(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400">
+                    <option value="confirme">Confirmé</option>
+                    <option value="tentative">Tentative</option>
+                    <option value="annule">Annulé</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500 block mb-1">Visibilité</label>
+                  <select value={visibilite} onChange={e => setVisibilite(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400">
+                    <option value="prive">Privé</option>
+                    <option value="public">Public</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Invitation email */}
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Inviter par email</label>
+                <input type="email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)}
+                  placeholder="email@exemple.com"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+              </div>
+
+              {/* Pièces jointes */}
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Pièces jointes</label>
+                <input ref={fileRef} type="file" multiple className="hidden"
+                  onChange={e => setFichiers(prev => [...prev, ...Array.from(e.target.files ?? [])])} />
+                <button onClick={() => fileRef.current?.click()}
+                  className="w-full py-2 border border-dashed border-gray-200 rounded-lg text-xs text-gray-400 hover:border-blue-300 hover:text-blue-500 transition-colors">
+                  Cliquer pour ajouter des fichiers
+                </button>
+                {fichiers.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {fichiers.map((f, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs text-gray-600 bg-gray-50 rounded-lg px-3 py-1.5">
+                        <span className="truncate">{f.name}</span>
+                        <button onClick={() => setFichiers(prev => prev.filter((_, j) => j !== i))} className="text-gray-400 hover:text-red-500 ml-2 flex-shrink-0">✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2 pt-1">
+                <button onClick={() => setType("choix")} className="flex-1 py-2.5 rounded-xl text-sm text-gray-600 border border-gray-200 hover:bg-gray-50">Retour</button>
+                <button onClick={handleSubmit} disabled={!titre || uploading}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50">
+                  {uploading ? "Upload..." : "Créer"}
+                </button>
+              </div>
+            </>
           )}
 
           {type === "indispo" && (
-            <div className="space-y-3">
+            <>
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="text-xs font-medium text-gray-500 block mb-1">Du</label>
-                  <input type="date" value={date} readOnly
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50" />
+                  <input type="date" value={date} readOnly className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 block mb-1">Au</label>
@@ -1262,7 +1454,7 @@ function CreateEventModal({
                 <button onClick={() => onCreateIndispo(date, indispoFin, motif)}
                   className="flex-1 py-2 rounded-xl text-sm font-bold text-white bg-orange-500 hover:bg-orange-600">Créer</button>
               </div>
-            </div>
+            </>
           )}
         </div>
       </div>
