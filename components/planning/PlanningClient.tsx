@@ -52,32 +52,6 @@ interface PlanningClientProps {
   initialReservations: Reservation[];
 }
 
-// ─── Jours fériés France 2024-2026 ───────────────────────────────────────────
-const JOURS_FERIES: Record<string, string> = {
-  "2025-01-01": "Jour de l'an",
-  "2025-04-21": "Lundi de Pâques",
-  "2025-05-01": "Fête du Travail",
-  "2025-05-08": "Victoire 1945",
-  "2025-05-29": "Ascension",
-  "2025-06-09": "Lundi de Pentecôte",
-  "2025-07-14": "Fête Nationale",
-  "2025-08-15": "Assomption",
-  "2025-11-01": "Toussaint",
-  "2025-11-11": "Armistice",
-  "2025-12-25": "Noël",
-  "2026-01-01": "Jour de l'an",
-  "2026-04-06": "Lundi de Pâques",
-  "2026-05-01": "Fête du Travail",
-  "2026-05-08": "Victoire 1945",
-  "2026-05-14": "Ascension",
-  "2026-05-25": "Lundi de Pentecôte",
-  "2026-07-14": "Fête Nationale",
-  "2026-08-15": "Assomption",
-  "2026-11-01": "Toussaint",
-  "2026-11-11": "Armistice",
-  "2026-12-25": "Noël",
-};
-
 // ─── Constantes ───────────────────────────────────────────────────────────────
 const JOURS_COURT = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 const JOURS_LONG = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
@@ -89,7 +63,7 @@ const VISIBLE_HOURS = Array.from({ length: END_HOUR - START_HOUR }, (_, i) => i 
 
 // ─── Utilitaires ──────────────────────────────────────────────────────────────
 function toISO(d: Date): string {
-  return d.toISOString().split("T")[0];
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 
 function timeToMin(t: string): number {
@@ -178,6 +152,14 @@ export default function PlanningClient({
   const [indispos, setIndispos] = useState<Indispo[]>(initialIndispos);
   const [reservations] = useState<Reservation[]>(initialReservations);
   const [showDispoModal, setShowDispoModal] = useState(false);
+  const [showLegendModal, setShowLegendModal] = useState(false);
+  const [customColors, setCustomColors] = useState<Record<string, string>>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("planning_colors");
+      return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
   const [selectedEvent, setSelectedEvent] = useState<CalEvent | null>(null);
   const [quickAdd, setQuickAdd] = useState<{ date: string; heure: string } | null>(null);
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
@@ -185,7 +167,6 @@ export default function PlanningClient({
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [miniCalDate, setMiniCalDate] = useState(new Date());
-  const [darkMode, setDarkMode] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const today = toISO(new Date());
@@ -243,6 +224,7 @@ export default function PlanningClient({
           couleur: d.type === "urgence" ? "red" : "green",
           type: "dispo",
           raw: d,
+          isBg: true,
         });
       });
     });
@@ -388,7 +370,6 @@ export default function PlanningClient({
           {weekDates.map((date, i) => {
             const iso = toISO(date);
             const isT = iso === today;
-            const ferie = JOURS_FERIES[iso];
             return (
               <div key={i} className={`flex-1 text-center py-2 border-l border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${isT ? "bg-blue-50" : ""}`}
                 onClick={() => { setCurrentDate(date); setView("jour"); }}>
@@ -396,7 +377,6 @@ export default function PlanningClient({
                 <div className={`text-xl font-bold w-9 h-9 flex items-center justify-center mx-auto rounded-full mt-0.5 ${isT ? "bg-blue-600 text-white" : "text-gray-800"}`}>
                   {date.getDate()}
                 </div>
-                {ferie && <div className="text-[9px] text-green-600 font-medium truncate px-1">{ferie}</div>}
               </div>
             );
           })}
@@ -468,22 +448,38 @@ export default function PlanningClient({
                     <div className="absolute inset-0 bg-orange-50 opacity-60 pointer-events-none" />
                   )}
 
+                  {/* Disponibilités en background */}
+                  {events.filter(e => e.date === iso && e.type === "dispo").map(ev => (
+                    <div key={ev.id}
+                      className="absolute inset-x-0 pointer-events-none z-0 opacity-30"
+                      style={{
+                        top: `${topPx(ev.heure_debut)}px`,
+                        height: `${heightPx(ev.heure_debut, ev.heure_fin)}px`,
+                        backgroundColor: (ev.couleur === "red" ? colors.urgence : colors.dispo) + "40",
+                        borderLeft: `3px solid ${ev.couleur === "red" ? colors.urgence : colors.dispo}`,
+                      }}
+                    />
+                  ))}
+
                   {/* Événements avec gestion chevauchements */}
-                  {cols.map((col, colIdx) =>
-                    col.map(ev => {
+                  {cols.filter(col => col.some(ev => ev.type !== "dispo")).map((col, colIdx) =>
+                    col.filter(ev => ev.type !== "dispo").map(ev => {
                       const top = topPx(ev.heure_debut);
                       const height = heightPx(ev.heure_debut, ev.heure_fin);
                       const c = colorMap[ev.couleur] ?? colorMap.blue;
-                      const width = totalCols > 1 ? `${100 / totalCols}%` : "calc(100% - 4px)";
-                      const left = totalCols > 1 ? `${(colIdx / totalCols) * 100}%` : "2px";
+                      const nonDispoCols = cols.filter(c => c.some(e => e.type !== "dispo"));
+                      const totalNonDisp = nonDispoCols.length;
+                      const colI = nonDispoCols.indexOf(col);
+                      const width = totalNonDisp > 1 ? `${100 / totalNonDisp}%` : "calc(100% - 4px)";
+                      const left = totalNonDisp > 1 ? `${(colI / totalNonDisp) * 100}%` : "2px";
                       return (
                         <div key={ev.id}
-                          className={`absolute rounded-lg border px-1.5 py-0.5 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity z-10 ${c.bg} ${c.border} ${c.text}`}
-                          style={{ top: `${top}px`, height: `${height}px`, left, width }}
+                          className="absolute rounded-lg border px-1.5 py-0.5 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity z-10"
+                          style={{ top: `${top}px`, height: `${height}px`, left, width, backgroundColor: c.bg.includes("[") ? undefined : undefined, borderColor: "transparent" }}
                           onClick={(e) => { e.stopPropagation(); setSelectedEvent(ev); }}
                         >
-                          <div className="text-[10px] font-bold truncate leading-tight">{ev.titre}</div>
-                          {height > 30 && <div className="text-[9px] opacity-75 truncate">{fmt(ev.heure_debut)}–{fmt(ev.heure_fin)}</div>}
+                          <div className="text-[10px] font-bold truncate leading-tight" style={{ color: ev.couleur === "brand" ? "white" : colors[ev.couleur === "blue" ? "confirme" : ev.couleur === "amber" ? "en_attente" : "en_cours"] }}>{ev.titre}</div>
+                          {height > 30 && <div className="text-[9px] opacity-75 truncate" style={{ color: ev.couleur === "brand" ? "white" : colors[ev.couleur === "blue" ? "confirme" : ev.couleur === "amber" ? "en_attente" : "en_cours"] }}>{fmt(ev.heure_debut)}–{fmt(ev.heure_fin)}</div>}
                         </div>
                       );
                     })
@@ -513,12 +509,10 @@ export default function PlanningClient({
     const iso = toISO(currentDate);
     const dayEvents = events.filter(e => e.date === iso && e.type !== "indispo");
     const indispoDay = events.find(e => e.date === iso && e.type === "indispo");
-    const ferie = JOURS_FERIES[iso];
 
     return (
       <div className="flex flex-col flex-1 overflow-hidden">
         <div className="flex-shrink-0 border-b border-gray-100 py-2 px-4">
-          {ferie && <span className="text-xs text-green-600 font-medium">{ferie}</span>}
           {indispoDay && <span className="ml-2 text-xs text-orange-600 font-medium">Indisponible</span>}
         </div>
         <div className="flex flex-1 overflow-y-auto" ref={scrollRef}>
@@ -592,7 +586,6 @@ export default function PlanningClient({
             const isCurrentMonth = date.getMonth() === month;
             const dayEvents = events.filter(e => e.date === iso).slice(0, 3);
             const more = events.filter(e => e.date === iso).length - 3;
-            const ferie = JOURS_FERIES[iso];
             return (
               <div key={i}
                 className={`border-b border-r border-gray-100 min-h-[90px] p-1 cursor-pointer hover:bg-gray-50 transition-colors ${!isCurrentMonth ? "bg-gray-50/50" : ""}`}
@@ -601,7 +594,6 @@ export default function PlanningClient({
                 <div className={`w-7 h-7 flex items-center justify-center rounded-full text-sm font-semibold mb-1 ${isT ? "bg-blue-600 text-white" : isCurrentMonth ? "text-gray-800" : "text-gray-300"}`}>
                   {date.getDate()}
                 </div>
-                {ferie && <div className="text-[8px] text-green-600 font-medium truncate mb-0.5">{ferie}</div>}
                 {dayEvents.map(ev => {
                   const c = colorMap[ev.couleur] ?? colorMap.blue;
                   return (
@@ -744,7 +736,7 @@ export default function PlanningClient({
   // RENDU PRINCIPAL
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className={`flex flex-col h-[calc(100vh-4rem)] ${darkMode ? "dark bg-gray-900 text-white" : "bg-white"}`}>
+    <div className="flex flex-col h-[calc(100vh-4rem)] bg-white">
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold border ${
@@ -819,16 +811,6 @@ export default function PlanningClient({
           ))}
         </div>
 
-        {/* Mode sombre */}
-        <button onClick={() => setDarkMode(d => !d)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors" title="Mode sombre">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {darkMode
-              ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            }
-          </svg>
-        </button>
-
         {/* Google */}
         {googleCalendarConnected ? (
           <span className="flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg">
@@ -846,6 +828,10 @@ export default function PlanningClient({
           </a>
         )}
 
+        {/* Légende */}
+        <button onClick={() => setShowLegendModal(true)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors" title="Personnaliser les couleurs">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
+        </button>
         {/* Mes disponibilités */}
         <button onClick={() => setShowDispoModal(true)}
           className="flex items-center gap-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl transition-colors shadow-sm">
@@ -919,6 +905,42 @@ export default function PlanningClient({
         </div>
       )}
 
+      {/* ── Modal légende ───────────────────────────────────────────────── */}
+      {showLegendModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowLegendModal(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 w-80" onClick={e => e.stopPropagation()}>
+            <h3 className="font-bold text-gray-900 mb-4">Personnaliser les couleurs</h3>
+            <div className="space-y-3">
+              {[
+                { key: "confirme", label: "Réservation confirmée" },
+                { key: "en_cours", label: "En cours" },
+                { key: "en_attente", label: "En attente" },
+                { key: "dispo", label: "Disponible" },
+                { key: "urgence", label: "Urgence" },
+                { key: "indispo", label: "Indisponible" },
+              ].map(({ key, label }) => (
+                <div key={key} className="flex items-center justify-between">
+                  <span className="text-sm text-gray-700">{label}</span>
+                  <input
+                    type="color"
+                    value={colors[key]}
+                    onChange={e => {
+                      const newColors = { ...customColors, [key]: e.target.value };
+                      setCustomColors(newColors);
+                      localStorage.setItem("planning_colors", JSON.stringify(newColors));
+                    }}
+                    className="w-8 h-8 rounded-lg border border-gray-200 cursor-pointer"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button onClick={() => { setCustomColors({}); localStorage.removeItem("planning_colors"); }} className="flex-1 py-2 rounded-xl text-sm text-gray-600 border border-gray-200 hover:bg-gray-50">Réinitialiser</button>
+              <button onClick={() => setShowLegendModal(false)} className="flex-1 py-2 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700">Fermer</button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* ── Modal disponibilités ──────────────────────────────────────────── */}
       {showDispoModal && (
         <DispoModal
