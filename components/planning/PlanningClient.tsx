@@ -383,14 +383,22 @@ export default function PlanningClient({
   useEffect(() => {
     const el = weekGridRef.current;
     if (!el) return;
-    const handler = (e: MouseEvent) => {
+    const onMD = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target.closest("[data-event]")) return;
       e.preventDefault();
     };
-    el.addEventListener("mousedown", handler, { passive: false });
-    return () => el.removeEventListener("mousedown", handler);
+    el.addEventListener("mousedown", onMD, { passive: false });
+    return () => el.removeEventListener("mousedown", onMD);
   }, []);
+
+  // Bloquer scroll pendant drag/draw
+  useEffect(() => {
+    if (!dragging && !drawStartRef.current) return;
+    const onMM = (e: MouseEvent) => { e.preventDefault(); };
+    window.addEventListener("mousemove", onMM, { passive: false });
+    return () => window.removeEventListener("mousemove", onMM);
+  }, [dragging]);
 
   // ── Gestion souris centralisée ───────────────────────────────────────────
   useEffect(() => {
