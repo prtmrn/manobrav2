@@ -45,6 +45,15 @@ type CalEvent = {
 
 type View = "jour" | "semaine" | "mois" | "liste";
 
+type Category = {
+  id: string;
+  nom: string;
+  couleur: string;
+  visible: boolean;
+  is_system: boolean;
+  system_key: string | null;
+};
+
 interface PlanningClientProps {
   userId: string;
   googleCalendarConnected?: boolean;
@@ -155,6 +164,8 @@ export default function PlanningClient({
   const [showDispoModal, setShowDispoModal] = useState(false);
   const [showLegendModal, setShowLegendModal] = useState(false);
   const [showCalendarIntegration, setShowCalendarIntegration] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
   const [customColors, setCustomColors] = useState<Record<string, string>>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("planning_colors");
@@ -171,7 +182,10 @@ export default function PlanningClient({
     urgence: "#ef4444",
     indispo: "#f97316",
   };
-  const colors = { ...DEFAULT_COLORS, ...customColors };
+  const colors = { ...DEFAULT_COLORS, ...customColors, ...Object.fromEntries(
+    categories.filter(c => c.system_key).map(c => [c.system_key!, c.couleur])
+  )};
+  const hiddenCategories = new Set(categories.filter(c => !c.visible).map(c => c.system_key ?? c.id));
   const [selectedEvent, setSelectedEvent] = useState<CalEvent | null>(null);
   const [quickAdd, setQuickAdd] = useState<{ date: string; heure: string } | null>(null);
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
@@ -183,6 +197,14 @@ export default function PlanningClient({
 
   const today = toISO(new Date());
   const weekDates = getWeekDates(currentDate);
+
+  // Charger catégories
+  useEffect(() => {
+    fetch("/api/planning/categories")
+      .then(r => r.json())
+      .then(data => { setCategories(data); setCategoriesLoaded(true); })
+      .catch(() => setCategoriesLoaded(true));
+  }, []);
 
   // Persister vue et date
   useEffect(() => {
@@ -999,39 +1021,11 @@ export default function PlanningClient({
       )}
       {/* ── Modal légende ───────────────────────────────────────────────── */}
       {showLegendModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowLegendModal(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 w-80" onClick={e => e.stopPropagation()}>
-            <h3 className="font-bold text-gray-900 mb-4">Personnaliser les couleurs</h3>
-            <div className="space-y-3">
-              {[
-                { key: "confirme", label: "Réservation confirmée" },
-                { key: "en_cours", label: "En cours" },
-                { key: "en_attente", label: "En attente" },
-                { key: "dispo", label: "Disponible" },
-                { key: "urgence", label: "Urgence" },
-                { key: "indispo", label: "Indisponible" },
-              ].map(({ key, label }) => (
-                <div key={key} className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">{label}</span>
-                  <input
-                    type="color"
-                    value={colors[key]}
-                    onChange={e => {
-                      const newColors = { ...customColors, [key]: e.target.value };
-                      setCustomColors(newColors);
-                      localStorage.setItem("planning_colors", JSON.stringify(newColors));
-                    }}
-                    className="w-8 h-8 rounded-lg border border-gray-200 cursor-pointer"
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-2 mt-4">
-              <button onClick={() => { setCustomColors({}); localStorage.removeItem("planning_colors"); }} className="flex-1 py-2 rounded-xl text-sm text-gray-600 border border-gray-200 hover:bg-gray-50">Réinitialiser</button>
-              <button onClick={() => setShowLegendModal(false)} className="flex-1 py-2 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700">Fermer</button>
-            </div>
-          </div>
-        </div>
+        <LegendModal
+          categories={categories}
+          setCategories={setCategories}
+          onClose={() => setShowLegendModal(false)}
+        />
       )}
       {/* ── Modal disponibilités ──────────────────────────────────────────── */}
       {showDispoModal && (
@@ -1043,6 +1037,181 @@ export default function PlanningClient({
           showToast={showToast}
         />
       )}
+    </div>
+  );
+}
+
+
+// ─── Modal Légende ────────────────────────────────────────────────────────────
+function LegendModal({
+  categories,
+  setCategories,
+  onClose,
+}: {
+  categories: Category[];
+  setCategories: React.Dispatch<React.SetStateAction<Category[]>>;
+  onClose: () => void;
+}) {
+  const [editing, setEditing] = useState<string | null>(null);
+  const [editNom, setEditNom] = useState("");
+  const [editCouleur, setEditCouleur] = useState("");
+  const [showAdd, setShowAdd] = useState(false);
+  const [newNom, setNewNom] = useState("");
+  const [newCouleur, setNewCouleur] = useState("#6366f1");
+  const [loading, setLoading] = useState(false);
+
+  async function updateCategory(id: string, updates: Partial<Category>) {
+    const res = await fetch("/api/planning/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "update", id, ...updates }),
+    });
+    const data = await res.json();
+    setCategories(prev => prev.map(c => c.id === id ? { ...c, ...data } : c));
+  }
+
+  async function deleteCategory(id: string) {
+    await fetch("/api/planning/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "delete", id }),
+    });
+    setCategories(prev => prev.filter(c => c.id !== id));
+  }
+
+  async function createCategory() {
+    if (!newNom.trim()) return;
+    setLoading(true);
+    const res = await fetch("/api/planning/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "create", nom: newNom, couleur: newCouleur }),
+    });
+    const data = await res.json();
+    setCategories(prev => [...prev, data]);
+    setNewNom("");
+    setNewCouleur("#6366f1");
+    setShowAdd(false);
+    setLoading(false);
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 w-full max-w-md max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <h2 className="text-lg font-bold text-gray-900">Gérer la légende</h2>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        <div className="overflow-y-auto flex-1 px-6 py-4 space-y-2">
+          {/* Catégories système */}
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-3">Catégories système</p>
+          {categories.filter(c => c.is_system).map(cat => (
+            <div key={cat.id} className="flex items-center gap-3 py-2">
+              {editing === cat.id ? (
+                <>
+                  <input type="color" value={editCouleur}
+                    onChange={e => setEditCouleur(e.target.value)}
+                    className="w-8 h-8 rounded border border-gray-200 cursor-pointer flex-shrink-0" />
+                  <input type="text" value={editNom}
+                    onChange={e => setEditNom(e.target.value)}
+                    className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400" />
+                  <button onClick={() => { updateCategory(cat.id, { nom: editNom, couleur: editCouleur }); setEditing(null); }}
+                    className="text-xs font-bold text-blue-600 hover:text-blue-700 flex-shrink-0">OK</button>
+                  <button onClick={() => setEditing(null)} className="text-xs text-gray-400 flex-shrink-0">Annuler</button>
+                </>
+              ) : (
+                <>
+                  <div className="w-4 h-4 rounded flex-shrink-0" style={{ backgroundColor: cat.couleur }} />
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <span className="text-sm text-gray-700 truncate">{cat.nom}</span>
+                    <button
+                      onClick={() => updateCategory(cat.id, { visible: !cat.visible })}
+                      className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors flex-shrink-0 ${cat.visible ? "bg-blue-500" : "bg-gray-200"}`}
+                    >
+                      <span className={`inline-block h-3 w-3 transform rounded-full bg-white shadow transition-transform ${cat.visible ? "translate-x-3.5" : "translate-x-0.5"}`} />
+                    </button>
+                  </div>
+                  <button onClick={() => { setEditing(cat.id); setEditNom(cat.nom); setEditCouleur(cat.couleur); }}
+                    className="text-xs text-gray-400 hover:text-gray-600 flex-shrink-0">Modifier</button>
+                </>
+              )}
+            </div>
+          ))}
+
+          {/* Catégories personnalisées */}
+          {categories.filter(c => !c.is_system).length > 0 && (
+            <>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mt-4 mb-3">Catégories personnalisées</p>
+              {categories.filter(c => !c.is_system).map(cat => (
+                <div key={cat.id} className="flex items-center gap-3 py-2">
+                  {editing === cat.id ? (
+                    <>
+                      <input type="color" value={editCouleur}
+                        onChange={e => setEditCouleur(e.target.value)}
+                        className="w-8 h-8 rounded border border-gray-200 cursor-pointer flex-shrink-0" />
+                      <input type="text" value={editNom}
+                        onChange={e => setEditNom(e.target.value)}
+                        className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400" />
+                      <button onClick={() => { updateCategory(cat.id, { nom: editNom, couleur: editCouleur }); setEditing(null); }}
+                        className="text-xs font-bold text-blue-600 flex-shrink-0">OK</button>
+                      <button onClick={() => setEditing(null)} className="text-xs text-gray-400 flex-shrink-0">Annuler</button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-4 h-4 rounded flex-shrink-0" style={{ backgroundColor: cat.couleur }} />
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <span className="text-sm text-gray-700 truncate">{cat.nom}</span>
+                        <button
+                          onClick={() => updateCategory(cat.id, { visible: !cat.visible })}
+                          className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors flex-shrink-0 ${cat.visible ? "bg-blue-500" : "bg-gray-200"}`}
+                        >
+                          <span className={`inline-block h-3 w-3 transform rounded-full bg-white shadow transition-transform ${cat.visible ? "translate-x-3.5" : "translate-x-0.5"}`} />
+                        </button>
+                      </div>
+                      <button onClick={() => { setEditing(cat.id); setEditNom(cat.nom); setEditCouleur(cat.couleur); }}
+                        className="text-xs text-gray-400 hover:text-gray-600 flex-shrink-0">Modifier</button>
+                      <button onClick={() => deleteCategory(cat.id)}
+                        className="text-xs text-red-400 hover:text-red-600 flex-shrink-0">Supprimer</button>
+                    </>
+                  )}
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* Ajouter */}
+          {showAdd && (
+            <div className="bg-gray-50 rounded-xl border border-gray-200 p-3 mt-3 space-y-2">
+              <p className="text-xs font-semibold text-gray-700">Nouvelle catégorie</p>
+              <div className="flex gap-2">
+                <input type="color" value={newCouleur} onChange={e => setNewCouleur(e.target.value)}
+                  className="w-9 h-9 rounded border border-gray-200 cursor-pointer flex-shrink-0" />
+                <input type="text" value={newNom} onChange={e => setNewNom(e.target.value)}
+                  placeholder="Nom de la catégorie"
+                  className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => setShowAdd(false)} className="flex-1 py-1.5 rounded-lg text-sm text-gray-600 border border-gray-200 hover:bg-gray-100">Annuler</button>
+                <button onClick={createCategory} disabled={!newNom.trim() || loading}
+                  className="flex-1 py-1.5 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50">
+                  {loading ? "..." : "Créer"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="px-6 py-4 border-t border-gray-100">
+          <button onClick={() => setShowAdd(true)}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-blue-600 border border-blue-200 hover:bg-blue-50 transition-colors">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+            Ajouter une catégorie
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
