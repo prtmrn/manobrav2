@@ -201,6 +201,7 @@ export default function PlanningClient({
   const [selectedEvent, setSelectedEvent] = useState<CalEvent | null>(null);
   const [quickAdd, setQuickAdd] = useState<{ date: string; heure: string } | null>(null);
   const [createModal, setCreateModal] = useState<{ date: string; heure: string; heureFin?: string } | null>(null);
+  const savedScrollTop = useRef(0);
   const [editDispo, setEditDispo] = useState<Dispo | null>(null);
   const [dragging, setDragging] = useState<{ ev: CalEvent; offsetY: number } | null>(null);
   const [dragOver, setDragOver] = useState<{ date: string; top: number } | null>(null);
@@ -225,6 +226,15 @@ export default function PlanningClient({
       .then(r => r.json())
       .then(data => setEvenements(Array.isArray(data) ? data : []));
   }, []);
+
+  // Restaurer scroll après ouverture modal
+  useEffect(() => {
+    if (createModal && scrollRef.current && savedScrollTop.current > 0) {
+      requestAnimationFrame(() => {
+        if (scrollRef.current) scrollRef.current.scrollTop = savedScrollTop.current;
+      });
+    }
+  }, [createModal]);
 
   // Charger catégories
   useEffect(() => {
@@ -444,6 +454,7 @@ export default function PlanningClient({
       const ds = drawStartRef.current;
       const dc = drawCurrentRef.current;
       if (ds) {
+        savedScrollTop.current = scrollRef.current?.scrollTop ?? 0;
         const dragDistance = dc ? Math.abs(dc - ds.top) : 0;
         if (dragDistance > minToPx(14) && dc) {
           const debut = pxToTime(ds.top);
