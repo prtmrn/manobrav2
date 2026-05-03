@@ -31,6 +31,16 @@ type Reservation = {
   adresse_intervention: string | null;
 };
 
+type Evenement = {
+  id: string;
+  titre: string;
+  date: string;
+  heure_debut: string;
+  heure_fin: string;
+  description: string | null;
+  couleur: string;
+};
+
 type CalEvent = {
   id: string;
   date: string;
@@ -41,6 +51,7 @@ type CalEvent = {
   type: "dispo" | "indispo" | "resa";
   raw: Dispo | Indispo | Reservation;
   isBg?: boolean;
+  customColor?: string;
 };
 
 type View = "jour" | "semaine" | "mois" | "liste";
@@ -161,6 +172,7 @@ export default function PlanningClient({
   const [dispos, setDispos] = useState<Dispo[]>(initialDispos);
   const [indispos, setIndispos] = useState<Indispo[]>(initialIndispos);
   const [reservations] = useState<Reservation[]>(initialReservations);
+  const [evenements, setEvenements] = useState<Evenement[]>([]);
   const [showDispoModal, setShowDispoModal] = useState(false);
   const [showLegendModal, setShowLegendModal] = useState(false);
   const [showCalendarIntegration, setShowCalendarIntegration] = useState(false);
@@ -188,6 +200,8 @@ export default function PlanningClient({
   const hiddenCategories = new Set(categories.filter(c => !c.visible).map(c => c.system_key ?? c.id));
   const [selectedEvent, setSelectedEvent] = useState<CalEvent | null>(null);
   const [quickAdd, setQuickAdd] = useState<{ date: string; heure: string } | null>(null);
+  const [createModal, setCreateModal] = useState<{ date: string; heure: string } | null>(null);
+  const [editDispo, setEditDispo] = useState<Dispo | null>(null);
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState("");
@@ -197,6 +211,15 @@ export default function PlanningClient({
 
   const today = toISO(new Date());
   const weekDates = getWeekDates(currentDate);
+
+  // Charger événements
+  useEffect(() => {
+    const from = new Date().toISOString().split("T")[0];
+    const to = new Date(Date.now() + 90 * 86400000).toISOString().split("T")[0];
+    fetch(`/api/planning/evenements?from=${from}&to=${to}`)
+      .then(r => r.json())
+      .then(data => setEvenements(Array.isArray(data) ? data : []));
+  }, []);
 
   // Charger catégories
   useEffect(() => {
@@ -294,6 +317,23 @@ export default function PlanningClient({
           couleur: r.statut === "en_cours" ? "brand" : r.statut === "confirme" ? "blue" : "amber",
           type: "resa",
           raw: r,
+        });
+      }
+    });
+
+    // Événements perso
+    evenements.forEach(ev => {
+      if (isoSet.has(ev.date)) {
+        events.push({
+          id: `evt-${ev.id}`,
+          date: ev.date,
+          heure_debut: ev.heure_debut,
+          heure_fin: ev.heure_fin,
+          titre: ev.titre,
+          couleur: "custom",
+          type: "resa",
+          raw: ev,
+          customColor: ev.couleur,
         });
       }
     });
@@ -466,7 +506,7 @@ export default function PlanningClient({
                     const totalMin = Math.floor(y / HOUR_HEIGHT) * 60 + START_HOUR * 60;
                     const h = String(Math.floor(totalMin / 60)).padStart(2, "0");
                     const m = String(totalMin % 60).padStart(2, "0");
-                    setQuickAdd({ date: iso, heure: `${h}:${m}` });
+                    setCreateModal({ date: iso, heure: `${h}:${m}` });
                   }}
                 >
                   {/* Lignes heures */}
@@ -482,29 +522,23 @@ export default function PlanningClient({
                     <div className="absolute inset-0 bg-orange-50 opacity-60 pointer-events-none" />
                   )}
 
-                  {/* Disponibilités — bandeau fin gauche, uniquement type normal */}
+                  {/* Disponibilités — bandeau fin gauche, cliquable */}
                   {events.filter(e => e.date === iso && e.type === "dispo" && e.couleur !== "red").map(ev => (
                     <div key={ev.id}
-                      className="absolute pointer-events-none z-0"
+                      className="absolute z-0 cursor-pointer group/dispo"
                       style={{
                         top: `${topPx(ev.heure_debut)}px`,
                         height: `${heightPx(ev.heure_debut, ev.heure_fin)}px`,
                         left: 0,
-                        width: "5px",
-                        backgroundColor: colors.dispo,
-                        borderRadius: "0 2px 2px 0",
+                        width: "20px",
                       }}
+                      onClick={(e) => { e.stopPropagation(); setEditDispo(ev.raw as Dispo); }}
+                      title="Cliquer pour modifier"
                     >
-                      <span style={{
-                        position: "absolute",
-                        left: "8px",
-                        top: "2px",
-                        fontSize: "9px",
-                        fontWeight: 600,
-                        color: colors.dispo,
-                        whiteSpace: "nowrap",
-                        pointerEvents: "none",
-                      }}>Disponible</span>
+                      <div className="absolute left-0 top-0 bottom-0 w-1.5 group-hover/dispo:w-2.5 transition-all"
+                        style={{ backgroundColor: colors.dispo, borderRadius: "0 2px 2px 0" }} />
+                      <span className="absolute left-3 top-0.5 text-[9px] font-semibold whitespace-nowrap opacity-70 group-hover/dispo:opacity-100 transition-opacity"
+                        style={{ color: colors.dispo }}>Disponible</span>
                     </div>
                   ))}
 
@@ -522,11 +556,20 @@ export default function PlanningClient({
                       return (
                         <div key={ev.id}
                           className="absolute rounded-lg border px-1.5 py-0.5 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity z-10"
-                          style={{ top: `${top}px`, height: `${height}px`, left, width, backgroundColor: c.bg.includes("[") ? undefined : undefined, borderColor: "transparent" }}
+                          style={{
+                            top: `${top}px`, height: `${height}px`, left, width,
+                            backgroundColor: ev.customColor ? ev.customColor + "33" : undefined,
+                            borderColor: ev.customColor ? ev.customColor + "88" : "transparent",
+                            borderWidth: "1px",
+                          }}
                           onClick={(e) => { e.stopPropagation(); setSelectedEvent(ev); }}
                         >
-                          <div className="text-[10px] font-bold truncate leading-tight" style={{ color: ev.couleur === "brand" ? "white" : colors[ev.couleur === "blue" ? "confirme" : ev.couleur === "amber" ? "en_attente" : "en_cours"] }}>{ev.titre}</div>
-                          {height > 30 && <div className="text-[9px] opacity-75 truncate" style={{ color: ev.couleur === "brand" ? "white" : colors[ev.couleur === "blue" ? "confirme" : ev.couleur === "amber" ? "en_attente" : "en_cours"] }}>{fmt(ev.heure_debut)}–{fmt(ev.heure_fin)}</div>}
+                          <div className="text-[10px] font-bold truncate leading-tight" style={{
+                            color: ev.customColor ?? (ev.couleur === "brand" ? "white" : colors[ev.couleur === "blue" ? "confirme" : ev.couleur === "amber" ? "en_attente" : "en_cours"])
+                          }}>{ev.titre}</div>
+                          {height > 30 && <div className="text-[9px] opacity-75 truncate" style={{
+                            color: ev.customColor ?? (ev.couleur === "brand" ? "white" : colors[ev.couleur === "blue" ? "confirme" : ev.couleur === "amber" ? "en_attente" : "en_cours"])
+                          }}>{fmt(ev.heure_debut)}–{fmt(ev.heure_fin)}</div>}
                         </div>
                       );
                     })
@@ -577,7 +620,7 @@ export default function PlanningClient({
               const totalMin = Math.floor(y / HOUR_HEIGHT) * 60 + START_HOUR * 60;
               const h = String(Math.floor(totalMin / 60)).padStart(2, "0");
               const m = String(totalMin % 60).padStart(2, "0");
-              setQuickAdd({ date: iso, heure: `${h}:${m}` });
+              setCreateModal({ date: iso, heure: `${h}:${m}` });
             }}
           >
             {VISIBLE_HOURS.map(h => (
@@ -893,22 +936,52 @@ export default function PlanningClient({
         </div>
       </div>
 
-      {/* ── Pop-up ajout rapide ───────────────────────────────────────────── */}
-      {quickAdd && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center p-4" onClick={() => setQuickAdd(null)}>
-          <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-5 w-72" onClick={e => e.stopPropagation()}>
-            <h3 className="font-bold text-gray-900 mb-1">Ajouter une disponibilité</h3>
-            <p className="text-sm text-gray-500 mb-4">
-              {new Date(quickAdd.date + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })} à {quickAdd.heure}
-            </p>
-            <div className="flex gap-2">
-              <button onClick={() => setQuickAdd(null)} className="flex-1 py-2 rounded-xl text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors">Annuler</button>
-              <button onClick={() => addQuickSlot(quickAdd.date, quickAdd.heure)} className="flex-1 py-2 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors">
-                Ajouter 1h
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* ── Modal création ────────────────────────────────────────────────── */}
+      {createModal && (
+        <CreateEventModal
+          date={createModal.date}
+          heure={createModal.heure}
+          onClose={() => setCreateModal(null)}
+          onCreateDispo={(date, heure) => { addQuickSlot(date, heure); setCreateModal(null); }}
+          onCreateEvenement={async (ev) => {
+            const res = await fetch("/api/planning/evenements", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ action: "create", ...ev }),
+            });
+            const data = await res.json();
+            if (data.id) setEvenements(prev => [...prev, data]);
+            setCreateModal(null);
+          }}
+          onCreateIndispo={async (dateDebut, dateFin, motif) => {
+            const supabase = createClient();
+            const { data } = await (supabase.from("indisponibilites") as any).insert({
+              artisan_id: userId,
+              date_debut: dateDebut,
+              date_fin: dateFin,
+              motif: motif || null,
+            }).select().single();
+            if (data) setIndispos(prev => [...prev, data]);
+            setCreateModal(null);
+          }}
+        />
+      )}
+
+      {/* ── Modal édition disponibilité ──────────────────────────────────── */}
+      {editDispo && (
+        <EditDispoModal
+          dispo={editDispo}
+          onClose={() => setEditDispo(null)}
+          onDelete={async (id) => { await deleteDispo(id); setEditDispo(null); }}
+          onUpdate={async (id, debut, fin) => {
+            const supabase = createClient();
+            const { data } = await (supabase.from("disponibilites") as any)
+              .update({ heure_debut: debut + ":00", heure_fin: fin + ":00" })
+              .eq("id", id).select().single();
+            if (data) setDispos(prev => prev.map(d => d.id === id ? { ...d, ...data } : d));
+            setEditDispo(null);
+          }}
+        />
       )}
 
       {/* ── Pop-up événement sélectionné ──────────────────────────────────── */}
@@ -1039,6 +1112,217 @@ export default function PlanningClient({
   );
 }
 
+
+
+// ─── Modal Création (Dispo / Événement / Indispo) ─────────────────────────────
+function CreateEventModal({
+  date, heure, onClose, onCreateDispo, onCreateEvenement, onCreateIndispo,
+}: {
+  date: string;
+  heure: string;
+  onClose: () => void;
+  onCreateDispo: (date: string, heure: string) => void;
+  onCreateEvenement: (ev: { titre: string; date: string; heure_debut: string; heure_fin: string; description: string; couleur: string }) => void;
+  onCreateIndispo: (dateDebut: string, dateFin: string, motif: string) => void;
+}) {
+  const [type, setType] = useState<"choix" | "dispo" | "evenement" | "indispo">("choix");
+  const dateLabel = new Date(date + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+
+  // Formulaire événement
+  const [titre, setTitre] = useState("");
+  const [debut, setDebut] = useState(heure);
+  const [fin, setFin] = useState(() => {
+    const [h, m] = heure.split(":").map(Number);
+    const endMin = h * 60 + m + 60;
+    return `${String(Math.floor(endMin/60)).padStart(2,"0")}:${String(endMin%60).padStart(2,"0")}`;
+  });
+  const [description, setDescription] = useState("");
+  const [couleur, setCouleur] = useState("#6366f1");
+
+  // Formulaire dispo
+  const [dispoDebut, setDispoDebut] = useState(heure);
+  const [dispoFin, setDispoFin] = useState(() => {
+    const [h, m] = heure.split(":").map(Number);
+    const endMin = h * 60 + m + 60;
+    return `${String(Math.floor(endMin/60)).padStart(2,"0")}:${String(endMin%60).padStart(2,"0")}`;
+  });
+
+  // Formulaire indispo
+  const [indispoFin, setIndispoFin] = useState(date);
+  const [motif, setMotif] = useState("");
+
+  const choices = [
+    { key: "dispo", label: "Disponibilité", desc: "Créneau où vous êtes disponible", color: "bg-green-50 border-green-200 text-green-700" },
+    { key: "evenement", label: "Événement", desc: "Bloc perso, formation, RDV...", color: "bg-blue-50 border-blue-200 text-blue-700" },
+    { key: "indispo", label: "Indisponibilité", desc: "Congé, fermeture, absence...", color: "bg-orange-50 border-orange-200 text-orange-700" },
+  ] as const;
+
+  return (
+    <div className="fixed inset-0 z-40 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 w-full max-w-sm" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div>
+            <h3 className="font-bold text-gray-900">
+              {type === "choix" ? "Créer" : type === "dispo" ? "Disponibilité" : type === "evenement" ? "Événement" : "Indisponibilité"}
+            </h3>
+            <p className="text-xs text-gray-500 mt-0.5">{dateLabel} à {heure}</p>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        <div className="p-5">
+          {type === "choix" && (
+            <div className="space-y-2">
+              {choices.map(c => (
+                <button key={c.key} onClick={() => setType(c.key)}
+                  className={`w-full text-left p-3 rounded-xl border transition-colors ${c.color} hover:opacity-80`}>
+                  <div className="font-semibold text-sm">{c.label}</div>
+                  <div className="text-xs opacity-70 mt-0.5">{c.desc}</div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {type === "dispo" && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs font-medium text-gray-500 block mb-1">Début</label>
+                  <input type="time" value={dispoDebut} onChange={e => setDispoDebut(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500 block mb-1">Fin</label>
+                  <input type="time" value={dispoFin} onChange={e => setDispoFin(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => setType("choix")} className="flex-1 py-2 rounded-xl text-sm text-gray-600 border border-gray-200 hover:bg-gray-50">Retour</button>
+                <button onClick={() => onCreateDispo(date, dispoDebut)}
+                  className="flex-1 py-2 rounded-xl text-sm font-bold text-white bg-green-600 hover:bg-green-700">Créer</button>
+              </div>
+            </div>
+          )}
+
+          {type === "evenement" && (
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <input type="color" value={couleur} onChange={e => setCouleur(e.target.value)}
+                  className="w-10 h-10 rounded-lg border border-gray-200 cursor-pointer flex-shrink-0" />
+                <input type="text" value={titre} onChange={e => setTitre(e.target.value)}
+                  placeholder="Titre de l'événement" autoFocus
+                  className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs font-medium text-gray-500 block mb-1">Début</label>
+                  <input type="time" value={debut} onChange={e => setDebut(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500 block mb-1">Fin</label>
+                  <input type="time" value={fin} onChange={e => setFin(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+                </div>
+              </div>
+              <textarea value={description} onChange={e => setDescription(e.target.value)}
+                placeholder="Description (optionnel)" rows={2}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400 resize-none" />
+              <div className="flex gap-2">
+                <button onClick={() => setType("choix")} className="flex-1 py-2 rounded-xl text-sm text-gray-600 border border-gray-200 hover:bg-gray-50">Retour</button>
+                <button onClick={() => titre && onCreateEvenement({ titre, date, heure_debut: debut, heure_fin: fin, description, couleur })}
+                  disabled={!titre}
+                  className="flex-1 py-2 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50">Créer</button>
+              </div>
+            </div>
+          )}
+
+          {type === "indispo" && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs font-medium text-gray-500 block mb-1">Du</label>
+                  <input type="date" value={date} readOnly
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50" />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500 block mb-1">Au</label>
+                  <input type="date" value={indispoFin} onChange={e => setIndispoFin(e.target.value)} min={date}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+                </div>
+              </div>
+              <input type="text" value={motif} onChange={e => setMotif(e.target.value)}
+                placeholder="Motif (optionnel)"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+              <div className="flex gap-2">
+                <button onClick={() => setType("choix")} className="flex-1 py-2 rounded-xl text-sm text-gray-600 border border-gray-200 hover:bg-gray-50">Retour</button>
+                <button onClick={() => onCreateIndispo(date, indispoFin, motif)}
+                  className="flex-1 py-2 rounded-xl text-sm font-bold text-white bg-orange-500 hover:bg-orange-600">Créer</button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Modal Édition disponibilité ──────────────────────────────────────────────
+function EditDispoModal({
+  dispo, onClose, onDelete, onUpdate,
+}: {
+  dispo: Dispo;
+  onClose: () => void;
+  onDelete: (id: string) => void;
+  onUpdate: (id: string, debut: string, fin: string) => void;
+}) {
+  const [debut, setDebut] = useState(dispo.heure_debut.slice(0, 5));
+  const [fin, setFin] = useState(dispo.heure_fin.slice(0, 5));
+  const JOURS_LONG = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+
+  return (
+    <div className="fixed inset-0 z-40 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 w-80" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div>
+            <h3 className="font-bold text-gray-900">Disponibilité</h3>
+            <p className="text-xs text-gray-500">{JOURS_LONG[dispo.jour_semaine]} · chaque semaine</p>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+        <div className="p-5 space-y-3">
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-xs font-medium text-gray-500 block mb-1">Début</label>
+              <input type="time" value={debut} onChange={e => setDebut(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-green-400" />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500 block mb-1">Fin</label>
+              <input type="time" value={fin} onChange={e => setFin(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-green-400" />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => onDelete(dispo.id)}
+              className="flex-1 py-2 rounded-xl text-sm font-semibold text-red-600 border border-red-200 hover:bg-red-50">
+              Supprimer
+            </button>
+            <button onClick={() => onUpdate(dispo.id, debut, fin)}
+              className="flex-1 py-2 rounded-xl text-sm font-bold text-white bg-green-600 hover:bg-green-700">
+              Enregistrer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── Modal Légende ────────────────────────────────────────────────────────────
 function LegendModal({
