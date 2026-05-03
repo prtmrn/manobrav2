@@ -677,7 +677,7 @@ export default function PlanningClient({
                     drawCurrentRef.current = null;
                   }}
                   onClick={(e) => {
-                    if (dragging || drawStart) return;
+                    if (dragging || drawStartRef.current) return;
                   }}
                 >
                   {/* Lignes heures */}
