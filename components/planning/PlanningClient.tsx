@@ -760,9 +760,7 @@ export default function PlanningClient({
         <div className="mt-4 space-y-1.5 border-t border-gray-100 pt-3">
           <div className="flex items-center justify-between mb-2">
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Légende</p>
-            <button onClick={() => setShowLegendModal(true)} className="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors" title="Personnaliser les couleurs">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
-            </button>
+<button onClick={() => setShowLegendModal(true)} className="text-[10px] font-semibold text-blue-500 hover:text-blue-600 transition-colors">Modifier</button>
           </div>
           {[
             { couleur: "green", label: "Disponible" },
@@ -1052,22 +1050,40 @@ function LegendModal({
   setCategories: React.Dispatch<React.SetStateAction<Category[]>>;
   onClose: () => void;
 }) {
-  const [editing, setEditing] = useState<string | null>(null);
-  const [editNom, setEditNom] = useState("");
-  const [editCouleur, setEditCouleur] = useState("");
+  // État local pour édition — copie des catégories
+  const [draft, setDraft] = useState<Category[]>(() => JSON.parse(JSON.stringify(categories)));
   const [showAdd, setShowAdd] = useState(false);
   const [newNom, setNewNom] = useState("");
   const [newCouleur, setNewCouleur] = useState("#6366f1");
   const [loading, setLoading] = useState(false);
 
-  async function updateCategory(id: string, updates: Partial<Category>) {
-    const res = await fetch("/api/planning/categories", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "update", id, ...updates }),
+  const isDirty = JSON.stringify(draft.map(c => ({ id: c.id, nom: c.nom, couleur: c.couleur, visible: c.visible })))
+    !== JSON.stringify(categories.map(c => ({ id: c.id, nom: c.nom, couleur: c.couleur, visible: c.visible })));
+
+  function updateDraft(id: string, updates: Partial<Category>) {
+    setDraft(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
+  }
+
+  async function handleSave() {
+    setLoading(true);
+    const changed = draft.filter(d => {
+      const orig = categories.find(c => c.id === d.id);
+      return orig && (orig.nom !== d.nom || orig.couleur !== d.couleur || orig.visible !== d.visible);
     });
-    const data = await res.json();
-    setCategories(prev => prev.map(c => c.id === id ? { ...c, ...data } : c));
+    await Promise.all(changed.map(cat =>
+      fetch("/api/planning/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update", id: cat.id, nom: cat.nom, couleur: cat.couleur, visible: cat.visible }),
+      })
+    ));
+    setCategories(draft);
+    setLoading(false);
+    onClose();
+  }
+
+  function handleCancel() {
+    setDraft(JSON.parse(JSON.stringify(categories)));
   }
 
   async function deleteCategory(id: string) {
@@ -1077,6 +1093,7 @@ function LegendModal({
       body: JSON.stringify({ action: "delete", id }),
     });
     setCategories(prev => prev.filter(c => c.id !== id));
+    setDraft(prev => prev.filter(c => c.id !== id));
   }
 
   async function createCategory() {
@@ -1089,11 +1106,65 @@ function LegendModal({
     });
     const data = await res.json();
     setCategories(prev => [...prev, data]);
+    setDraft(prev => [...prev, data]);
     setNewNom("");
     setNewCouleur("#6366f1");
     setShowAdd(false);
     setLoading(false);
   }
+
+  const EyeIcon = ({ open }: { open: boolean }) => (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      {open
+        ? <><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></>
+        : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+      }
+    </svg>
+  );
+
+  const renderRow = (cat: Category, showDelete = false) => (
+    <div key={cat.id} className="flex items-center gap-3 py-2">
+      {/* Couleur avec crayon au survol */}
+      <div className="relative group/color flex-shrink-0">
+        <input
+          type="color"
+          value={cat.couleur}
+          onChange={e => updateDraft(cat.id, { couleur: e.target.value })}
+          className="w-7 h-7 rounded cursor-pointer border border-gray-200 opacity-0 absolute inset-0 z-10"
+          title="Changer la couleur"
+        />
+        <div className="w-7 h-7 rounded flex items-center justify-center" style={{ backgroundColor: cat.couleur }}>
+          <svg className="w-3 h-3 text-white opacity-0 group-hover/color:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Nom éditable */}
+      <input
+        type="text"
+        value={cat.nom}
+        onChange={e => updateDraft(cat.id, { nom: e.target.value })}
+        className="flex-1 text-sm text-gray-700 bg-transparent border-b border-transparent hover:border-gray-200 focus:border-blue-400 focus:outline-none px-1 py-0.5 transition-colors min-w-0"
+      />
+
+      {/* Bouton oeil */}
+      <button
+        onClick={() => updateDraft(cat.id, { visible: !cat.visible })}
+        className={`flex-shrink-0 transition-colors ${cat.visible ? "text-gray-400 hover:text-gray-600" : "text-gray-200 hover:text-gray-400"}`}
+        title={cat.visible ? "Masquer" : "Afficher"}
+      >
+        <EyeIcon open={cat.visible} />
+      </button>
+
+      {/* Supprimer (custom seulement) */}
+      {showDelete && (
+        <button onClick={() => deleteCategory(cat.id)} className="flex-shrink-0 text-gray-200 hover:text-red-400 transition-colors">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+        </button>
+      )}
+    </div>
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -1105,92 +1176,25 @@ function LegendModal({
           </button>
         </div>
 
-        <div className="overflow-y-auto flex-1 px-6 py-4 space-y-2">
-          {/* Catégories système */}
+        <div className="overflow-y-auto flex-1 px-6 py-4">
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-3">Catégories système</p>
-          {categories.filter(c => c.is_system).map(cat => (
-            <div key={cat.id} className="flex items-center gap-3 py-2">
-              {editing === cat.id ? (
-                <>
-                  <input type="color" value={editCouleur}
-                    onChange={e => setEditCouleur(e.target.value)}
-                    className="w-8 h-8 rounded border border-gray-200 cursor-pointer flex-shrink-0" />
-                  <input type="text" value={editNom}
-                    onChange={e => setEditNom(e.target.value)}
-                    className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400" />
-                  <button onClick={() => { updateCategory(cat.id, { nom: editNom, couleur: editCouleur }); setEditing(null); }}
-                    className="text-xs font-bold text-blue-600 hover:text-blue-700 flex-shrink-0">OK</button>
-                  <button onClick={() => setEditing(null)} className="text-xs text-gray-400 flex-shrink-0">Annuler</button>
-                </>
-              ) : (
-                <>
-                  <div className="w-4 h-4 rounded flex-shrink-0" style={{ backgroundColor: cat.couleur }} />
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <span className="text-sm text-gray-700 truncate">{cat.nom}</span>
-                    <button
-                      onClick={() => updateCategory(cat.id, { visible: !cat.visible })}
-                      className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors flex-shrink-0 ${cat.visible ? "bg-blue-500" : "bg-gray-200"}`}
-                    >
-                      <span className={`inline-block h-3 w-3 transform rounded-full bg-white shadow transition-transform ${cat.visible ? "translate-x-3.5" : "translate-x-0.5"}`} />
-                    </button>
-                  </div>
-                  <button onClick={() => { setEditing(cat.id); setEditNom(cat.nom); setEditCouleur(cat.couleur); }}
-                    className="text-xs text-gray-400 hover:text-gray-600 flex-shrink-0">Modifier</button>
-                </>
-              )}
-            </div>
-          ))}
+          {draft.filter(c => c.is_system).map(cat => renderRow(cat, false))}
 
-          {/* Catégories personnalisées */}
-          {categories.filter(c => !c.is_system).length > 0 && (
+          {draft.filter(c => !c.is_system).length > 0 && (
             <>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mt-4 mb-3">Catégories personnalisées</p>
-              {categories.filter(c => !c.is_system).map(cat => (
-                <div key={cat.id} className="flex items-center gap-3 py-2">
-                  {editing === cat.id ? (
-                    <>
-                      <input type="color" value={editCouleur}
-                        onChange={e => setEditCouleur(e.target.value)}
-                        className="w-8 h-8 rounded border border-gray-200 cursor-pointer flex-shrink-0" />
-                      <input type="text" value={editNom}
-                        onChange={e => setEditNom(e.target.value)}
-                        className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-400" />
-                      <button onClick={() => { updateCategory(cat.id, { nom: editNom, couleur: editCouleur }); setEditing(null); }}
-                        className="text-xs font-bold text-blue-600 flex-shrink-0">OK</button>
-                      <button onClick={() => setEditing(null)} className="text-xs text-gray-400 flex-shrink-0">Annuler</button>
-                    </>
-                  ) : (
-                    <>
-                      <div className="w-4 h-4 rounded flex-shrink-0" style={{ backgroundColor: cat.couleur }} />
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <span className="text-sm text-gray-700 truncate">{cat.nom}</span>
-                        <button
-                          onClick={() => updateCategory(cat.id, { visible: !cat.visible })}
-                          className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors flex-shrink-0 ${cat.visible ? "bg-blue-500" : "bg-gray-200"}`}
-                        >
-                          <span className={`inline-block h-3 w-3 transform rounded-full bg-white shadow transition-transform ${cat.visible ? "translate-x-3.5" : "translate-x-0.5"}`} />
-                        </button>
-                      </div>
-                      <button onClick={() => { setEditing(cat.id); setEditNom(cat.nom); setEditCouleur(cat.couleur); }}
-                        className="text-xs text-gray-400 hover:text-gray-600 flex-shrink-0">Modifier</button>
-                      <button onClick={() => deleteCategory(cat.id)}
-                        className="text-xs text-red-400 hover:text-red-600 flex-shrink-0">Supprimer</button>
-                    </>
-                  )}
-                </div>
-              ))}
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mt-5 mb-3">Catégories personnalisées</p>
+              {draft.filter(c => !c.is_system).map(cat => renderRow(cat, true))}
             </>
           )}
 
-          {/* Ajouter */}
           {showAdd && (
-            <div className="bg-gray-50 rounded-xl border border-gray-200 p-3 mt-3 space-y-2">
+            <div className="bg-gray-50 rounded-xl border border-gray-200 p-3 mt-4 space-y-2">
               <p className="text-xs font-semibold text-gray-700">Nouvelle catégorie</p>
               <div className="flex gap-2">
                 <input type="color" value={newCouleur} onChange={e => setNewCouleur(e.target.value)}
                   className="w-9 h-9 rounded border border-gray-200 cursor-pointer flex-shrink-0" />
                 <input type="text" value={newNom} onChange={e => setNewNom(e.target.value)}
-                  placeholder="Nom de la catégorie"
+                  placeholder="Nom de la catégorie" autoFocus
                   className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
               </div>
               <div className="flex gap-2">
@@ -1204,12 +1208,28 @@ function LegendModal({
           )}
         </div>
 
-        <div className="px-6 py-4 border-t border-gray-100">
-          <button onClick={() => setShowAdd(true)}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-blue-600 border border-blue-200 hover:bg-blue-50 transition-colors">
+        <div className="px-6 py-4 border-t border-gray-100 space-y-2">
+          <button onClick={() => { setShowAdd(true); }}
+            className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-semibold text-blue-600 border border-blue-200 hover:bg-blue-50 transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
             Ajouter une catégorie
           </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleCancel}
+              disabled={!isDirty}
+              className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-gray-600 border border-gray-200 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              Annuler les modifications
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={!isDirty || loading}
+              className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed text-white bg-blue-600 hover:bg-blue-700"
+            >
+              {loading ? "Sauvegarde..." : "Sauvegarder"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
