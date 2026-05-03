@@ -16,7 +16,7 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
-  const admin = createAdminClient();
+  const admin = createAdminClient() as any;
   const { data } = await (admin.from("planning_categories") as any)
     .select("*")
     .eq("artisan_id", user.id)
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
   const body = await request.json();
-  const admin = createAdminClient();
+  const admin = createAdminClient() as any;
 
   if (body.action === "create") {
     const { data } = await (admin.from("planning_categories") as any).insert({
