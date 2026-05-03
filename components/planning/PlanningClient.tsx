@@ -393,7 +393,7 @@ export default function PlanningClient({
       style.userSelect = "";
       style.webkitUserSelect = "";
     };
-  }, [dragging, drawGhost]);
+  }, [dragging]);
 
   // ── Bloquer scroll natif sur la grille ───────────────────────────────────
   useEffect(() => {
