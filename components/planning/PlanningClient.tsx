@@ -212,6 +212,7 @@ export default function PlanningClient({
   const [showSearch, setShowSearch] = useState(false);
   const [miniCalDate, setMiniCalDate] = useState(new Date());
   const scrollRef = useRef<HTMLDivElement>(null);
+  const hasScrolled = useRef(false);
 
   const today = toISO(new Date());
   const weekDates = getWeekDates(currentDate);
@@ -242,12 +243,13 @@ export default function PlanningClient({
     localStorage.setItem("planning_date", currentDate.toISOString());
   }, [currentDate]);
 
-  // Scroll vers l'heure actuelle
+  // Scroll vers l'heure actuelle — une seule fois par vue
   useEffect(() => {
-    if (scrollRef.current && (view === "semaine" || view === "jour")) {
+    if (scrollRef.current && (view === "semaine" || view === "jour") && !hasScrolled.current) {
       const now = new Date();
       const top = minToPx(now.getHours() * 60 + now.getMinutes() - START_HOUR * 60) - 150;
       scrollRef.current.scrollTop = Math.max(0, top);
+      hasScrolled.current = true;
     }
   }, [view]);
 
