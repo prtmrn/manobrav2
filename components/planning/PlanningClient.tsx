@@ -157,17 +157,9 @@ export default function PlanningClient({
   const supabase = createClient();
 
   // State persisté
-  const [view, setView] = useState<View>(() => {
-    if (typeof window !== "undefined") return (localStorage.getItem("planning_view") as View) || "semaine";
-    return "semaine";
-  });
-  const [currentDate, setCurrentDate] = useState(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("planning_date");
-      return saved ? new Date(saved) : new Date();
-    }
-    return new Date();
-  });
+  const [view, setView] = useState<View>("semaine");
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [hydrated, setHydrated] = useState(false);
 
   const [dispos, setDispos] = useState<Dispo[]>(initialDispos);
   const [indispos, setIndispos] = useState<Indispo[]>(initialIndispos);
@@ -178,13 +170,7 @@ export default function PlanningClient({
   const [showCalendarIntegration, setShowCalendarIntegration] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoriesLoaded, setCategoriesLoaded] = useState(false);
-  const [customColors, setCustomColors] = useState<Record<string, string>>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("planning_colors");
-      return saved ? JSON.parse(saved) : {};
-    }
-    return {};
-  });
+  const [customColors, setCustomColors] = useState<Record<string, string>>({});
 
   const DEFAULT_COLORS: Record<string, string> = {
     confirme: "#3b82f6",
@@ -244,14 +230,27 @@ export default function PlanningClient({
       .catch(() => setCategoriesLoaded(true));
   }, []);
 
+  // Hydratation localStorage
+  useEffect(() => {
+    const savedView = localStorage.getItem("planning_view") as View;
+    const savedDate = localStorage.getItem("planning_date");
+    const savedColors = localStorage.getItem("planning_colors");
+    if (savedView) setView(savedView);
+    if (savedDate) setCurrentDate(new Date(savedDate));
+    if (savedColors) setCustomColors(JSON.parse(savedColors));
+    setHydrated(true);
+  }, []);
+
   // Persister vue et date
   useEffect(() => {
+    if (!hydrated) return;
     localStorage.setItem("planning_view", view);
-  }, [view]);
+  }, [view, hydrated]);
 
   useEffect(() => {
+    if (!hydrated) return;
     localStorage.setItem("planning_date", currentDate.toISOString());
-  }, [currentDate]);
+  }, [currentDate, hydrated]);
 
   // Scroll automatique désactivé
 
