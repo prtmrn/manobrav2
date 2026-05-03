@@ -378,10 +378,11 @@ export default function PlanningClient({
   // ── Drag & Drop ───────────────────────────────────────────────────────────
   function pxToTime(px: number): string {
     const totalMin = Math.round(px / HOUR_HEIGHT * 60) + START_HOUR * 60;
-    const clamped = Math.max(START_HOUR * 60, Math.min(END_HOUR * 60 - 30, totalMin));
-    const h = Math.floor(clamped / 60);
-    const m = Math.round((clamped % 60) / 15) * 15;
-    return `${String(h).padStart(2,"0")}:${String(m % 60).padStart(2,"0")}:00`;
+    const clamped = Math.max(START_HOUR * 60, Math.min((END_HOUR - 1) * 60, totalMin));
+    const rounded = Math.round(clamped / 15) * 15;
+    const h = Math.floor(rounded / 60);
+    const m = rounded % 60;
+    return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:00`;
   }
 
   async function handleDrop(ev: CalEvent, newDate: string, newDebut: string) {
@@ -572,10 +573,11 @@ export default function PlanningClient({
                   onClick={(e) => {
                     if (dragging) return;
                     const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-                    const y = e.clientY - rect.top + (scrollRef.current?.scrollTop ?? 0);
+                    const y = e.clientY - rect.top;
                     const totalMin = Math.floor(y / HOUR_HEIGHT) * 60 + START_HOUR * 60;
-                    const h = String(Math.floor(totalMin / 60)).padStart(2, "0");
-                    const m = String(totalMin % 60).padStart(2, "0");
+                    const clamped = Math.max(START_HOUR * 60, Math.min((END_HOUR - 1) * 60, totalMin));
+                    const h = String(Math.floor(clamped / 60)).padStart(2, "0");
+                    const m = String(Math.round((clamped % 60) / 15) * 15 % 60).padStart(2, "0");
                     setCreateModal({ date: iso, heure: `${h}:${m}` });
                   }}
                 >
@@ -647,13 +649,14 @@ export default function PlanningClient({
                           }}>{fmt(ev.heure_debut)}–{fmt(ev.heure_fin)}</div>}
                           {/* Handle resize */}
                           <div
-                            className="absolute bottom-0 left-0 right-0 h-2 cursor-s-resize flex items-center justify-center"
+                            className="absolute bottom-0 left-0 right-0 h-1.5 cursor-s-resize flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
                             onMouseDown={(e) => {
+                              e.preventDefault();
                               e.stopPropagation();
                               setResizing({ ev, startY: e.clientY, startFin: ev.heure_fin });
                             }}
                           >
-                            <div className="w-6 h-0.5 rounded-full bg-current opacity-40" />
+                            <div className="w-8 h-0.5 rounded-full bg-gray-500 opacity-60" />
                           </div>
                         </div>
                       );
