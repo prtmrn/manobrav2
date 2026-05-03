@@ -941,6 +941,7 @@ export default function PlanningClient({
         <CreateEventModal
           date={createModal.date}
           heure={createModal.heure}
+          categories={categories}
           onClose={() => setCreateModal(null)}
           onCreateDispo={(date, heure) => { addQuickSlot(date, heure); setCreateModal(null); }}
           onCreateEvenement={async (ev) => {
