@@ -469,6 +469,7 @@ export default function PlanningClient({
   const drawStartRef = useRef<{ date: string; top: number } | null>(null);
   const drawCurrentRef = useRef<number | null>(null);
   const drawGhostRef = useRef<HTMLDivElement | null>(null);
+  const drawColRef = useRef<{ left: number; width: number } | null>(null);
 
   useEffect(() => {
     function onMouseMove(e: MouseEvent) {
@@ -478,10 +479,12 @@ export default function PlanningClient({
       const y = e.clientY - rect.top + scrollTop;
       drawCurrentRef.current = Math.max(drawStartRef.current.top + minToPx(15), y);
       const distance = drawCurrentRef.current - drawStartRef.current.top;
-      if (distance > minToPx(10) && drawGhostRef.current) {
+      if (distance > minToPx(10) && drawGhostRef.current && drawColRef.current) {
         drawGhostRef.current.style.display = "block";
         drawGhostRef.current.style.top = drawStartRef.current.top + "px";
         drawGhostRef.current.style.height = distance + "px";
+        drawGhostRef.current.style.left = (drawColRef.current.left + 2) + "px";
+        drawGhostRef.current.style.width = (drawColRef.current.width - 4) + "px";
         const label = drawGhostRef.current.querySelector("div");
         if (label) label.textContent = pxToTime(drawStartRef.current.top).slice(0,5) + " – " + pxToTime(drawCurrentRef.current!).slice(0,5);
       }
@@ -671,7 +674,13 @@ export default function PlanningClient({
 
         {/* Grille */}
         <div className="flex-1 overflow-y-auto" ref={scrollRef}>
-          <div ref={weekGridRef} className="flex" style={{ minHeight: `${(END_HOUR - START_HOUR) * HOUR_HEIGHT}px` }}>
+          <div ref={weekGridRef} className="flex relative" style={{ minHeight: `${(END_HOUR - START_HOUR) * HOUR_HEIGHT}px` }}>
+            <div ref={drawGhostRef}
+              className="absolute rounded-lg bg-blue-200/60 border-2 border-blue-400 border-dashed z-20 pointer-events-none"
+              style={{ display: "none", top: 0, height: 0, left: 0, width: 0 }}
+            >
+              <div className="text-[9px] font-bold text-blue-700 px-1 py-0.5" />
+            </div>
             {/* Heures */}
             <div className="w-14 flex-shrink-0 relative">
               {VISIBLE_HOURS.map(h => (
@@ -717,10 +726,17 @@ export default function PlanningClient({
                   onMouseDown={(e) => {
                     if (dragging || resizing || (e.target as HTMLElement).closest("[data-event]")) return;
                     const scrollTop = scrollRef.current?.scrollTop ?? 0;
-                    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-                    const y = e.clientY - rect.top + scrollTop;
+                    const colRect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+                    const gridRect = weekGridRef.current?.getBoundingClientRect();
+                    const y = e.clientY - colRect.top + scrollTop;
                     drawStartRef.current = { date: iso, top: y };
                     drawCurrentRef.current = null;
+                    if (gridRect) {
+                      drawColRef.current = {
+                        left: colRect.left - gridRect.left,
+                        width: colRect.width,
+                      };
+                    }
                   }}
                   onClick={(e) => {
                     if (dragging || drawStartRef.current) return;
@@ -809,14 +825,7 @@ export default function PlanningClient({
                     })
                   )}
 
-                  {dayIdx === 0 && (
-                    <div ref={drawGhostRef}
-                      className="absolute inset-x-0.5 rounded-lg bg-blue-200/60 border-2 border-blue-400 border-dashed z-20 pointer-events-none"
-                      style={{ display: "none", top: 0, height: 0 }}
-                    >
-                      <div className="text-[9px] font-bold text-blue-700 px-1 py-0.5" />
-                    </div>
-                  )}
+
                   {/* Ghost drag */}
                   {dragging && dragOver?.date === iso && (
                     <div className="absolute inset-x-0.5 rounded-lg border-2 border-blue-400 border-dashed bg-blue-50/50 z-20 pointer-events-none"
