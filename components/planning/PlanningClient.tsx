@@ -408,13 +408,7 @@ export default function PlanningClient({
     return () => el.removeEventListener("mousedown", onMD);
   }, []);
 
-  // Bloquer scroll pendant drag/draw
-  useEffect(() => {
-    if (!dragging && !drawStartRef.current) return;
-    const onMM = (e: MouseEvent) => { e.preventDefault(); };
-    window.addEventListener("mousemove", onMM, { passive: false });
-    return () => window.removeEventListener("mousemove", onMM);
-  }, [dragging]);
+  // Scroll non bloqué — géré par le listener non-passif sur weekGridRef
 
   // ── Gestion souris centralisée ───────────────────────────────────────────
   useEffect(() => {
@@ -478,12 +472,19 @@ export default function PlanningClient({
       const scrollTop = scrollRef.current.scrollTop;
       const y = e.clientY - rect.top + scrollTop;
       drawCurrentRef.current = Math.max(drawStartRef.current.top + minToPx(15), y);
+      // Auto-scroll si souris proche du bord bas
+      if (e.clientY > rect.bottom - 40) scrollRef.current.scrollTop += 8;
+      if (e.clientY < rect.top + 40) scrollRef.current.scrollTop -= 8;
       const distance = drawCurrentRef.current - drawStartRef.current.top;
-      if (distance > minToPx(10) && drawGhostRef.current && drawColRef.current) {
+      if (distance > minToPx(10) && drawGhostRef.current && drawColRef.current && weekGridRef.current) {
+        const gridRect = weekGridRef.current.getBoundingClientRect();
+        const scrollTop = scrollRef.current?.scrollTop ?? 0;
+        // Recalculer left relatif à la grille en tenant compte du scroll
+        const colLeft = drawColRef.current.left;
         drawGhostRef.current.style.display = "block";
         drawGhostRef.current.style.top = drawStartRef.current.top + "px";
         drawGhostRef.current.style.height = distance + "px";
-        drawGhostRef.current.style.left = (drawColRef.current.left + 2) + "px";
+        drawGhostRef.current.style.left = (colLeft + 2) + "px";
         drawGhostRef.current.style.width = (drawColRef.current.width - 4) + "px";
         const label = drawGhostRef.current.querySelector("div");
         if (label) label.textContent = pxToTime(drawStartRef.current.top).slice(0,5) + " – " + pxToTime(drawCurrentRef.current!).slice(0,5);
