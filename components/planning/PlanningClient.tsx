@@ -478,16 +478,12 @@ export default function PlanningClient({
       const y = e.clientY - rect.top + scrollTop;
       drawCurrentRef.current = Math.max(drawStartRef.current.top + minToPx(15), y);
       const distance = drawCurrentRef.current - drawStartRef.current.top;
-      if (distance > minToPx(10)) {
-        const savedScroll = scrollRef.current?.scrollTop ?? 0;
-        setDrawGhost({
-          date: drawStartRef.current.date,
-          top: drawStartRef.current.top,
-          height: distance,
-        });
-        requestAnimationFrame(() => {
-          if (scrollRef.current) scrollRef.current.scrollTop = savedScroll;
-        });
+      if (distance > minToPx(10) && drawGhostRef.current) {
+        drawGhostRef.current.style.display = "block";
+        drawGhostRef.current.style.top = drawStartRef.current.top + "px";
+        drawGhostRef.current.style.height = distance + "px";
+        const label = drawGhostRef.current.querySelector("div");
+        if (label) label.textContent = pxToTime(drawStartRef.current.top).slice(0,5) + " – " + pxToTime(drawCurrentRef.current!).slice(0,5);
       }
     }
 
