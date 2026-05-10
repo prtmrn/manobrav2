@@ -382,7 +382,7 @@ export default function PlanningClient({
   // ── Désactiver sélection texte pendant drag/draw ─────────────────────────
   useEffect(() => {
     const style = document.body.style;
-    if (dragging || drawGhost) {
+    if (dragging) {
       style.userSelect = "none";
       style.webkitUserSelect = "none";
     } else {
@@ -468,7 +468,7 @@ export default function PlanningClient({
   // ── Drag to create ────────────────────────────────────────────────────────
   const drawStartRef = useRef<{ date: string; top: number } | null>(null);
   const drawCurrentRef = useRef<number | null>(null);
-  const [drawGhost, setDrawGhost] = useState<{ date: string; top: number; height: number } | null>(null);
+  const drawGhostRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     function onMouseMove(e: MouseEvent) {
@@ -510,7 +510,7 @@ export default function PlanningClient({
       }
       drawStartRef.current = null;
       drawCurrentRef.current = null;
-      setDrawGhost(null);
+      if (drawGhostRef.current) drawGhostRef.current.style.display = "none";
     }
     window.addEventListener("mousemove", onMMPos);
 
@@ -813,14 +813,12 @@ export default function PlanningClient({
                     })
                   )}
 
-                  {/* Draw to create */}
-                  {drawGhost?.date === iso && (
-                    <div className="absolute inset-x-0.5 rounded-lg bg-blue-200/60 border-2 border-blue-400 border-dashed z-20 pointer-events-none"
-                      style={{ top: `${drawGhost.top}px`, height: `${drawGhost.height}px` }}
+                  {dayIdx === 0 && (
+                    <div ref={drawGhostRef}
+                      className="absolute inset-x-0.5 rounded-lg bg-blue-200/60 border-2 border-blue-400 border-dashed z-20 pointer-events-none"
+                      style={{ display: "none", top: 0, height: 0 }}
                     >
-                      <div className="text-[9px] font-bold text-blue-700 px-1 py-0.5">
-                        {pxToTime(drawGhost.top).slice(0,5)} – {pxToTime(drawGhost.top + drawGhost.height).slice(0,5)}
-                      </div>
+                      <div className="text-[9px] font-bold text-blue-700 px-1 py-0.5" />
                     </div>
                   )}
                   {/* Ghost drag */}
@@ -1086,7 +1084,7 @@ export default function PlanningClient({
   // RENDU PRINCIPAL
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] bg-white" style={{ userSelect: drawGhost || dragging ? "none" : "auto" }}>
+    <div className="flex flex-col h-[calc(100vh-4rem)] bg-white" style={{ userSelect: dragging ? "none" : "auto" }}>
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold border ${
