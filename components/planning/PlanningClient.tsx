@@ -479,10 +479,14 @@ export default function PlanningClient({
       drawCurrentRef.current = Math.max(drawStartRef.current.top + minToPx(15), y);
       const distance = drawCurrentRef.current - drawStartRef.current.top;
       if (distance > minToPx(10)) {
+        const savedScroll = scrollRef.current?.scrollTop ?? 0;
         setDrawGhost({
           date: drawStartRef.current.date,
           top: drawStartRef.current.top,
           height: distance,
+        });
+        requestAnimationFrame(() => {
+          if (scrollRef.current) scrollRef.current.scrollTop = savedScroll;
         });
       }
     }
