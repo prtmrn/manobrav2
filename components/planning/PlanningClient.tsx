@@ -158,7 +158,7 @@ export default function PlanningClient({
 
   // State persisté
   const [view, setView] = useState<View>("semaine");
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [currentDate, setCurrentDate] = useState<Date>(new Date(2026, 0, 1));
   const [hydrated, setHydrated] = useState(false);
 
   const [dispos, setDispos] = useState<Dispo[]>(initialDispos);
