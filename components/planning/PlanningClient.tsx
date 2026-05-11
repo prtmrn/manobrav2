@@ -496,19 +496,15 @@ export default function PlanningClient({
     function onMouseUp(e: MouseEvent) {
       const ds = drawStartRef.current;
       const dc = drawCurrentRef.current;
-      console.log("mouseup draw", { ds, dc });
       if (ds) {
         savedScrollTop.current = scrollRef.current?.scrollTop ?? 0;
         const dragDistance = dc ? Math.abs(dc - ds.top) : 0;
-        console.log("dragDistance", dragDistance, "minToPx(14)", minToPx(14));
         if (dragDistance > minToPx(14) && dc) {
           const debut = pxToTime(ds.top);
           const fin = pxToTime(dc);
-          console.log("opening modal with", debut, fin);
           setCreateModal({ date: ds.date, heure: debut.slice(0,5), heureFin: fin.slice(0,5), x: e.clientX, y: e.clientY } as any);
         } else {
           const debut = pxToTime(ds.top);
-          console.log("opening modal simple click", debut);
           setCreateModal({ date: ds.date, heure: debut.slice(0,5), x: e.clientX, y: e.clientY } as any);
         }
       }
