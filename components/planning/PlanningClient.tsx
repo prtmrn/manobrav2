@@ -624,6 +624,9 @@ export default function PlanningClient({
       if (typeof window !== "undefined" && window.innerWidth < 1024) {
         return currentDate.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" });
       }
+      if (typeof window !== "undefined" && window.innerWidth < 1024) {
+        return currentDate.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" });
+      }
       return currentDate.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
     }
     if (view === "semaine") {
