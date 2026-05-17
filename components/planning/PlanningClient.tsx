@@ -461,7 +461,7 @@ export default function PlanningClient({
   }, [dragging, dragOver, resizing]);
 
   // ── Drag to create ────────────────────────────────────────────────────────
-  const drawStartRef = useRef<{ date: string; top: number } | null>(null);
+  const drawStartRef = useRef<{ date: string; top: number; topViewport: number } | null>(null);
   const drawCurrentRef = useRef<number | null>(null);
   const drawGhostRef = useRef<HTMLDivElement | null>(null);
   const drawColRef = useRef<{ left: number; width: number } | null>(null);
@@ -471,22 +471,19 @@ export default function PlanningClient({
       if (!drawStartRef.current || !scrollRef.current) return;
       const rect = scrollRef.current.getBoundingClientRect();
       const scrollTop = scrollRef.current.scrollTop;
-      const y = e.clientY - rect.top + scrollTop;
-      drawCurrentRef.current = Math.max(drawStartRef.current.top + minToPx(15), y);
+      const yAbsolute = e.clientY - rect.top + scrollTop;
+      drawCurrentRef.current = Math.max(drawStartRef.current.top + minToPx(15), yAbsolute);
       // Auto-scroll si souris proche du bord bas
       if (e.clientY > rect.bottom - 40) scrollRef.current.scrollTop += 8;
       if (e.clientY < rect.top + 40) scrollRef.current.scrollTop -= 8;
       const distance = drawCurrentRef.current - drawStartRef.current.top;
       if (distance > minToPx(10) && drawGhostRef.current && drawColRef.current && scrollRef.current) {
-        console.log("ghost", { distance, ghost: !!drawGhostRef.current, col: drawColRef.current });
         const scrollTop = scrollRef.current.scrollTop;
         const scrollRect = scrollRef.current.getBoundingClientRect();
-        // Position viewport du haut du ghost
         const topViewport = drawStartRef.current.top - scrollTop + scrollRect.top;
-        const heightPxVal = distance;
         drawGhostRef.current.style.display = "block";
         drawGhostRef.current.style.top = topViewport + "px";
-        drawGhostRef.current.style.height = heightPxVal + "px";
+        drawGhostRef.current.style.height = distance + "px";
         drawGhostRef.current.style.left = (drawColRef.current.left + 2) + "px";
         drawGhostRef.current.style.width = (drawColRef.current.width - 4) + "px";
         const label = drawGhostRef.current.querySelector("div");
