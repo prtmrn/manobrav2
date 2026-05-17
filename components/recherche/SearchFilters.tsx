@@ -262,7 +262,6 @@ export default function SearchFilters({
               <span className="hidden sm:inline">Carte</span>
             </button>
           </div>
-          </div>
         </div>
       </div>
 
