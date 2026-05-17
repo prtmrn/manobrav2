@@ -439,7 +439,7 @@ export default async function artisanPage({ params }: PageProps) {
           {/* ════════════════════════════════════════════════════════════════
               COLONNE PRINCIPALE (2/3)
           ════════════════════════════════════════════════════════════════ */}
-          <div className="order-2 lg:order-1 lg:col-span-2 space-y-5">
+          <div className="order-1 lg:col-span-2 space-y-5">
 
             {/* ── Hero : Profil ──────────────────────────────────────────── */}
             <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -689,7 +689,7 @@ export default async function artisanPage({ params }: PageProps) {
           {/* ════════════════════════════════════════════════════════════════
               SIDEBAR (1/3) | sticky sur desktop
           ════════════════════════════════════════════════════════════════ */}
-          <aside className="order-1 lg:order-2 mt-0 lg:mt-0 space-y-4 lg:sticky lg:top-[72px]">
+          <aside className="hidden lg:block order-1 lg:order-2 mt-0 space-y-4 lg:sticky lg:top-[72px]">
 
             {/* ── CTA Réservation ───────────────────────────────────────── */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
