@@ -445,14 +445,14 @@ export default async function artisanPage({ params }: PageProps) {
             <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               {/* Bandeau coloré */}
               <div
-                className="h-12 lg:h-20 w-full"
+                className="hidden lg:block h-20 w-full"
                 style={{
                   background: `linear-gradient(135deg, ${config.color}25 0%, ${config.color}55 100%)`,
                 }}
               />
 
               {/* ── Header mobile compact ─────────────────────────────── */}
-              <div className="lg:hidden px-4 pb-4 -mt-8">
+              <div className="lg:hidden px-4 py-4">
                 <div className="flex items-center gap-3">
                   {/* Photo */}
                   {artisan.photo_url ? (
