@@ -478,6 +478,7 @@ export default function PlanningClient({
       if (e.clientY < rect.top + 40) scrollRef.current.scrollTop -= 8;
       const distance = drawCurrentRef.current - drawStartRef.current.top;
       if (distance > minToPx(10) && drawGhostRef.current && drawColRef.current && scrollRef.current) {
+        console.log("ghost", { distance, ghost: !!drawGhostRef.current, col: drawColRef.current });
         const scrollTop = scrollRef.current.scrollTop;
         const scrollRect = scrollRef.current.getBoundingClientRect();
         // Position viewport du haut du ghost
