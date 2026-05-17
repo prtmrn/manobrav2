@@ -445,14 +445,14 @@ export default async function artisanPage({ params }: PageProps) {
             <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               {/* Bandeau coloré */}
               <div
-                className="h-20 w-full"
+                className="h-12 lg:h-20 w-full"
                 style={{
                   background: `linear-gradient(135deg, ${config.color}25 0%, ${config.color}55 100%)`,
                 }}
               />
 
               <div className="px-6 pb-6 -mt-10">
-                <div className="flex items-end justify-between gap-4">
+                <div className="flex items-end justify-between gap-2 lg:gap-4">
                   {/* Photo */}
                   {artisan.photo_url ? (
                     <Image
@@ -460,10 +460,10 @@ export default async function artisanPage({ params }: PageProps) {
                       alt={fullName}
                       fill
                       sizes="(max-width: 768px) 100vw, 400px"
-                      className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg flex-shrink-0"
+                      className="w-14 h-14 lg:w-20 lg:h-20 rounded-2xl object-cover border-4 border-white shadow-lg flex-shrink-0"
                     />) : (
                     <div
-                      className="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-2xl font-black border-4 border-white shadow-lg flex-shrink-0"
+                      className="w-14 h-14 lg:w-20 lg:h-20 rounded-2xl flex items-center justify-center text-white text-xl lg:text-2xl font-black border-4 border-white shadow-lg flex-shrink-0"
                       style={{ backgroundColor: config.color }}
                     >
                       {(artisan.prenom?.[0] ?? "?").toUpperCase()}
@@ -515,7 +515,7 @@ export default async function artisanPage({ params }: PageProps) {
 
                 {/* Nom + Métier */}
                 <div className="mt-3">
-                  <h1 className="text-2xl font-black text-gray-900 leading-tight">
+                  <h1 className="text-lg lg:text-2xl font-black text-gray-900 leading-tight">
                     {fullName}
                   </h1>
                   <div
@@ -592,7 +592,7 @@ export default async function artisanPage({ params }: PageProps) {
 
                 {/* Bouton Réserver visible sur mobile */}
                 <div className="mt-5 lg:hidden">
-                  <ReserveButton artisan_id={id} className="w-full" />
+                  <ReserveButton artisan_id={id} className="w-full hidden lg:block" />
                   <p className="text-center text-xs text-gray-400 mt-2">
                     Gratuit, sans engagement
                   </p>
@@ -695,7 +695,7 @@ export default async function artisanPage({ params }: PageProps) {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
               {/* Prix affiché */}
               {minPrix !== null && minPrix > 0 && (
-                <div className="text-center mb-4">
+                <div className="hidden lg:block text-center mb-4">
                   <p className="text-xs text-gray-400 mb-0.5">À partir de</p>
                   <p className="text-3xl font-black text-gray-900">
                     {formatPrix(minPrix)}
@@ -706,7 +706,7 @@ export default async function artisanPage({ params }: PageProps) {
                 </div>
               )}
 
-              <ReserveButton artisan_id={id} className="w-full" />
+              <ReserveButton artisan_id={id} className="w-full hidden lg:block" />
 
 
 
@@ -769,7 +769,7 @@ export default async function artisanPage({ params }: PageProps) {
               </dl>
               {/* Disponibilités */}
               {disponibilites.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="hidden lg:block mt-4 pt-4 border-t border-gray-100">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Disponibilités</p>
                   <div className="space-y-1.5">
                     {disponibilites.map((d, i) => {
