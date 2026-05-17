@@ -743,8 +743,8 @@ export default function PlanningClient({
                     const colRect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
                     const gridRect = weekGridRef.current?.getBoundingClientRect();
                     const y = e.clientY - colRect.top + scrollTop;
-                    drawStartRef.current = { date: iso, top: y };
-                    drawCurrentRef.current = null;
+                    drawStartRef.current = { date: iso, top: y, topViewport: e.clientY - colRect.top };
+                    drawCurrentRef.current = y;
                     drawColRef.current = {
                       left: colRect.left,
                       width: colRect.width,
