@@ -207,7 +207,7 @@ export default function SearchFilters({
     <div className={`transition-opacity duration-200 ${isPending ? "opacity-50" : ""}`}>
 
       {/* ── Ligne adresse ─────────────────────────────────────────────────── */}
-      <div className="flex gap-2 mb-2">
+      <div className="flex gap-2 mb-2 items-center">
         <div className="flex-1 min-w-0 relative">
           <AddressAutocomplete
             value={adresseLabel}
@@ -261,6 +261,7 @@ export default function SearchFilters({
               </svg>
               <span className="hidden sm:inline">Carte</span>
             </button>
+          </div>
           </div>
         </div>
       </div>
@@ -427,7 +428,7 @@ export default function SearchFilters({
         <select
           value={metier}
           onChange={(e) => { setMetier(e.target.value); setServiceTag(""); stateRef.current.serviceTag = ""; applyFilters({ metier: e.target.value, serviceTag: "" }); }}
-          className="flex-1 min-w-0 px-2 py-2 rounded-lg border border-gray-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 truncate"
+          className="flex-1 min-w-0 px-2 py-2 rounded-lg border border-gray-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="">Métier</option>
           {METIER_LIST.map((m) => (
@@ -437,16 +438,29 @@ export default function SearchFilters({
         <select
           value={serviceTag}
           onChange={(e) => { setServiceTag(e.target.value); stateRef.current.serviceTag = e.target.value; applyFilters({ serviceTag: e.target.value }); }}
-          className="flex-1 min-w-0 px-2 py-2 rounded-lg border border-gray-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 truncate"
+          className="flex-1 min-w-0 px-2 py-2 rounded-lg border border-gray-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="">Service</option>
-          {SERVICES_STANDARDISES.filter(sv => !metier || sv.metier === metier).map((svc) => (
-            <option key={svc.id} value={svc.id}>{svc.label}</option>
-          ))}
+          {metier
+            ? SERVICES_STANDARDISES.filter(sv => sv.metier === metier).map(svc => (
+                <option key={svc.id} value={svc.id}>{svc.label}</option>
+              ))
+            : METIER_LIST.map(m => {
+                const svcs = SERVICES_STANDARDISES.filter(sv => sv.metier === m);
+                if (!svcs.length) return null;
+                return (
+                  <optgroup key={m} label={m}>
+                    {svcs.map(svc => (
+                      <option key={svc.id} value={svc.id}>{svc.label}</option>
+                    ))}
+                  </optgroup>
+                );
+              })
+          }
         </select>
         <button
-          onClick={() => setShowTri(prev => !prev)}
-          className="flex-shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-600"
+          onClick={() => setShowTri(v => !v)}
+          className={`flex-shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-lg border text-xs font-medium transition-colors ${showTri ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-600"}`}
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6h18M6 12h12M9 18h6" />
