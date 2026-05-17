@@ -451,26 +451,74 @@ export default async function artisanPage({ params }: PageProps) {
                 }}
               />
 
-              <div className="px-6 pb-6 -mt-10">
-                <div className="flex items-end justify-between gap-2 lg:gap-4">
+              {/* ── Header mobile compact ─────────────────────────────── */}
+              <div className="lg:hidden px-4 pb-4 -mt-8">
+                <div className="flex items-center gap-3">
                   {/* Photo */}
                   {artisan.photo_url ? (
                     <Image
                       src={artisan.photo_url}
                       alt={fullName}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 400px"
-                      className="w-14 h-14 lg:w-20 lg:h-20 rounded-2xl object-cover border-4 border-white shadow-lg flex-shrink-0"
-                    />) : (
+                      width={56}
+                      height={56}
+                      className="w-14 h-14 rounded-xl object-cover border-2 border-white shadow-md flex-shrink-0"
+                    />
+                  ) : (
                     <div
-                      className="w-14 h-14 lg:w-20 lg:h-20 rounded-2xl flex items-center justify-center text-white text-xl lg:text-2xl font-black border-4 border-white shadow-lg flex-shrink-0"
+                      className="w-14 h-14 rounded-xl flex items-center justify-center text-white text-xl font-black border-2 border-white shadow-md flex-shrink-0"
                       style={{ backgroundColor: config.color }}
                     >
                       {(artisan.prenom?.[0] ?? "?").toUpperCase()}
                     </div>
                   )}
+                  {/* Infos */}
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-base font-black text-gray-900 leading-tight truncate">{fullName}</h1>
+                    <p className="text-xs font-medium truncate" style={{ color: config.color }}>
+                      {Array.isArray(artisan.metier) ? artisan.metier.join(" · ") : (artisan.metier ?? "artisan")}
+                      {location ? ` · ${location}` : ""}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      {artisan.nombre_avis > 0 && (
+                        <div className="flex items-center gap-1">
+                          <StarRow note={artisan.note_moyenne} size="sm" />
+                          <span className="text-xs font-bold text-gray-800">{artisan.note_moyenne.toFixed(1)}</span>
+                          <span className="text-xs text-gray-400">({artisan.nombre_avis})</span>
+                        </div>
+                      )}
+                      {artisan.siret && (
+                        <span className="flex items-center gap-0.5 text-[10px] text-green-600 font-medium">
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                          </svg>
+                          SIRET vérifié
+                        </span>
+                      )}
+                      {urgenceActif && (
+                        <span className="flex items-center gap-0.5 text-[10px] text-red-600 font-bold animate-pulse">
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                          </svg>
+                          Disponible maintenant
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-                  {/* Badges */}
+              {/* ── Header desktop (inchangé) ─────────────────────────────── */}
+              <div className="hidden lg:block px-6 pb-6 -mt-10">
+                <div className="flex items-end justify-between gap-4">
+                  {artisan.photo_url ? (
+                    <Image src={artisan.photo_url} alt={fullName} width={80} height={80}
+                      className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg flex-shrink-0" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-2xl font-black border-4 border-white shadow-lg flex-shrink-0"
+                      style={{ backgroundColor: config.color }}>
+                      {(artisan.prenom?.[0] ?? "?").toUpperCase()}
+                    </div>
+                  )}
                   <div className="flex flex-wrap gap-2 mb-1">
                     {urgenceActif && (
                       <span className="inline-flex items-center gap-1 bg-red-50 text-red-700 border border-red-200 text-xs font-bold px-2.5 py-1 rounded-full animate-pulse">
@@ -480,103 +528,38 @@ export default async function artisanPage({ params }: PageProps) {
                         Disponible maintenant{urgenceTimeLeft ? ` · encore ${urgenceTimeLeft}` : ""}
                       </span>
                     )}
-                    {(artisan as { plan_actif?: string }).plan_actif === "pro" && (
-                      <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold px-2.5 py-1 rounded-full">
-                        <svg
-                          className="w-3.5 h-3.5"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        Vérifié Pro
-                      </span>
-                    )}
-                    <span
-                      className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border ${
-                        artisan.actif
-                          ? "bg-green-50 text-green-700 border-green-200"
-                          : "bg-gray-100 text-gray-500 border-gray-200"
-                      }`}
-                    >
-                      <span
-                        className={`w-1.5 h-1.5 rounded-full ${
-                          artisan.actif ? "bg-green-500" : "bg-gray-400"
-                        }`}
-                      />
+                    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border ${artisan.actif ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-100 text-gray-500 border-gray-200"}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${artisan.actif ? "bg-green-500" : "bg-gray-400"}`} />
                       {artisan.actif ? "Disponible" : "Indisponible"}
                     </span>
                   </div>
                 </div>
-
-                {/* Nom + Métier */}
                 <div className="mt-3">
-                  <h1 className="text-lg lg:text-2xl font-black text-gray-900 leading-tight">
-                    {fullName}
-                  </h1>
-                  <div
-                    className="inline-flex items-center gap-1.5 mt-1.5 text-sm font-semibold px-2.5 py-1 rounded-full"
-                    style={{
-                      backgroundColor: `${config.color}18`,
-                      color: config.color,
-                    }}
-                  >
+                  <h1 className="text-2xl font-black text-gray-900 leading-tight">{fullName}</h1>
+                  <div className="inline-flex items-center gap-1.5 mt-1.5 text-sm font-semibold px-2.5 py-1 rounded-full"
+                    style={{ backgroundColor: `${config.color}18`, color: config.color }}>
                     <span>{Array.isArray(artisan.metier) ? artisan.metier.join(" · ") : (artisan.metier ?? "artisan")}</span>
                   </div>
                 </div>
-
-                {/* Note + localisation */}
                 <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-gray-600">
                   {artisan.nombre_avis > 0 ? (
                     <div className="flex items-center gap-1.5">
                       <StarRow note={artisan.note_moyenne} size="sm" />
-                      <span className="font-semibold text-gray-900">
-                        {artisan.note_moyenne.toFixed(1)}
-                      </span>
-                      <span className="text-gray-400">
-                        ({artisan.nombre_avis} avis)
-                      </span>
+                      <span className="font-semibold text-gray-900">{artisan.note_moyenne.toFixed(1)}</span>
+                      <span className="text-gray-400">({artisan.nombre_avis} avis)</span>
                     </div>
-                  ) : (
-                    <span className="text-gray-400 italic text-xs">
-                      Aucun avis pour le moment
-                    </span>
-                  )}
-
+                  ) : <span className="text-gray-400 italic text-xs">Aucun avis pour le moment</span>}
                   {location && (
                     <div className="flex items-center gap-1 text-gray-500">
-                      <svg
-                        className="w-4 h-4 text-gray-400 flex-shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                          clipRule="evenodd"
-                        />
+                      <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                       </svg>
                       {location}
                     </div>
                   )}
-
                   <div className="flex items-center gap-1 text-gray-400 text-xs">
-                    <svg
-                      className="w-3.5 h-3.5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     Membre depuis {formatDateMoisAnnee(artisan.created_at)}
                   </div>
@@ -588,14 +571,6 @@ export default async function artisanPage({ params }: PageProps) {
                       SIRET vérifié
                     </div>
                   )}
-                </div>
-
-                {/* Bouton Réserver visible sur mobile */}
-                <div className="mt-5 lg:hidden">
-                  <ReserveButton artisan_id={id} className="w-full hidden lg:block" />
-                  <p className="text-center text-xs text-gray-400 mt-2">
-                    Gratuit, sans engagement
-                  </p>
                 </div>
               </div>
             </section>
