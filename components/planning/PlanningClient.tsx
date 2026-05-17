@@ -158,7 +158,7 @@ export default function PlanningClient({
 
   // State persisté
   const [view, setView] = useState<View>("semaine");
-  const [currentDate, setCurrentDate] = useState<Date>(new Date(2026, 0, 1));
+  const [currentDate, setCurrentDate] = useState<Date>(new Date(2026, 4, 17));
   const [hydrated, setHydrated] = useState(false);
 
   const [dispos, setDispos] = useState<Dispo[]>(initialDispos);
@@ -238,6 +238,7 @@ export default function PlanningClient({
     const savedColors = localStorage.getItem("planning_colors");
     if (savedView) setView(savedView);
     if (savedDate) setCurrentDate(new Date(savedDate));
+    else setCurrentDate(new Date());
     if (savedColors) setCustomColors(JSON.parse(savedColors));
     setHydrated(true);
   }, []);
@@ -497,20 +498,33 @@ export default function PlanningClient({
       const ds = drawStartRef.current;
       const dc = drawCurrentRef.current;
       if (ds) {
-        savedScrollTop.current = scrollRef.current?.scrollTop ?? 0;
+        const currentScroll = scrollRef.current?.scrollTop ?? 0;
+        savedScrollTop.current = currentScroll;
         const dragDistance = dc ? Math.abs(dc - ds.top) : 0;
+        let modal: any;
         if (dragDistance > minToPx(14) && dc) {
           const debut = pxToTime(ds.top);
           const fin = pxToTime(dc);
-          setCreateModal({ date: ds.date, heure: debut.slice(0,5), heureFin: fin.slice(0,5), x: e.clientX, y: e.clientY } as any);
+          modal = { date: ds.date, heure: debut.slice(0,5), heureFin: fin.slice(0,5), x: e.clientX, y: e.clientY };
         } else {
           const debut = pxToTime(ds.top);
-          setCreateModal({ date: ds.date, heure: debut.slice(0,5), x: e.clientX, y: e.clientY } as any);
+          modal = { date: ds.date, heure: debut.slice(0,5), x: e.clientX, y: e.clientY };
         }
+        drawStartRef.current = null;
+        drawCurrentRef.current = null;
+        if (drawGhostRef.current) drawGhostRef.current.style.display = "none";
+        // Ouvrir modal puis restaurer scroll
+        setCreateModal(modal);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (scrollRef.current) scrollRef.current.scrollTop = currentScroll;
+          });
+        });
+      } else {
+        drawStartRef.current = null;
+        drawCurrentRef.current = null;
+        if (drawGhostRef.current) drawGhostRef.current.style.display = "none";
       }
-      drawStartRef.current = null;
-      drawCurrentRef.current = null;
-      if (drawGhostRef.current) drawGhostRef.current.style.display = "none";
     }
     window.addEventListener("mousemove", onMMPos);
 
