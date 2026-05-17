@@ -411,6 +411,12 @@ export default function PlanningClient({
 
   // Scroll non bloqué — géré par le listener non-passif sur weekGridRef
 
+  // ── Refs draw to create ──────────────────────────────────────────────────
+  const drawStartRef = useRef<{ date: string; top: number; topViewport: number } | null>(null);
+  const drawCurrentRef = useRef<number | null>(null);
+  const drawGhostRef = useRef<HTMLDivElement | null>(null);
+  const drawColRef = useRef<{ left: number; width: number } | null>(null);
+
   // ── Refs pour accès sans dépendances dans useEffect ─────────────────────
   const draggingRef = useRef<typeof dragging>(null);
   const dragOverRef = useRef<typeof dragOver>(null);
