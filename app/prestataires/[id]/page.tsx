@@ -435,11 +435,11 @@ export default async function artisanPage({ params }: PageProps) {
       </nav>
 
       <div className="max-w-6xl mx-auto px-4 py-6 md:py-10">
-        <div className="lg:grid lg:grid-cols-3 lg:gap-8 lg:items-start">
+        <div className="flex flex-col lg:grid lg:grid-cols-3 lg:gap-8 lg:items-start">
           {/* ════════════════════════════════════════════════════════════════
               COLONNE PRINCIPALE (2/3)
           ════════════════════════════════════════════════════════════════ */}
-          <div className="lg:col-span-2 space-y-5">
+          <div className="order-2 lg:order-1 lg:col-span-2 space-y-5">
 
             {/* ── Hero : Profil ──────────────────────────────────────────── */}
             <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -689,7 +689,7 @@ export default async function artisanPage({ params }: PageProps) {
           {/* ════════════════════════════════════════════════════════════════
               SIDEBAR (1/3) | sticky sur desktop
           ════════════════════════════════════════════════════════════════ */}
-          <aside className="mt-5 lg:mt-0 space-y-4 lg:sticky lg:top-[72px]">
+          <aside className="order-1 lg:order-2 mt-0 lg:mt-0 space-y-4 lg:sticky lg:top-[72px]">
 
             {/* ── CTA Réservation ───────────────────────────────────────── */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
