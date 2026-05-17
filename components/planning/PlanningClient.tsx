@@ -477,15 +477,16 @@ export default function PlanningClient({
       if (e.clientY > rect.bottom - 40) scrollRef.current.scrollTop += 8;
       if (e.clientY < rect.top + 40) scrollRef.current.scrollTop -= 8;
       const distance = drawCurrentRef.current - drawStartRef.current.top;
-      if (distance > minToPx(10) && drawGhostRef.current && drawColRef.current && weekGridRef.current) {
-        const gridRect = weekGridRef.current.getBoundingClientRect();
-        const scrollTop = scrollRef.current?.scrollTop ?? 0;
-        // Recalculer left relatif à la grille en tenant compte du scroll
-        const colLeft = drawColRef.current.left;
+      if (distance > minToPx(10) && drawGhostRef.current && drawColRef.current && scrollRef.current) {
+        const scrollTop = scrollRef.current.scrollTop;
+        const scrollRect = scrollRef.current.getBoundingClientRect();
+        // Position viewport du haut du ghost
+        const topViewport = drawStartRef.current.top - scrollTop + scrollRect.top;
+        const heightPxVal = distance;
         drawGhostRef.current.style.display = "block";
-        drawGhostRef.current.style.top = drawStartRef.current.top + "px";
-        drawGhostRef.current.style.height = distance + "px";
-        drawGhostRef.current.style.left = (colLeft + 2) + "px";
+        drawGhostRef.current.style.top = topViewport + "px";
+        drawGhostRef.current.style.height = heightPxVal + "px";
+        drawGhostRef.current.style.left = (drawColRef.current.left + scrollRect.left + 56 + 2) + "px";
         drawGhostRef.current.style.width = (drawColRef.current.width - 4) + "px";
         const label = drawGhostRef.current.querySelector("div");
         if (label) label.textContent = pxToTime(drawStartRef.current.top).slice(0,5) + " – " + pxToTime(drawCurrentRef.current!).slice(0,5);
@@ -691,7 +692,7 @@ export default function PlanningClient({
         <div className="flex-1 overflow-y-auto" ref={scrollRef}>
           <div ref={weekGridRef} className="flex relative" style={{ minHeight: `${(END_HOUR - START_HOUR) * HOUR_HEIGHT}px` }}>
             <div ref={drawGhostRef}
-              className="absolute rounded-lg bg-blue-200/60 border-2 border-blue-400 border-dashed z-20 pointer-events-none"
+              className="fixed rounded-lg bg-blue-200/60 border-2 border-blue-400 border-dashed z-30 pointer-events-none"
               style={{ display: "none", top: 0, height: 0, left: 0, width: 0 }}
             >
               <div className="text-[9px] font-bold text-blue-700 px-1 py-0.5" />
@@ -1220,7 +1221,15 @@ export default function PlanningClient({
           x={createModal.x}
           y={createModal.y}
           categories={categories}
-          onClose={() => setCreateModal(null)}
+          onClose={() => {
+            const scroll = scrollRef.current?.scrollTop ?? 0;
+            setCreateModal(null);
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                if (scrollRef.current) scrollRef.current.scrollTop = scroll;
+              });
+            });
+          }}
           onCreateDispo={(date, heure) => { addQuickSlot(date, heure); setCreateModal(null); }}
           onCreateEvenement={async (ev) => {
             const res = await fetch("/api/planning/evenements", {
