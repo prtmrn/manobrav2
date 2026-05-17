@@ -223,7 +223,7 @@ export default function DashboardShell({
           </button>
 
           {/* Logo */}
-          <Link href="/dashboard" className="flex items-center gap-2.5 flex-shrink-0">
+          <Link href="/dashboard" onClick={() => setSidebarOpen(false)} className="flex items-center gap-2.5 flex-shrink-0">
             <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
               <span className="text-white text-sm font-bold leading-none">M</span>
             </div>
