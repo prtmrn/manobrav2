@@ -231,6 +231,14 @@ export default function PlanningClient({
       .catch(() => setCategoriesLoaded(true));
   }, []);
 
+  // Vue jour par défaut sur mobile
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      const savedView = localStorage.getItem("planning_view") as View;
+      if (!savedView) setView("jour");
+    }
+  }, []);
+
   // Hydratation localStorage
   useEffect(() => {
     const savedView = localStorage.getItem("planning_view") as View;
@@ -1150,6 +1158,7 @@ export default function PlanningClient({
         {/* Sélecteur vue */}
         <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden text-xs font-semibold">
           {(["jour", "semaine", "mois", "liste"] as View[]).map(v => (
+            // Sur mobile, masquer mois et liste
             <button key={v} onClick={() => setView(v)}
               className={`px-3 py-1.5 transition-colors capitalize ${view === v ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-50"}`}>
               {v === "liste" ? "Planning" : v.charAt(0).toUpperCase() + v.slice(1)}
@@ -1160,7 +1169,8 @@ export default function PlanningClient({
         {/* Intégrer un calendrier */}
         <button
           onClick={() => setShowCalendarIntegration(true)}
-          className={`flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border transition-colors ${
+          // masqué sur mobile
+          className={`hidden lg:flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border transition-colors ${
             googleCalendarConnected
               ? "text-green-700 bg-green-50 border-green-200"
               : "text-gray-500 border-gray-200 hover:bg-gray-50"
@@ -1180,7 +1190,7 @@ export default function PlanningClient({
 
       {/* ── Corps : mini-cal + vue ─────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
-        <MiniCal />
+        <div className="hidden lg:block"><MiniCal /></div>
         <div className="flex flex-col flex-1 overflow-hidden">
           {view === "semaine" && <ViewSemaine />}
           {view === "jour" && <ViewJour />}
