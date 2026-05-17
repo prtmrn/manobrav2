@@ -621,6 +621,9 @@ export default function PlanningClient({
   // ── Titre header ─────────────────────────────────────────────────────────
   const headerTitle = (() => {
     if (view === "jour") {
+      if (typeof window !== "undefined" && window.innerWidth < 1024) {
+        return currentDate.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" });
+      }
       return currentDate.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
     }
     if (view === "semaine") {
@@ -1156,7 +1159,7 @@ export default function PlanningClient({
           {(["jour", "semaine", "mois", "liste"] as View[]).map(v => (
             // Sur mobile, masquer mois et liste
             <button key={v} onClick={() => setView(v)}
-              className={`px-3 py-1.5 transition-colors capitalize ${view === v ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-50"}`}>
+              className={`px-3 py-1.5 transition-colors capitalize ${view === v ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-50"} ${(v === "mois" || v === "liste") ? "hidden lg:inline-flex" : ""}`}>
               {v === "liste" ? "Planning" : v.charAt(0).toUpperCase() + v.slice(1)}
             </button>
           ))}
