@@ -411,6 +411,14 @@ export default function PlanningClient({
 
   // Scroll non bloqué — géré par le listener non-passif sur weekGridRef
 
+  // ── Refs pour accès sans dépendances dans useEffect ─────────────────────
+  const draggingRef = useRef<typeof dragging>(null);
+  const dragOverRef = useRef<typeof dragOver>(null);
+  const resizingRef = useRef<typeof resizing>(null);
+  useEffect(() => { draggingRef.current = dragging; }, [dragging]);
+  useEffect(() => { dragOverRef.current = dragOver; }, [dragOver]);
+  useEffect(() => { resizingRef.current = resizing; }, [resizing]);
+
   // ── Gestion souris unifiée ───────────────────────────────────────────────
   useEffect(() => {
     function onMouseMove(e: MouseEvent) {
