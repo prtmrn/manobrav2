@@ -411,132 +411,97 @@ export default function PlanningClient({
 
   // Scroll non bloqué — géré par le listener non-passif sur weekGridRef
 
-  // ── Gestion souris centralisée ───────────────────────────────────────────
+  // ── Gestion souris unifiée ───────────────────────────────────────────────
   useEffect(() => {
     function onMouseMove(e: MouseEvent) {
-      if (dragging && scrollRef.current) {
+      // Drag événement
+      if (draggingRef.current && scrollRef.current) {
         const scrollEl = scrollRef.current;
         const rect = scrollEl.getBoundingClientRect();
         const cols = scrollEl.querySelectorAll("[data-col]") as NodeListOf<HTMLElement>;
-        let targetDate = dragging.ev.date;
+        let targetDate = draggingRef.current.ev.date;
         cols.forEach(col => {
           const cr = col.getBoundingClientRect();
-          if (e.clientX >= cr.left && e.clientX <= cr.right) {
-            targetDate = col.dataset.col ?? dragging.ev.date;
-          }
+          if (e.clientX >= cr.left && e.clientX <= cr.right) targetDate = col.dataset.col ?? draggingRef.current!.ev.date;
         });
         const scrollTop = scrollEl.scrollTop;
-        const relY = e.clientY - rect.top + scrollTop - dragging.offsetY;
+        const relY = e.clientY - rect.top + scrollTop - draggingRef.current.offsetY;
         setDragOver({ date: targetDate, top: Math.max(0, relY) });
       }
-      if (resizing && scrollRef.current) {
-        const delta = e.clientY - resizing.startY;
-        const startTop = topPx(resizing.startFin);
-        const newTop = Math.max(startTop + 20, startTop + delta);
-        const newFin = pxToTime(newTop);
+      // Resize
+      if (resizingRef.current && scrollRef.current) {
+        const delta = e.clientY - resizingRef.current.startY;
+        const startTop = topPx(resizingRef.current.startFin);
+        const newFin = pxToTime(Math.max(startTop + 20, startTop + delta));
         setResizing(prev => prev ? { ...prev, currentFin: newFin } as any : null);
+      }
+      // Draw to create
+      if (drawStartRef.current && scrollRef.current) {
+        const rect = scrollRef.current.getBoundingClientRect();
+        const scrollTop = scrollRef.current.scrollTop;
+        const yAbsolute = e.clientY - rect.top + scrollTop;
+        drawCurrentRef.current = Math.max(drawStartRef.current.top + minToPx(15), yAbsolute);
+        if (e.clientY > rect.bottom - 40) scrollRef.current.scrollTop += 8;
+        if (e.clientY < rect.top + 40) scrollRef.current.scrollTop -= 8;
+        const distance = drawCurrentRef.current - drawStartRef.current.top;
+        if (distance > minToPx(10) && drawGhostRef.current && drawColRef.current) {
+          const topViewport = drawStartRef.current.top - scrollTop + rect.top;
+          drawGhostRef.current.style.display = "block";
+          drawGhostRef.current.style.top = topViewport + "px";
+          drawGhostRef.current.style.height = distance + "px";
+          drawGhostRef.current.style.left = (drawColRef.current.left + 2) + "px";
+          drawGhostRef.current.style.width = (drawColRef.current.width - 4) + "px";
+          const label = drawGhostRef.current.querySelector("div");
+          if (label) label.textContent = pxToTime(drawStartRef.current.top).slice(0,5) + " – " + pxToTime(drawCurrentRef.current).slice(0,5);
+        }
       }
     }
 
-    function onMouseUp() {
-      if (dragging && dragOver) {
-        handleDrop(dragging.ev, dragOver.date, pxToTime(dragOver.top));
-      } else if (dragging) {
+    function onMouseUp(e: MouseEvent) {
+      // Drag drop
+      if (draggingRef.current && dragOverRef.current) {
+        handleDrop(draggingRef.current.ev, dragOverRef.current.date, pxToTime(dragOverRef.current.top));
+      } else if (draggingRef.current) {
         setDragging(null);
         setDragOver(null);
       }
-      if (resizing) {
-        const r = resizing as any;
-        if (r.currentFin) handleResize(resizing.ev, r.currentFin);
+      // Resize
+      if (resizingRef.current) {
+        const r = resizingRef.current as any;
+        if (r.currentFin) handleResize(resizingRef.current.ev, r.currentFin);
         else setResizing(null);
       }
-    }
-
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-    return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-    };
-  }, [dragging, dragOver, resizing]);
-
-  // ── Drag to create ────────────────────────────────────────────────────────
-  const drawStartRef = useRef<{ date: string; top: number; topViewport: number } | null>(null);
-  const drawCurrentRef = useRef<number | null>(null);
-  const drawGhostRef = useRef<HTMLDivElement | null>(null);
-  const drawColRef = useRef<{ left: number; width: number } | null>(null);
-
-  useEffect(() => {
-    function onMouseMove(e: MouseEvent) {
-      if (!drawStartRef.current || !scrollRef.current) return;
-      const rect = scrollRef.current.getBoundingClientRect();
-      const scrollTop = scrollRef.current.scrollTop;
-      const yAbsolute = e.clientY - rect.top + scrollTop;
-      drawCurrentRef.current = Math.max(drawStartRef.current.top + minToPx(15), yAbsolute);
-      // Auto-scroll si souris proche du bord bas
-      if (e.clientY > rect.bottom - 40) scrollRef.current.scrollTop += 8;
-      if (e.clientY < rect.top + 40) scrollRef.current.scrollTop -= 8;
-      const distance = drawCurrentRef.current - drawStartRef.current.top;
-      if (distance > minToPx(10) && drawGhostRef.current && drawColRef.current && scrollRef.current) {
-        const scrollTop = scrollRef.current.scrollTop;
-        const scrollRect = scrollRef.current.getBoundingClientRect();
-        const topViewport = drawStartRef.current.top - scrollTop + scrollRect.top;
-        drawGhostRef.current.style.display = "block";
-        drawGhostRef.current.style.top = topViewport + "px";
-        drawGhostRef.current.style.height = distance + "px";
-        drawGhostRef.current.style.left = (drawColRef.current.left + 2) + "px";
-        drawGhostRef.current.style.width = (drawColRef.current.width - 4) + "px";
-        const label = drawGhostRef.current.querySelector("div");
-        if (label) label.textContent = pxToTime(drawStartRef.current.top).slice(0,5) + " – " + pxToTime(drawCurrentRef.current!).slice(0,5);
-      }
-    }
-
-    let lastMousePos = { x: 0, y: 0 };
-    function onMMPos(e: MouseEvent) { lastMousePos = { x: e.clientX, y: e.clientY }; }
-    function onMouseUp(e: MouseEvent) {
+      // Draw
       const ds = drawStartRef.current;
       const dc = drawCurrentRef.current;
       if (ds) {
         const currentScroll = scrollRef.current?.scrollTop ?? 0;
-        savedScrollTop.current = currentScroll;
         const dragDistance = dc ? Math.abs(dc - ds.top) : 0;
         let modal: any;
         if (dragDistance > minToPx(14) && dc) {
-          const debut = pxToTime(ds.top);
-          const fin = pxToTime(dc);
-          modal = { date: ds.date, heure: debut.slice(0,5), heureFin: fin.slice(0,5), x: e.clientX, y: e.clientY };
+          modal = { date: ds.date, heure: pxToTime(ds.top).slice(0,5), heureFin: pxToTime(dc).slice(0,5), x: e.clientX, y: e.clientY };
         } else {
-          const debut = pxToTime(ds.top);
-          modal = { date: ds.date, heure: debut.slice(0,5), x: e.clientX, y: e.clientY };
+          modal = { date: ds.date, heure: pxToTime(ds.top).slice(0,5), x: e.clientX, y: e.clientY };
         }
         drawStartRef.current = null;
         drawCurrentRef.current = null;
         if (drawGhostRef.current) drawGhostRef.current.style.display = "none";
-        // Ouvrir modal puis restaurer scroll
         setCreateModal(modal);
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            if (scrollRef.current) scrollRef.current.scrollTop = currentScroll;
-          });
-        });
-      } else {
-        drawStartRef.current = null;
-        drawCurrentRef.current = null;
-        if (drawGhostRef.current) drawGhostRef.current.style.display = "none";
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          if (scrollRef.current) scrollRef.current.scrollTop = currentScroll;
+        }));
       }
     }
-    window.addEventListener("mousemove", onMMPos);
 
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mousemove", onMMPos);
       window.removeEventListener("mouseup", onMouseUp);
     };
   }, []);
 
-  // ── Drag & Drop ───────────────────────────────────────────────────────────
+  // ── Drag & Drop ───────────────────────────────────────────────────────────  // ── Drag & Drop ───────────────────────────────────────────────────────────
   function pxToTime(px: number): string {
     const totalMin = Math.round(px / HOUR_HEIGHT * 60) + START_HOUR * 60;
     const clamped = Math.max(START_HOUR * 60, Math.min((END_HOUR - 1) * 60, totalMin));
