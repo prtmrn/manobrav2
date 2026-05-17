@@ -423,36 +423,66 @@ export default function SearchFilters({
 
       {/* Bouton flottant mobile */}
       {/* ── Barre filtres mobile ──────────────────────────────────────────── */}
-      <div className="flex sm:hidden items-center gap-2 w-full">
+      <div className="flex sm:hidden items-center gap-1.5 w-full">
         <select
           value={metier}
           onChange={(e) => { setMetier(e.target.value); setServiceTag(""); stateRef.current.serviceTag = ""; applyFilters({ metier: e.target.value, serviceTag: "" }); }}
-          className="flex-1 min-w-0 px-2 py-2 rounded-lg border border-gray-200 bg-white text-xs shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="flex-1 min-w-0 px-2 py-2 rounded-lg border border-gray-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 truncate"
         >
-          <option value="">Tous les métiers</option>
+          <option value="">Métier</option>
           {METIER_LIST.map((m) => (
             <option key={m} value={m}>{m}</option>
           ))}
         </select>
-        <button
-          onClick={() => { const dm = !dispoMaintenant; setDispoMaintenant(dm); stateRef.current.dispoMaintenant = dm; applyFilters({ dispoMaintenant: dm }); }}
-          className={`flex-shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-lg border text-xs font-medium transition-colors ${dispoMaintenant ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 bg-white text-gray-600"}`}
-          title="Disponible maintenant"
+        <select
+          value={serviceTag}
+          onChange={(e) => { setServiceTag(e.target.value); stateRef.current.serviceTag = e.target.value; applyFilters({ serviceTag: e.target.value }); }}
+          className="flex-1 min-w-0 px-2 py-2 rounded-lg border border-gray-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 truncate"
         >
-          <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dispoMaintenant ? "bg-red-500 animate-pulse" : "bg-gray-300"}`} />
-          Urgence
-        </button>
+          <option value="">Service</option>
+          {SERVICES_STANDARDISES.filter(sv => !metier || sv.metier === metier).map((svc) => (
+            <option key={svc.id} value={svc.id}>{svc.label}</option>
+          ))}
+        </select>
         <button
-          onClick={() => setShowFilters(!showFilters)}
-          className={`flex-shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-lg border text-xs font-semibold shadow-sm transition-colors ${hasActiveFilters ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-600"}`}
+          onClick={() => setShowTri(prev => !prev)}
+          className="flex-shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-600"
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 010 2H4a1 1 0 01-1-1zm3 5a1 1 0 011-1h10a1 1 0 010 2H7a1 1 0 01-1-1zm4 5a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6h18M6 12h12M9 18h6" />
           </svg>
-          Filtres
-          {activeCount > 0 && <span className="w-4 h-4 rounded-full bg-brand-600 text-white text-[9px] font-bold flex items-center justify-center">{activeCount}</span>}
+          Tri
         </button>
       </div>
+
+      {/* ── Bottom sheet tri mobile ───────────────────────────────────────── */}
+      {showTri && (
+        <div className="sm:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/30" onClick={() => setShowTri(false)}>
+          <div className="bg-white rounded-t-2xl shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-gray-100">
+              <h3 className="font-bold text-gray-900">Trier par</h3>
+              <button onClick={() => setShowTri(false)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="px-5 py-4 space-y-2">
+              {[{v:"note",l:"Meilleure note"},{v:"prix",l:"Prix croissant"},{v:"distance",l:"Distance"},{v:"reponse",l:"Réactivité"}].map(({v,l}) => (
+                <button key={v} onClick={() => { setTri(v); stateRef.current.tri = v; applyFilters({ tri: v }); setShowTri(false); }}
+                  className={`w-full py-3 px-4 rounded-xl border text-sm font-medium text-left transition-colors ${tri === v ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-100 text-gray-700 hover:bg-gray-50"}`}>
+                  {l} {tri === v && "✓"}
+                </button>
+              ))}
+            </div>
+            <div className="px-5 pb-6">
+              <button onClick={() => { const dm = !dispoMaintenant; setDispoMaintenant(dm); stateRef.current.dispoMaintenant = dm; applyFilters({ dispoMaintenant: dm }); }}
+                className={`w-full flex items-center gap-2 py-3 px-4 rounded-xl border text-sm font-medium transition-colors ${dispoMaintenant ? "border-red-400 bg-red-50 text-red-700" : "border-gray-100 text-gray-700"}`}>
+                <span className={`w-2 h-2 rounded-full ${dispoMaintenant ? "bg-red-500 animate-pulse" : "bg-gray-300"}`} />
+                Disponible maintenant (urgence)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Bottom sheet filtres mobile ───────────────────────────────────── */}
       {showFilters && (
