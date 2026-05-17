@@ -231,20 +231,14 @@ export default function PlanningClient({
       .catch(() => setCategoriesLoaded(true));
   }, []);
 
-  // Vue jour par défaut sur mobile
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.innerWidth < 1024) {
-      const savedView = localStorage.getItem("planning_view") as View;
-      if (!savedView) setView("jour");
-    }
-  }, []);
-
   // Hydratation localStorage
   useEffect(() => {
     const savedView = localStorage.getItem("planning_view") as View;
     const savedDate = localStorage.getItem("planning_date");
     const savedColors = localStorage.getItem("planning_colors");
-    if (savedView) setView(savedView);
+    const isMobile = window.innerWidth < 1024;
+    if (savedView && !isMobile) setView(savedView);
+    else if (isMobile) setView("jour");
     if (savedDate) setCurrentDate(new Date(savedDate));
     else setCurrentDate(new Date());
     if (savedColors) setCustomColors(JSON.parse(savedColors));
@@ -254,7 +248,9 @@ export default function PlanningClient({
   // Persister vue et date
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem("planning_view", view);
+    if (typeof window !== "undefined" && window.innerWidth >= 1024) {
+      localStorage.setItem("planning_view", view);
+    }
   }, [view, hydrated]);
 
   useEffect(() => {
@@ -759,7 +755,7 @@ export default function PlanningClient({
                   {/* Disponibilités — bandeau fin gauche, cliquable */}
                   {events.filter(e => e.date === iso && e.type === "dispo" && e.couleur !== "red").map(ev => (
                     <div key={ev.id}
-                      className="absolute z-0 cursor-pointer group/dispo"
+                      className="absolute z-0 cursor-pointer group/dispo hidden lg:block"
                       style={{
                         top: `${topPx(ev.heure_debut)}px`,
                         height: `${heightPx(ev.heure_debut, ev.heure_fin)}px`,
