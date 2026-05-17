@@ -721,8 +721,10 @@ export default function PlanningClient({
                     const scrollTop = scrollRef.current?.scrollTop ?? 0;
                     const colRect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
                     const gridRect = weekGridRef.current?.getBoundingClientRect();
-                    const y = e.clientY - colRect.top + scrollTop;
-                    drawStartRef.current = { date: iso, top: y, topViewport: e.clientY - colRect.top };
+                    const scrollRect = scrollRef.current?.getBoundingClientRect();
+                    const y = e.clientY - (scrollRect?.top ?? colRect.top) + scrollTop;
+                    console.log("mousedown", { clientY: e.clientY, colTop: colRect.top, scrollTop: scrollRef.current?.getBoundingClientRect().top, scrollTopVal: scrollTop, y });
+                    drawStartRef.current = { date: iso, top: y, topViewport: e.clientY - (scrollRef.current?.getBoundingClientRect().top ?? colRect.top) };
                     drawCurrentRef.current = y;
                     drawColRef.current = {
                       left: colRect.left,
