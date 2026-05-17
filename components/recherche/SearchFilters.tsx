@@ -236,8 +236,16 @@ export default function SearchFilters({
             </span>
           </div>
         )}
-        {/* Toggle Liste/Carte */}
-        <div className="flex-shrink-0 flex items-center">
+        {/* Toggle Liste/Carte + Urgence mobile */}
+        <div className="flex-shrink-0 flex items-center gap-2">
+          <button
+            onClick={() => { const dm = !dispoMaintenant; setDispoMaintenant(dm); stateRef.current.dispoMaintenant = dm; applyFilters({ dispoMaintenant: dm }); }}
+            className={`sm:hidden flex items-center gap-1 px-2 py-1.5 rounded-lg border text-xs font-medium transition-colors ${dispoMaintenant ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 bg-white text-gray-600"}`}
+            title="Disponible maintenant"
+          >
+            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dispoMaintenant ? "bg-red-500 animate-pulse" : "bg-gray-300"}`} />
+            <span className="text-[10px]">Urgence</span>
+          </button>
           <div className="flex rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
             <button
               onClick={() => { setVue("grille"); applyFilters({ vue: "grille" }); }}
