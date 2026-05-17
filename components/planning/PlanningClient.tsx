@@ -486,7 +486,7 @@ export default function PlanningClient({
         drawGhostRef.current.style.display = "block";
         drawGhostRef.current.style.top = topViewport + "px";
         drawGhostRef.current.style.height = heightPxVal + "px";
-        drawGhostRef.current.style.left = (drawColRef.current.left + scrollRect.left + 56 + 2) + "px";
+        drawGhostRef.current.style.left = (drawColRef.current.left + 2) + "px";
         drawGhostRef.current.style.width = (drawColRef.current.width - 4) + "px";
         const label = drawGhostRef.current.querySelector("div");
         if (label) label.textContent = pxToTime(drawStartRef.current.top).slice(0,5) + " – " + pxToTime(drawCurrentRef.current!).slice(0,5);
@@ -747,12 +747,10 @@ export default function PlanningClient({
                     const y = e.clientY - colRect.top + scrollTop;
                     drawStartRef.current = { date: iso, top: y };
                     drawCurrentRef.current = null;
-                    if (gridRect) {
-                      drawColRef.current = {
-                        left: colRect.left - gridRect.left,
-                        width: colRect.width,
-                      };
-                    }
+                    drawColRef.current = {
+                      left: colRect.left,
+                      width: colRect.width,
+                    };
                   }}
                   onClick={(e) => {
                     if (dragging || drawStartRef.current) return;
