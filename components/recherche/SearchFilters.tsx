@@ -427,7 +427,7 @@ export default function SearchFilters({
         <select
           value={metier}
           onChange={(e) => { setMetier(e.target.value); setServiceTag(""); stateRef.current.serviceTag = ""; applyFilters({ metier: e.target.value, serviceTag: "" }); }}
-          className="flex-1 min-w-0 px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="flex-1 min-w-0 px-2 py-2 rounded-lg border border-gray-200 bg-white text-xs shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="">Tous les métiers</option>
           {METIER_LIST.map((m) => (
@@ -435,69 +435,63 @@ export default function SearchFilters({
           ))}
         </select>
         <button
-          onClick={() => setShowFilters(!showFilters)}
-          className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-sm font-semibold shadow-sm transition-colors ${
-            hasActiveFilters ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-600"
-          }`}
+          onClick={() => { const dm = !dispoMaintenant; setDispoMaintenant(dm); stateRef.current.dispoMaintenant = dm; applyFilters({ dispoMaintenant: dm }); }}
+          className={`flex-shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-lg border text-xs font-medium transition-colors ${dispoMaintenant ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 bg-white text-gray-600"}`}
+          title="Disponible maintenant"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dispoMaintenant ? "bg-red-500 animate-pulse" : "bg-gray-300"}`} />
+          Urgence
+        </button>
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className={`flex-shrink-0 flex items-center gap-1 px-2.5 py-2 rounded-lg border text-xs font-semibold shadow-sm transition-colors ${hasActiveFilters ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-600"}`}
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 010 2H4a1 1 0 01-1-1zm3 5a1 1 0 011-1h10a1 1 0 010 2H7a1 1 0 01-1-1zm4 5a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1z" />
           </svg>
           Filtres
-          {activeCount > 0 && (
-            <span className="w-5 h-5 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center">{activeCount}</span>
-          )}
+          {activeCount > 0 && <span className="w-4 h-4 rounded-full bg-brand-600 text-white text-[9px] font-bold flex items-center justify-center">{activeCount}</span>}
         </button>
       </div>
 
       {/* ── Bottom sheet filtres mobile ───────────────────────────────────── */}
       {showFilters && (
-        <div className="sm:hidden fixed inset-0 z-50 flex flex-col justify-end" onClick={() => setShowFilters(false)}>
-          <div className="bg-white rounded-t-2xl shadow-2xl p-5 space-y-4 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-bold text-gray-900 text-lg">Filtres</h3>
-              <button onClick={() => setShowFilters(false)} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+        <div className="sm:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/30" onClick={() => setShowFilters(false)}>
+          <div className="bg-white rounded-t-2xl shadow-2xl max-h-[60vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-gray-100">
+              <h3 className="font-bold text-gray-900">Filtres</h3>
+              <button onClick={() => setShowFilters(false)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
-            <div>
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-2">Service</label>
-              <div className="grid grid-cols-2 gap-2">
-                <button onClick={() => { setServiceTag(""); stateRef.current.serviceTag = ""; applyFilters({ serviceTag: "" }); }}
-                  className={`py-2.5 rounded-xl border text-sm font-medium transition-colors ${!serviceTag ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 text-gray-600"}`}>
-                  Tous
-                </button>
-                {SERVICES_STANDARDISES.filter(s => !metier || s.metier === metier).map(svc => (
-                  <button key={svc.id} onClick={() => { setServiceTag(svc.id); stateRef.current.serviceTag = svc.id; applyFilters({ serviceTag: svc.id }); }}
-                    className={`py-2.5 rounded-xl border text-sm font-medium transition-colors truncate px-2 ${serviceTag === svc.id ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 text-gray-600"}`}>
-                    {svc.label}
-                  </button>
-                ))}
+            <div className="px-5 py-4 space-y-4">
+              <div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Service</p>
+                <select value={serviceTag} onChange={e => { setServiceTag(e.target.value); stateRef.current.serviceTag = e.target.value; applyFilters({ serviceTag: e.target.value }); }}
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                  <option value="">Tous les services</option>
+                  {SERVICES_STANDARDISES.filter(s => !metier || s.metier === metier).map(svc => (
+                    <option key={svc.id} value={svc.id}>{svc.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Trier par</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[{v:"note",l:"Meilleure note"},{v:"prix",l:"Prix croissant"},{v:"distance",l:"Distance"},{v:"reponse",l:"Réactivité"}].map(({v,l}) => (
+                    <button key={v} onClick={() => { setTri(v); stateRef.current.tri = v; applyFilters({ tri: v }); setShowFilters(false); }}
+                      className={`py-2 rounded-lg border text-sm font-medium transition-colors ${tri === v ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+                      {l}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-            <div>
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-2">Disponibilité</label>
-              <button onClick={() => { const dm = !dispoMaintenant; setDispoMaintenant(dm); stateRef.current.dispoMaintenant = dm; applyFilters({ dispoMaintenant: dm }); }}
-                className={`w-full flex items-center gap-2 py-2.5 px-4 rounded-xl border text-sm font-medium transition-colors ${dispoMaintenant ? "border-red-400 bg-red-50 text-red-700" : "border-gray-200 text-gray-600"}`}>
-                <span className={`w-2 h-2 rounded-full ${dispoMaintenant ? "bg-red-500 animate-pulse" : "bg-gray-300"}`} />
-                Disponible maintenant
+            <div className="px-5 pb-5">
+              <button onClick={() => setShowFilters(false)} className="w-full py-3 rounded-xl bg-brand-600 text-white font-bold text-sm">
+                Voir les résultats
               </button>
             </div>
-            <div>
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-2">Trier par</label>
-              <div className="grid grid-cols-2 gap-2">
-                {[{v:"note",l:"Note"},{v:"prix",l:"Prix"},{v:"distance",l:"Distance"},{v:"reponse",l:"Réactivité"}].map(({v,l}) => (
-                  <button key={v} onClick={() => { setTri(v); stateRef.current.tri = v; applyFilters({ tri: v }); }}
-                    className={`py-2.5 rounded-xl border text-sm font-medium transition-colors ${tri === v ? "border-brand-400 bg-brand-50 text-brand-700" : "border-gray-200 text-gray-600"}`}>
-                    {l}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <button onClick={() => setShowFilters(false)}
-              className="w-full py-3 rounded-xl bg-brand-600 text-white font-bold text-sm">
-              Voir les résultats
-            </button>
           </div>
         </div>
       )}
