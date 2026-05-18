@@ -7,6 +7,8 @@ import type { UserRole } from "@/types";
 export default function RegisterForm({ defaultRole }: { defaultRole?: "client" | "artisan" }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [prenom, setPrenom] = useState("");
+  const [nom, setNom] = useState("");
   const [role, setRole] = useState<UserRole>(defaultRole ?? "client");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -30,14 +32,19 @@ export default function RegisterForm({ defaultRole }: { defaultRole?: "client" |
       setLoading(false);
       return;
     }
-    if (role === "artisan") {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase
-          .from("profiles")
+    const { data: { user: newUser } } = await supabase.auth.getUser();
+    if (newUser) {
+      if (role === "artisan") {
+        await supabase.from("profiles")
           // @ts-ignore
-          .update({ role: "artisan" })
-          .eq("id", user.id);
+          .update({ role: "artisan" }).eq("id", newUser.id);
+      } else {
+        // Créer profil client avec nom/prénom
+        await (supabase.from("profiles_clients") as any).upsert({
+          id: newUser.id,
+          prenom: prenom.trim() || null,
+          nom: nom.trim() || null,
+        });
       }
     }
     setSuccess(true);
@@ -72,6 +79,20 @@ export default function RegisterForm({ defaultRole }: { defaultRole?: "client" |
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
           {error}
+        </div>
+      )}
+      {role === "client" && (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label htmlFor="prenom" className="block text-sm font-medium text-gray-700">Prénom</label>
+            <input id="prenom" type="text" autoComplete="given-name" value={prenom} onChange={e => setPrenom(e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="Jean" />
+          </div>
+          <div className="space-y-1">
+            <label htmlFor="nom" className="block text-sm font-medium text-gray-700">Nom</label>
+            <input id="nom" type="text" autoComplete="family-name" value={nom} onChange={e => setNom(e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="Dupont" />
+          </div>
         </div>
       )}
       <div className="space-y-1">
