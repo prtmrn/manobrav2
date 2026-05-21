@@ -458,9 +458,9 @@ export default async function RecherchePage({ searchParams }: PageProps) {
               "Aucun résultat"
             ) : (
               <>
-                <span className="font-semibold text-gray-700">{total}</span>
+                <span className="font-semibold text-gray-700">{vue === "carte" ? mapartisans.length : total}</span>
                 {" artisan"}
-                {total > 1 ? "s" : ""} trouvé{total > 1 ? "s" : ""}
+                {(vue === "carte" ? mapartisans.length : total) > 1 ? "s" : ""} trouvé{(vue === "carte" ? mapartisans.length : total) > 1 ? "s" : ""}
                 {(metierFilter || villeFilter) && (
                   <span className="text-gray-400">
                     {metierFilter && ` · ${metierFilter}`}
