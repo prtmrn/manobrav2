@@ -331,7 +331,7 @@ export default function SearchMapView({ artisans, modeUrgence = false, clientLat
             return (
               <>
                 <p className="text-xs text-gray-400 flex-shrink-0">
-                  {artisansAvecCoords.length} artisan{artisansAvecCoords.length > 1 ? "s" : ""} sur la carte
+                  
                 </p>
                 {artisansAvecCoords.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-40 text-gray-400">
