@@ -369,8 +369,76 @@ export default async function HomePage() {
         {/* ══════════════════════════════════════════════════════════════════ */}
         
 
+
         {/* ══════════════════════════════════════════════════════════════════ */}
-        {/*  POURQUOI MANOBRA                                                 */}
+        {/*  EXPLOREZ LA CARTE                                                */}
+        {/* ══════════════════════════════════════════════════════════════════ */}
+        <section className="py-20 bg-white">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <div className="flex flex-col lg:flex-row items-center gap-12">
+              {/* Texte */}
+              <div className="flex-1 text-center lg:text-left">
+                <SectionLabel>Près de chez vous</SectionLabel>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4">
+                  Des artisans partout en France
+                </h2>
+                <p className="text-gray-500 text-base leading-relaxed mb-6 max-w-md mx-auto lg:mx-0">
+                  Visualisez les artisans disponibles autour de vous sur la carte. Filtrez par métier, note ou disponibilité et trouvez le professionnel le plus proche en un coup d&apos;œil.
+                </p>
+                <Link
+                  href="/recherche?vue=carte"
+                  className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all duration-200 shadow-md hover:-translate-y-0.5"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  </svg>
+                  Explorer la carte
+                </Link>
+              </div>
+              {/* Aperçu carte — masqué sur mobile */}
+              <div className="hidden lg:block flex-1 w-full">
+                <div className="relative rounded-2xl overflow-hidden border border-gray-200 shadow-xl aspect-video bg-gray-100">
+                  {/* Fond carte stylisé */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-blue-50 to-gray-100" />
+                  {/* Grille simulant une carte */}
+                  <svg className="absolute inset-0 w-full h-full opacity-20" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#94a3b8" strokeWidth="0.5"/>
+                      </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#grid)" />
+                  </svg>
+                  {/* Marqueurs simulés */}
+                  {[
+                    { top: "30%", left: "25%", color: "#16a34a", label: "Plombier" },
+                    { top: "50%", left: "55%", color: "#2563eb", label: "Électricien" },
+                    { top: "65%", left: "35%", color: "#dc2626", label: "Serrurier" },
+                    { top: "25%", left: "65%", color: "#16a34a", label: "Chauffagiste" },
+                    { top: "70%", left: "70%", color: "#2563eb", label: "Plombier" },
+                  ].map((m, i) => (
+                    <div key={i} className="absolute flex flex-col items-center" style={{ top: m.top, left: m.left, transform: "translate(-50%,-100%)" }}>
+                      <div className="px-2 py-1 rounded-full text-white text-[10px] font-bold shadow-lg mb-1 whitespace-nowrap" style={{ backgroundColor: m.color }}>
+                        {m.label}
+                      </div>
+                      <svg className="w-4 h-4" style={{ color: m.color }} fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  ))}
+                  {/* Badge overlay */}
+                  <div className="absolute bottom-4 left-4 bg-white rounded-xl px-3 py-2 shadow-md border border-gray-100">
+                    <p className="text-xs font-bold text-gray-900">Artisans disponibles</p>
+                    <p className="text-xs text-gray-500">Près de chez vous</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════════════════════ */}
+        {/*  POURQUOI MANOBRA                                                 */
         {/* ══════════════════════════════════════════════════════════════════ */}
         <section className="py-20 bg-gray-50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
