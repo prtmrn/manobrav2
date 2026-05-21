@@ -242,6 +242,9 @@ export default function Step3Confirm({
   const [guestTelephone, setGuestTelephone] = useState(clientProfile?.telephone ?? "");
   const [guestEmail, setGuestEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [clientPrenom, setClientPrenom] = useState(clientProfile?.prenom ?? "");
+  const [clientNom, setClientNom] = useState(clientProfile?.nom ?? "");
+  const clientNomManquant = !isGuest && !clientProfile?.prenom && !clientProfile?.nom;
 
   const fullName = `${artisan.prenom ?? ""} ${artisan.nom ?? ""}`.trim();
 
@@ -311,6 +314,19 @@ export default function Step3Confirm({
 
   // ── Réservation directe (services gratuits / sur devis) ───────────────────
   async function handleDirectConfirm() {
+    // Sauvegarder nom/prénom client si manquant
+    if (clientNomManquant && (clientPrenom.trim() || clientNom.trim())) {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await (supabase.from("profiles_clients") as any).upsert({
+          id: user.id,
+          prenom: clientPrenom.trim() || null,
+          nom: clientNom.trim() || null,
+        }, { onConflict: "id" });
+      }
+    }
     try {
       const res = await fetch("/api/reservations/confirm", {
         method: "POST",
