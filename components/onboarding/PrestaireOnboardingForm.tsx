@@ -19,9 +19,6 @@ const METIERS: Metier[] = [
   "Chauffagiste",
   "Électricien",
   "Vitrier",
-  "Ramoneur",
-  "Frigoriste",
-  "Dépanneur",
   "Autre",
 ];
 
@@ -33,7 +30,7 @@ const schema = z.object({
   nom: z.string().min(2, "Le nom doit contenir au moins 2 caractères").max(50),
   prenom: z.string().min(2, "Le prénom doit contenir au moins 2 caractères").max(50),
   metier: z.enum(
-    ["Serrurier", "Plombier", "Chauffagiste", "Électricien", "Vitrier", "Ramoneur", "Frigoriste", "Dépanneur", "Autre"],
+    ["Serrurier", "Plombier", "Chauffagiste", "Électricien", "Vitrier", "Autre"],
     { error: "Veuillez sélectionner un métier" }
   ),
   bio: z.string().max(500, "500 caractères maximum").optional().or(z.literal("")),

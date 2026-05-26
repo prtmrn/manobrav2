@@ -20,9 +20,6 @@ export type Metier =
   | "Chauffagiste"
   | "Électricien"
   | "Vitrier"
-  | "Ramoneur"
-  | "Frigoriste"
-  | "Dépanneur"
   | "Autre";
 
 export type ReservationStatut =

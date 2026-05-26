@@ -577,9 +577,6 @@ export default async function HomePage() {
                   "Chauffagiste": ["Entretien chaudière", "Pompe à chaleur", "Dépannage chauffage"],
                   "Électricien": ["Tableau électrique", "Installation prise", "Dépannage panne"],
                   "Vitrier": ["Vitre cassée", "Double vitrage", "Porte-fenêtre"],
-                  "Ramoneur": ["Ramonage cheminée", "Poêle à bois", "Insert"],
-                  "Frigoriste": ["Climatisation", "Entretien clim", "Dépannage clim"],
-                  "Dépanneur": ["Panne véhicule", "Remorquage", "Démarrage batterie"],
                 };
                 return (
                   <Link

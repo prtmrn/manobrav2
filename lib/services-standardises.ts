@@ -74,33 +74,6 @@ export const SERVICES_STANDARDISES: ServiceStandardise[] = [
   { id: "vit-06", label: "Pose de film solaire", metier: "Vitrier" },
   { id: "vit-07", label: "Réparation velux", metier: "Vitrier" },
 
-  // Ramoneur
-  { id: "ram-diag", label: "Diagnostic conduit de fumée", metier: "Ramoneur" },
-  { id: "ram-01", label: "Ramonage cheminée", metier: "Ramoneur" },
-  { id: "ram-02", label: "Ramonage poêle à bois", metier: "Ramoneur" },
-  { id: "ram-03", label: "Ramonage poêle à granulés", metier: "Ramoneur" },
-  { id: "ram-04", label: "Ramonage insert", metier: "Ramoneur" },
-  { id: "ram-05", label: "Entretien conduit de fumée", metier: "Ramoneur" },
-  { id: "ram-06", label: "Désobstruction conduit", metier: "Ramoneur" },
-
-  // Frigoriste
-  { id: "fri-diag", label: "Diagnostic climatisation", metier: "Frigoriste" },
-  { id: "fri-diag-gaz", label: "Diagnostic fuite de gaz frigorigène", metier: "Frigoriste" },
-  { id: "fri-01", label: "Installation climatisation", metier: "Frigoriste" },
-  { id: "fri-02", label: "Entretien climatisation", metier: "Frigoriste" },
-  { id: "fri-03", label: "Dépannage climatisation", metier: "Frigoriste" },
-  { id: "fri-04", label: "Installation climatisation réversible", metier: "Frigoriste" },
-  { id: "fri-05", label: "Remplacement climatisation", metier: "Frigoriste" },
-  { id: "fri-06", label: "Recharge gaz climatisation", metier: "Frigoriste" },
-
-  // Dépanneur
-  { id: "dep-diag", label: "Diagnostic véhicule", metier: "Dépanneur" },
-  { id: "dep-01", label: "Dépannage véhicule en panne", metier: "Dépanneur" },
-  { id: "dep-02", label: "Remorquage véhicule", metier: "Dépanneur" },
-  { id: "dep-03", label: "Démarrage batterie", metier: "Dépanneur" },
-  { id: "dep-04", label: "Changement roue crevée", metier: "Dépanneur" },
-  { id: "dep-05", label: "Ouverture véhicule", metier: "Dépanneur" },
-  { id: "dep-06", label: "Dépannage panne d\'essence", metier: "Dépanneur" },
 ];
 
 export function getServicesForMetier(metier: string): ServiceStandardise[] {

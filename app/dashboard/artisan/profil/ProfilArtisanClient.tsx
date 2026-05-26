@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 
 const METIERS = [
   "Serrurier", "Plombier", "Chauffagiste", "Électricien",
-  "Vitrier", "Ramoneur", "Frigoriste", "Dépanneur", "Autre",
+  "Vitrier", "Autre",
 ];
 
 interface Props {
