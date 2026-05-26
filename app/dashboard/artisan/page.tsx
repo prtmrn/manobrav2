@@ -327,7 +327,7 @@ export default async function DashboardartisanPage() {
           </h1>
           <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-2 flex-wrap">
             {artisan?.metier && (
-              <span className="font-medium text-brand-600">{artisan?.metier}</span>
+              <span className="font-medium text-brand-600">{Array.isArray(artisan?.metier) ? artisan.metier.join(" · ") : artisan?.metier}</span>
             )}
             {artisan?.metier && artisan?.ville && (
               <span className="text-gray-300">·</span>
