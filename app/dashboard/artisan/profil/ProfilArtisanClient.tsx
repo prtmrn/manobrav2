@@ -1,6 +1,5 @@
 "use client";
 import AddressAutocomplete from "@/components/ui/AddressAutocomplete";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -9,6 +8,10 @@ const METIERS = [
   "Serrurier", "Plombier", "Chauffagiste", "Électricien",
   "Vitrier", "Autre",
 ];
+
+// Règles d'obligation par métier
+const DECENNALE_REQUISE = ["Plombier", "Chauffagiste", "Électricien", "Vitrier"];
+const DECENNALE_RECOMMANDEE = ["Serrurier", "Autre"];
 
 interface Props {
   userId: string;
@@ -32,6 +35,13 @@ interface Props {
     frais_deplacement?: string | null;
     disponible_urgence?: boolean | null;
     delai_urgence?: string | null;
+    assurance_rc_numero?: string | null;
+    assurance_rc_assureur?: string | null;
+    assurance_decennale_numero?: string | null;
+    assurance_decennale_assureur?: string | null;
+    qualification_cstb_numero?: string | null;
+    verification_status?: string | null;
+    verification_note?: string | null;
   };
 }
 
@@ -55,13 +65,34 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
     frais_deplacement: initialData.frais_deplacement ?? "inclus",
     disponible_urgence: initialData.disponible_urgence ?? false,
     delai_urgence: initialData.delai_urgence ?? "1h",
+    assurance_rc_numero: initialData.assurance_rc_numero ?? "",
+    assurance_rc_assureur: initialData.assurance_rc_assureur ?? "",
+    assurance_decennale_numero: initialData.assurance_decennale_numero ?? "",
+    assurance_decennale_assureur: initialData.assurance_decennale_assureur ?? "",
+    qualification_cstb_numero: initialData.qualification_cstb_numero ?? "",
   });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmittingVerif, setIsSubmittingVerif] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [successVerif, setSuccessVerif] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const verificationStatus = initialData.verification_status ?? "non_soumis";
+  const verificationNote = initialData.verification_note ?? "";
 
   const inputClass = "w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20";
   const selectClass = `${inputClass} bg-white`;
+
+  // Est-ce que la décennale est requise pour les métiers sélectionnés ?
+  const decennaleRequise = form.metiers.some((m) => DECENNALE_REQUISE.includes(m));
+  const decennaleRecommandee = !decennaleRequise && form.metiers.some((m) => DECENNALE_RECOMMANDEE.includes(m));
+
+  // Vérifie si les champs obligatoires docs sont remplis pour soumettre
+  const peutSoumettre =
+    form.assurance_rc_numero.trim() !== "" &&
+    form.assurance_rc_assureur.trim() !== "" &&
+    (!decennaleRequise || (form.assurance_decennale_numero.trim() !== "" && form.assurance_decennale_assureur.trim() !== ""));
 
   function toggleMetier(m: string) {
     setForm((prev) => ({
@@ -85,7 +116,7 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
     const supabase = createClient();
     const { error: err } = await supabase
       .from("profiles_artisans")
-      // @ts-ignore Supabase generated types
+      // @ts-ignore
       .upsert({
         id: userId,
         nom: form.nom,
@@ -105,6 +136,11 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
         frais_deplacement: form.frais_deplacement || null,
         disponible_urgence: form.disponible_urgence,
         delai_urgence: form.disponible_urgence ? form.delai_urgence : null,
+        assurance_rc_numero: form.assurance_rc_numero || null,
+        assurance_rc_assureur: form.assurance_rc_assureur || null,
+        assurance_decennale_numero: form.assurance_decennale_numero || null,
+        assurance_decennale_assureur: form.assurance_decennale_assureur || null,
+        qualification_cstb_numero: form.qualification_cstb_numero || null,
       }, { onConflict: "id" });
 
     if (err) {
@@ -116,6 +152,86 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
     setIsSubmitting(false);
   }
 
+  async function handleSoumettreDossier() {
+    if (!peutSoumettre) return;
+    setIsSubmittingVerif(true);
+    setError(null);
+    setSuccessVerif(false);
+
+    // D'abord sauvegarder les champs docs
+    const supabase = createClient();
+    const { error: saveErr } = await supabase
+      .from("profiles_artisans")
+      // @ts-ignore
+      .update({
+        assurance_rc_numero: form.assurance_rc_numero || null,
+        assurance_rc_assureur: form.assurance_rc_assureur || null,
+        assurance_decennale_numero: form.assurance_decennale_numero || null,
+        assurance_decennale_assureur: form.assurance_decennale_assureur || null,
+        qualification_cstb_numero: form.qualification_cstb_numero || null,
+        verification_status: "en_attente",
+      })
+      .eq("id", userId);
+
+    if (saveErr) {
+      setError(saveErr.message);
+    } else {
+      setSuccessVerif(true);
+      router.refresh();
+    }
+    setIsSubmittingVerif(false);
+  }
+
+  // Badge statut vérification
+  function VerifBanner() {
+    if (verificationStatus === "verifie") {
+      return (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center gap-3">
+          <span className="text-emerald-500 text-xl">✓</span>
+          <div>
+            <p className="text-emerald-800 font-semibold text-sm">Profil vérifié</p>
+            <p className="text-emerald-600 text-xs mt-0.5">Vos documents ont été validés par Manobra.</p>
+          </div>
+        </div>
+      );
+    }
+    if (verificationStatus === "en_attente") {
+      return (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 flex items-center gap-3">
+          <span className="text-yellow-500 text-xl">⏳</span>
+          <div>
+            <p className="text-yellow-800 font-semibold text-sm">Dossier en cours de vérification</p>
+            <p className="text-yellow-600 text-xs mt-0.5">Nous vérifions vos informations. Vous serez notifié une fois validé.</p>
+          </div>
+        </div>
+      );
+    }
+    if (verificationStatus === "rejete") {
+      return (
+        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-start gap-3">
+          <span className="text-red-500 text-xl">✗</span>
+          <div>
+            <p className="text-red-800 font-semibold text-sm">Dossier rejeté — action requise</p>
+            {verificationNote && (
+              <p className="text-red-600 text-xs mt-0.5">{verificationNote}</p>
+            )}
+            <p className="text-red-500 text-xs mt-1">Corrigez les informations ci-dessous et soumettez à nouveau.</p>
+          </div>
+        </div>
+      );
+    }
+    // non_soumis
+    return (
+      <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 flex items-center gap-3">
+        <span className="text-orange-500 text-xl">⚠️</span>
+        <div>
+          <p className="text-orange-800 font-semibold text-sm">Profil en attente de vérification</p>
+          <p className="text-orange-600 text-xs mt-0.5">Renseignez vos assurances ci-dessous pour soumettre votre dossier à Manobra.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <div className="mb-6">
@@ -123,6 +239,11 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
         <p className="text-sm text-gray-500 mt-1">
           Ces informations sont visibles par les clients sur votre fiche artisan.
         </p>
+      </div>
+
+      {/* Bannière statut vérification */}
+      <div className="mb-6">
+        <VerifBanner />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -284,6 +405,137 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
               </select>
             </div>
           )}
+        </div>
+
+        {/* Documents & Assurances */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-5">
+          <div>
+            <h2 className="text-base font-semibold text-gray-900">Documents & Assurances</h2>
+            <p className="text-xs text-gray-500 mt-1">
+              Ces informations permettent à Manobra de vérifier votre dossier. Elles ne sont pas visibles par les clients.
+            </p>
+          </div>
+
+          {/* RC Pro — toujours obligatoire */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-gray-800">Assurance RC Professionnelle</span>
+              <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-red-100 text-red-600">Obligatoire</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Numéro de contrat</label>
+                <input
+                  type="text"
+                  value={form.assurance_rc_numero}
+                  onChange={(e) => setForm({ ...form, assurance_rc_numero: e.target.value })}
+                  className={inputClass}
+                  placeholder="Ex: RC-2024-123456"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Nom de l'assureur</label>
+                <input
+                  type="text"
+                  value={form.assurance_rc_assureur}
+                  onChange={(e) => setForm({ ...form, assurance_rc_assureur: e.target.value })}
+                  className={inputClass}
+                  placeholder="Ex: Axa, Allianz…"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-100 pt-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-gray-800">Assurance Décennale</span>
+              {decennaleRequise ? (
+                <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-red-100 text-red-600">Obligatoire</span>
+              ) : decennaleRecommandee ? (
+                <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-orange-100 text-orange-600">Recommandée</span>
+              ) : (
+                <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">Optionnelle</span>
+              )}
+            </div>
+            {decennaleRequise && (
+              <p className="text-xs text-gray-500">Obligatoire pour votre métier (loi Spinetta 1978).</p>
+            )}
+            {decennaleRecommandee && (
+              <p className="text-xs text-gray-500">Recommandée pour les travaux structurels (pose de portes blindées, garde-corps…).</p>
+            )}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Numéro de contrat</label>
+                <input
+                  type="text"
+                  value={form.assurance_decennale_numero}
+                  onChange={(e) => setForm({ ...form, assurance_decennale_numero: e.target.value })}
+                  className={inputClass}
+                  placeholder="Ex: DEC-2024-789012"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Nom de l'assureur</label>
+                <input
+                  type="text"
+                  value={form.assurance_decennale_assureur}
+                  onChange={(e) => setForm({ ...form, assurance_decennale_assureur: e.target.value })}
+                  className={inputClass}
+                  placeholder="Ex: Maaf, Groupama…"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-100 pt-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-gray-800">Qualification CSTB / QB</span>
+              <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">Optionnelle</span>
+            </div>
+            <p className="text-xs text-gray-500">Certification Qualité Bâtiment (QB) délivrée par le CSTB — valorisante mais non obligatoire.</p>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Numéro de qualification</label>
+              <input
+                type="text"
+                value={form.qualification_cstb_numero}
+                onChange={(e) => setForm({ ...form, qualification_cstb_numero: e.target.value })}
+                className={inputClass}
+                placeholder="Ex: QB-2024-001234"
+              />
+            </div>
+          </div>
+
+          {/* Bouton soumettre dossier */}
+          <div className="border-t border-gray-100 pt-4">
+            {verificationStatus === "verifie" ? (
+              <div className="flex items-center gap-2 text-emerald-600 text-sm font-medium">
+                <span>✓</span> Dossier validé par Manobra
+              </div>
+            ) : verificationStatus === "en_attente" ? (
+              <div className="flex items-center gap-2 text-yellow-600 text-sm">
+                <span>⏳</span> Dossier soumis — en cours de vérification
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {!peutSoumettre && (
+                  <p className="text-xs text-gray-400">
+                    Renseignez au minimum le numéro et l'assureur RC Pro{decennaleRequise ? " et Décennale" : ""} pour soumettre.
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={handleSoumettreDossier}
+                  disabled={!peutSoumettre || isSubmittingVerif}
+                  className="px-5 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors"
+                >
+                  {isSubmittingVerif ? "Envoi…" : "Soumettre mon dossier pour vérification"}
+                </button>
+                {successVerif && (
+                  <p className="text-green-600 text-xs">Dossier soumis. Manobra vous contactera sous 48h.</p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{error}</div>}

@@ -22,9 +22,9 @@ export default async function ProfilArtisanPage() {
   if (!profile || (profile as any).role !== "artisan") redirect("/dashboard");
 
   const adminClient = createAdminClient();
-  const { data: artisan } = await adminClient
-    .from("profiles_artisans")
-    .select("nom, prenom, bio, metier, adresse, ville, code_postal, photo_url, siret, telephone, latitude, longitude, zone_intervention_km, tarif_horaire_min, tarif_horaire_max, frais_deplacement, disponible_urgence, abonnement_pro")
+  const { data: artisan } = await (adminClient
+    .from("profiles_artisans") as any)
+    .select("nom, prenom, bio, metier, adresse, ville, code_postal, photo_url, siret, telephone, latitude, longitude, zone_intervention_km, tarif_horaire_min, tarif_horaire_max, frais_deplacement, disponible_urgence, assurance_rc_numero, assurance_rc_assureur, assurance_decennale_numero, assurance_decennale_assureur, qualification_cstb_numero, verification_status, verification_note")
     .eq("id", user.id)
     .single();
 
