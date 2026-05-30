@@ -140,10 +140,11 @@ function StarRow({
 }
 
 /** Carte d'un service */
-function ServiceCard({ service, artisanId }: { service: Service; artisanId: string }) {
+function ServiceCard({ service, artisanId, canReserve }: { service: Service; artisanId: string; canReserve: boolean }) {
   const duree = formatDuree(service.duree_minutes);
-  return (
-    <Link href={`/reserver/${artisanId}?service=${service.id}`} className="group relative bg-white border border-gray-100 rounded-xl p-5 hover:shadow-md hover:border-brand-200 transition-all block">
+  if (!canReserve) {
+    return (
+      <div className="relative bg-white border border-gray-100 rounded-xl p-5 opacity-60 cursor-not-allowed">
       {/* Catégorie */}
       {service.categorie && (
         <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full mb-2">
@@ -182,6 +183,37 @@ function ServiceCard({ service, artisanId }: { service: Service; artisanId: stri
                 strokeWidth={2}
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
               />
+            </svg>
+            {duree}
+          </span>
+        )}
+      </div>
+    </div>
+    );
+  }
+  return (
+    <Link href={`/reserver/${artisanId}?service=${service.id}`} className="group relative bg-white border border-gray-100 rounded-xl p-5 hover:shadow-md hover:border-brand-200 transition-all block">
+      {service.categorie && (
+        <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full mb-2">
+          {service.categorie}
+        </span>
+      )}
+      <h3 className="font-semibold text-gray-900 text-sm mb-1 leading-tight">
+        {service.titre}
+      </h3>
+      {service.description && (
+        <p className="text-xs text-gray-500 line-clamp-2 mb-3 leading-relaxed">
+          {service.description}
+        </p>
+      )}
+      <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
+        <span className="text-lg font-bold text-gray-900">
+          {formatPrix(service.prix)}
+        </span>
+        {duree && (
+          <span className="flex items-center gap-1 text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-lg">
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             {duree}
           </span>
@@ -295,10 +327,20 @@ function RatingSummary({
 function ReserveButton({
   artisan_id,
   className = "",
+  canReserve = true,
 }: {
   artisan_id: string;
   className?: string;
+  canReserve?: boolean;
 }) {
+  if (!canReserve) {
+    return (
+      <div className={`flex flex-col items-center justify-center gap-1 bg-gray-100 border border-gray-200 text-gray-400 font-semibold text-sm py-3.5 px-6 rounded-xl cursor-not-allowed ${className}`}>
+        <span>⏳ Profil en cours de vérification</span>
+        <span className="text-xs font-normal text-gray-400">Réservation disponible après validation</span>
+      </div>
+    );
+  }
   return (
     <Link
       href={`/reserver/${artisan_id}`}
@@ -330,9 +372,9 @@ export default async function artisanPage({ params }: PageProps) {
 
   // Parallel fetch : profil + services + avis + disponibilites
   const [profileRes, servicesRes, avisRes, dispoRes] = await Promise.all([
-    supabase
-      .from("profiles_artisans")
-      .select("*")
+    (supabase
+      .from("profiles_artisans") as any)
+      .select("*, verification_status, bypass_verification")
       .eq("id", id)
       .single(),
 
@@ -369,6 +411,11 @@ export default async function artisanPage({ params }: PageProps) {
   const fullName =
     `${artisan.prenom ?? ""} ${artisan.nom ?? ""}`.trim() ||
     "artisan";
+  // Vérification du compte
+  const isVerifie =
+    (artisan as any).bypass_verification === true ||
+    (artisan as any).verification_status === "verifie";
+
   const urgenceActif = (artisan as any).urgence_actif === true &&
     (artisan as any).urgence_fin &&
     new Date((artisan as any).urgence_fin) > new Date();
@@ -424,12 +471,18 @@ export default async function artisanPage({ params }: PageProps) {
           </Link>
 
           {/* CTA mobile sticky */}
-          <Link
-            href={`/reserver/${id}`}
-            className="sm:hidden inline-flex items-center gap-1 bg-brand-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-brand-700 transition-colors"
-          >
-            Réserver
-          </Link>
+          {isVerifie ? (
+            <Link
+              href={`/reserver/${id}`}
+              className="sm:hidden inline-flex items-center gap-1 bg-brand-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-brand-700 transition-colors"
+            >
+              Réserver
+            </Link>
+          ) : (
+            <span className="sm:hidden inline-flex items-center gap-1 bg-gray-100 text-gray-400 text-xs font-bold px-3 py-2 rounded-lg cursor-not-allowed">
+              ⏳ En vérification
+            </span>
+          )}
           <div className="hidden sm:block w-[120px]" />
         </div>
       </nav>
@@ -502,6 +555,11 @@ export default async function artisanPage({ params }: PageProps) {
                           Disponible maintenant
                         </span>
                       )}
+                      {!isVerifie && (
+                        <span className="flex items-center gap-0.5 text-[10px] text-orange-600 font-medium">
+                          ⏳ En cours de vérification
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -532,6 +590,11 @@ export default async function artisanPage({ params }: PageProps) {
                       <span className={`w-1.5 h-1.5 rounded-full ${artisan.actif ? "bg-green-500" : "bg-gray-400"}`} />
                       {artisan.actif ? "Disponible" : "Indisponible"}
                     </span>
+                    {!isVerifie && (
+                      <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-orange-50 text-orange-700 border-orange-200">
+                        ⏳ En cours de vérification
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="mt-3">
@@ -609,7 +672,7 @@ export default async function artisanPage({ params }: PageProps) {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {services.map((s) => (
-                    <ServiceCard key={s.id} service={s} artisanId={id} />
+                    <ServiceCard key={s.id} service={s} artisanId={id} canReserve={isVerifie} />
                   ))}
                 </div>
               )}
@@ -681,7 +744,7 @@ export default async function artisanPage({ params }: PageProps) {
                 </div>
               )}
 
-              <ReserveButton artisan_id={id} className="w-full hidden lg:block" />
+              <ReserveButton artisan_id={id} className="w-full hidden lg:block" canReserve={isVerifie} />
 
 
 
@@ -818,7 +881,7 @@ export default async function artisanPage({ params }: PageProps) {
 
       {/* ── Bouton Réserver flottant (mobile uniquement) ──────────────────────── */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 p-4 safe-area-bottom">
-        <ReserveButton artisan_id={id} className="w-full" />
+        <ReserveButton artisan_id={id} className="w-full" canReserve={isVerifie} />
       </div>
       {/* Espace pour le bouton flottant mobile */}
       <div className="lg:hidden h-24" />
