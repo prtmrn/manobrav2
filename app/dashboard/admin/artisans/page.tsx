@@ -75,17 +75,17 @@ export default async function AdminArtisansPage() {
         </div>
       )}
 
-      <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-x-auto">
+        <table className="w-full text-sm min-w-[960px]">
           <thead>
             <tr className="border-b border-gray-800">
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Artisan</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Métier</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Ville</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">SIRET</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Avis</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Statut</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Vérification</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider w-44">Artisan</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider w-36">Métier</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider w-24">Ville</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider w-28">SIRET</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider w-16">Avis</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider w-20">Statut</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider w-28">Vérification</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
@@ -105,7 +105,7 @@ export default async function AdminArtisansPage() {
                       {a.bypass_verification && <span className="text-xs text-purple-400 font-mono">bypass</span>}
                     </div>
                   </td>
-                  <td className="px-4 py-3"><span className="text-gray-300">{metier}</span></td>
+                  <td className="px-4 py-3"><span className="text-gray-300 text-xs block truncate max-w-[130px]">{metier}</span></td>
                   <td className="px-4 py-3"><span className="text-gray-300">{a.ville ?? "N/A"}</span></td>
                   <td className="px-4 py-3">
                     <span className={`text-xs font-mono ${a.siret ? "text-green-400" : "text-red-400"}`}>
