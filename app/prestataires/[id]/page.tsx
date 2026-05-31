@@ -875,7 +875,7 @@ export default async function artisanPage({ params }: PageProps) {
                 
                 <div>
                   <p className="text-sm font-bold text-amber-800">
-                    artisan vérifié Pro
+                    Artisan vérifié Pro
                   </p>
                   <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">
                     Son identité et ses qualifications ont été vérifiées par
