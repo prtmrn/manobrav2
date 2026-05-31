@@ -51,7 +51,8 @@ interface ReservationDetail {
 // ─── Helpers de formatage ─────────────────────────────────────────────────────
 
 function fmtEuro(v: number | null) {
-  if (v === null || v === 0) return "N/A";
+  if (v === null) return "N/A";
+  if (v === 0) return "Gratuit";
   return new Intl.NumberFormat("fr-FR", {
     style: "currency", currency: "EUR", minimumFractionDigits: 0,
   }).format(v);
