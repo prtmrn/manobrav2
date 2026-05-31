@@ -19,13 +19,13 @@ const stepsClient: Step[] = [
   },
   {
     num: "02",
-    icon: "📅",
+    icon: "",
     title: "Réservez en ligne",
     desc: "Choisissez un créneau disponible directement dans l'agenda du artisan. Aucun appel téléphonique requis.",
   },
   {
     num: "03",
-    icon: "✅",
+    icon: "",
     title: "Profitez du service",
     desc: "Payez en toute sécurité via Stripe. Laissez un avis après la prestation pour aider la communauté.",
   },

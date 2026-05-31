@@ -223,7 +223,7 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
     // non_soumis
     return (
       <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 flex items-center gap-3">
-        <span className="text-orange-500 text-xl">⚠️</span>
+        
         <div>
           <p className="text-orange-800 font-semibold text-sm">Profil en attente de vérification</p>
           <p className="text-orange-600 text-xs mt-0.5">Renseignez vos assurances ci-dessous pour soumettre votre dossier à Manobra.</p>

@@ -310,7 +310,7 @@ export default async function DashboardClientPage() {
           ════════════════════════════════════════════════════════════════════ */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          {greeting}, {displayName}&nbsp;👋
+          {greeting}, {displayName}
         </h1>
         <p className="text-sm text-gray-500 mt-1">Bienvenue sur votre espace client.</p>
       </div>

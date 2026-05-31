@@ -214,7 +214,7 @@ export default function AdminArtisansTable({ artisans, emailMap }: Props) {
 
       {enAttente > 0 && (
         <div className="bg-yellow-900/20 border border-yellow-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
-          <span className="text-yellow-400 text-sm">⚠️</span>
+          <svg className="w-4 h-4 text-yellow-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
           <p className="text-yellow-300 text-[11px]"><span className="font-semibold">{enAttente} profil{enAttente > 1 ? "s" : ""}</span> en attente de vérification.</p>
         </div>
       )}

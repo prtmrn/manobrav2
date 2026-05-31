@@ -780,7 +780,7 @@ export default function SearchFilters({
           )}
           {ville && (
             <FilterChip
-              label={`📍 ${ville}`}
+              label={`${ville}`}
               onRemove={() => {
                 setVille("");
                 setAdresseLabel("");
@@ -815,7 +815,7 @@ export default function SearchFilters({
           )}
           {dispo && (
             <FilterChip
-              label="📅 Disponible cette semaine"
+              label="Disponible cette semaine"
               onRemove={() => {
                 setDispo(false);
                 applyFilters({ dispo: false });

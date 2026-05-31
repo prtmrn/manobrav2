@@ -629,7 +629,7 @@ export default async function artisanPage({ params }: PageProps) {
             {artisan.bio && (
               <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-                  <span className="text-xl">💬</span> À propos
+                  À propos
                 </h2>
                 <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">
                   {artisan.bio}
@@ -640,7 +640,6 @@ export default async function artisanPage({ params }: PageProps) {
             {/* ── Services ──────────────────────────────────────────────── */}
             <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="text-xl">🛠️</span>
                 Services proposés
                 {services.length > 0 && (
                   <span className="ml-auto text-xs font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">
@@ -651,7 +650,7 @@ export default async function artisanPage({ params }: PageProps) {
 
               {services.length === 0 ? (
                 <div className="text-center py-10">
-                  <div className="text-4xl mb-2">📋</div>
+                  
                   <p className="text-sm text-gray-500">
                     Aucun service renseigné pour le moment.
                   </p>
@@ -686,7 +685,7 @@ export default async function artisanPage({ params }: PageProps) {
 
               {avis.length === 0 ? (
                 <div className="text-center py-10">
-                  <div className="text-4xl mb-2">💭</div>
+                  
                   <p className="text-sm font-semibold text-gray-700 mb-1">
                     Aucun avis pour le moment
                   </p>
@@ -873,7 +872,7 @@ export default async function artisanPage({ params }: PageProps) {
             {/* ── Badge Pro détail ──────────────────────────────────────── */}
             {(artisan as { plan_actif?: string }).plan_actif === "pro" && (
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex gap-3">
-                <div className="text-2xl flex-shrink-0">🏅</div>
+                
                 <div>
                   <p className="text-sm font-bold text-amber-800">
                     artisan vérifié Pro
