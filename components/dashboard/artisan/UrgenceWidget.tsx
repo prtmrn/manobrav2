@@ -145,7 +145,7 @@ export default function UrgenceWidget({
                   <p>Le <span className="font-semibold text-gray-800">mode urgence</span> signale aux clients que vous êtes disponible immédiatement pour une intervention.</p>
                   <p>Votre profil affiche alors un badge <span className="font-semibold text-red-600">« Disponible maintenant »</span> visible dans les résultats de recherche et sur votre fiche.</p>
                   <p>Les clients peuvent vous contacter en priorité pour des demandes urgentes.</p>
-                  <p className="text-gray-400 pt-1 border-t border-gray-100">⚠️ Si vous ne répondez pas à une demande urgente, votre mode urgence peut être temporairement suspendu.</p>
+                  <p className="text-gray-400 pt-1 border-t border-gray-100">Si le mode urgence est activé mais que vous n'acceptez ou ne refusez pas une demande dans les 15 minutes, le mode urgence sera temporairement suspendu.</p>
                 </div>
                 <button onClick={() => setShowHelp(false)}
                   className="w-full py-2 rounded-lg bg-gray-900 hover:bg-gray-700 text-white text-xs font-semibold transition-colors">
