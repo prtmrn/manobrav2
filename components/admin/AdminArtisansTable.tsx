@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AdminArtisanActions from "@/components/admin/AdminArtisanActions";
@@ -39,14 +39,98 @@ function VerifBadge({ status }: { status: string | null }) {
   }
 }
 
-const TH = "px-2 py-2 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap";
-const TD = "px-2 py-2 text-[11px]";
+const STORAGE_KEY = "manobra_admin_artisans_col_widths";
+
+const DEFAULT_WIDTHS: Record<string, number> = {
+  check:    32,
+  artisan:  170,
+  metier:   140,
+  ville:    80,
+  siret:    130,
+  avis:     60,
+  statut:   70,
+  verif:    90,
+  docs:     50,
+  voir:     55,
+  compte:   85,
+  suppr:    80,
+  modif:    70,
+};
+
+function loadWidths(): Record<string, number> {
+  if (typeof window === "undefined") return DEFAULT_WIDTHS;
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) return { ...DEFAULT_WIDTHS, ...JSON.parse(stored) };
+  } catch {}
+  return DEFAULT_WIDTHS;
+}
+
+function saveWidths(widths: Record<string, number>) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(widths)); } catch {}
+}
+
+const COLS = [
+  { key: "check",   label: "" },
+  { key: "artisan", label: "Artisan" },
+  { key: "metier",  label: "Métier" },
+  { key: "ville",   label: "Ville" },
+  { key: "siret",   label: "SIRET" },
+  { key: "avis",    label: "Avis" },
+  { key: "statut",  label: "Statut" },
+  { key: "verif",   label: "Vérification" },
+  { key: "docs",    label: "Docs" },
+  { key: "voir",    label: "Voir" },
+  { key: "compte",  label: "Compte" },
+  { key: "suppr",   label: "Suppr." },
+  { key: "modif",   label: "Modif." },
+];
+
+const TD = "px-2 py-1.5 text-[11px] overflow-hidden";
+const TH_TEXT = "text-[10px] font-semibold text-gray-400 uppercase tracking-wider";
 
 export default function AdminArtisansTable({ artisans, emailMap }: Props) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
   const [filter, setFilter] = useState<"all" | "actifs" | "inactifs" | "en_attente">("all");
+  const [colWidths, setColWidths] = useState<Record<string, number>>(DEFAULT_WIDTHS);
+
+  // Charger depuis localStorage après le mount
+  useEffect(() => {
+    setColWidths(loadWidths());
+  }, []);
+
+  // Resize state
+  const resizing = useRef<{ key: string; startX: number; startW: number } | null>(null);
+
+  const onResizeStart = useCallback((key: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    resizing.current = { key, startX: e.clientX, startW: colWidths[key] };
+
+    function onMove(ev: MouseEvent) {
+      if (!resizing.current) return;
+      const delta = ev.clientX - resizing.current.startX;
+      const newW = Math.max(30, resizing.current.startW + delta);
+      setColWidths((prev) => ({ ...prev, [resizing.current!.key]: newW }));
+    }
+
+    function onUp() {
+      if (resizing.current) {
+        setColWidths((prev) => {
+          const next = { ...prev };
+          saveWidths(next);
+          return next;
+        });
+        resizing.current = null;
+      }
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    }
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, [colWidths]);
 
   const total = artisans.length;
   const actifs = artisans.filter((a) => a.actif).length;
@@ -101,12 +185,20 @@ export default function AdminArtisansTable({ artisans, emailMap }: Props) {
 
   return (
     <div className="p-4 space-y-3">
-      <div>
-        <h1 className="text-lg font-bold text-white">Artisans</h1>
-        <p className="text-[11px] text-gray-400 mt-0.5">
-          {total} inscrits · {actifs} actifs · {inactifs} inactifs
-          {enAttente > 0 && <span className="text-yellow-400"> · {enAttente} en attente</span>}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-lg font-bold text-white">Artisans</h1>
+          <p className="text-[11px] text-gray-400 mt-0.5">
+            {total} inscrits · {actifs} actifs · {inactifs} inactifs
+            {enAttente > 0 && <span className="text-yellow-400"> · {enAttente} en attente</span>}
+          </p>
+        </div>
+        <button
+          onClick={() => { saveWidths(DEFAULT_WIDTHS); setColWidths(DEFAULT_WIDTHS); }}
+          className="text-[10px] text-gray-500 hover:text-gray-300 border border-gray-700 px-2 py-0.5 rounded transition-colors"
+        >
+          Réinitialiser colonnes
+        </button>
       </div>
 
       <div className="flex gap-1.5 flex-wrap">
@@ -132,11 +224,11 @@ export default function AdminArtisansTable({ artisans, emailMap }: Props) {
           <span className="text-[11px] text-white font-semibold">{selected.size} sélectionné{selected.size > 1 ? "s" : ""}</span>
           <div className="flex gap-1 flex-wrap ml-1">
             {[
-              { action: "activer" as const, label: "Activer", cls: "text-green-400 border-green-800 hover:bg-green-900/50" },
-              { action: "desactiver" as const, label: "Désactiver", cls: "text-gray-300 border-gray-600 hover:bg-gray-700" },
-              { action: "valider" as const, label: "✓ Valider", cls: "text-emerald-400 border-emerald-800 hover:bg-emerald-900/50" },
-              { action: "rejeter" as const, label: "Rejeter", cls: "text-orange-400 border-orange-800 hover:bg-orange-900/50" },
-              { action: "supprimer" as const, label: "Supprimer", cls: "text-red-400 border-red-800 hover:bg-red-900/50" },
+              { action: "activer" as const,    label: "Activer",     cls: "text-green-400 border-green-800 hover:bg-green-900/50" },
+              { action: "desactiver" as const, label: "Désactiver",  cls: "text-gray-300 border-gray-600 hover:bg-gray-700" },
+              { action: "valider" as const,    label: "✓ Valider",   cls: "text-emerald-400 border-emerald-800 hover:bg-emerald-900/50" },
+              { action: "rejeter" as const,    label: "Rejeter",     cls: "text-orange-400 border-orange-800 hover:bg-orange-900/50" },
+              { action: "supprimer" as const,  label: "Supprimer",   cls: "text-red-400 border-red-800 hover:bg-red-900/50" },
             ].map(({ action, label, cls }) => (
               <button key={action} onClick={() => bulkAction(action)} disabled={bulkLoading}
                 className={`text-[10px] px-2 py-0.5 rounded border bg-transparent disabled:opacity-50 font-medium ${cls}`}>
@@ -148,41 +240,33 @@ export default function AdminArtisansTable({ artisans, emailMap }: Props) {
         </div>
       )}
 
-      <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-x-auto">
-        <table className="text-[11px] border-collapse" style={{width: "100%", tableLayout: "fixed"}}>
+      <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-x-auto select-none">
+        <table className="text-[11px] border-collapse" style={{ tableLayout: "fixed", width: `${Object.values(colWidths).reduce((a, b) => a + b, 0)}px` }}>
           <colgroup>
-            <col style={{width: "32px"}} />
-            <col style={{width: "160px"}} />
-            <col style={{width: "140px"}} />
-            <col style={{width: "80px"}} />
-            <col style={{width: "130px"}} />
-            <col style={{width: "55px"}} />
-            <col style={{width: "65px"}} />
-            <col style={{width: "90px"}} />
-            <col style={{width: "50px"}} />
-            <col style={{width: "50px"}} />
-            <col style={{width: "90px"}} />
-            <col style={{width: "70px"}} />
-            <col style={{width: "65px"}} />
-            <col style={{width: "65px"}} />
+            {COLS.map((c) => <col key={c.key} style={{ width: `${colWidths[c.key]}px` }} />)}
           </colgroup>
           <thead>
             <tr className="border-b border-gray-800 bg-gray-900/80">
-              <th className="px-2 py-2 text-center">
-                <input type="checkbox" checked={allSelected} onChange={toggleAll} className="w-3 h-3 rounded border-gray-600 bg-gray-800 accent-brand-500 cursor-pointer" />
-              </th>
-              <th className={TH}>Artisan</th>
-              <th className={TH}>Métier</th>
-              <th className={TH}>Ville</th>
-              <th className={TH}>SIRET</th>
-              <th className={TH}>Avis</th>
-              <th className={TH}>Statut</th>
-              <th className={TH}>Vérification</th>
-              <th className={TH}>Docs</th>
-              <th className={TH}>Voir</th>
-              <th className={TH}>Compte</th>
-              <th className={TH}>Suppr.</th>
-              <th className={TH}>Modif.</th>
+              {COLS.map((col, i) => (
+                <th key={col.key} className="relative px-2 py-2 text-left" style={{ width: colWidths[col.key] }}>
+                  {col.key === "check" ? (
+                    <input type="checkbox" checked={allSelected} onChange={toggleAll}
+                      className="w-3 h-3 rounded border-gray-600 bg-gray-800 accent-brand-500 cursor-pointer" />
+                  ) : (
+                    <span className={`${TH_TEXT} block overflow-hidden text-ellipsis whitespace-nowrap`}>{col.label}</span>
+                  )}
+                  {/* Séparateur redimensionnable — sauf dernière colonne */}
+                  {i < COLS.length - 1 && (
+                    <div
+                      onMouseDown={(e) => onResizeStart(col.key, e)}
+                      className="absolute right-0 top-0 h-full w-2 cursor-col-resize flex items-center justify-center group z-10"
+                      title="Glisser pour redimensionner"
+                    >
+                      <div className="w-px h-4 bg-gray-700 group-hover:bg-brand-500 group-hover:h-full transition-all" />
+                    </div>
+                  )}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800/60">
@@ -195,8 +279,9 @@ export default function AdminArtisansTable({ artisans, emailMap }: Props) {
               const hasDocs = !!(a.assurance_rc_numero || a.assurance_decennale_numero || a.qualification_cstb_numero);
               return (
                 <tr key={a.id} className={`transition-colors ${isSelected ? "bg-brand-900/20" : a.verification_status === "en_attente" ? "bg-yellow-900/5" : "hover:bg-gray-800/30"}`}>
-                  <td className="px-2 py-1.5 text-center">
-                    <input type="checkbox" checked={isSelected} onChange={() => toggleOne(a.id)} className="w-3 h-3 rounded border-gray-600 bg-gray-800 accent-brand-500 cursor-pointer" />
+                  <td className={TD + " text-center"}>
+                    <input type="checkbox" checked={isSelected} onChange={() => toggleOne(a.id)}
+                      className="w-3 h-3 rounded border-gray-600 bg-gray-800 accent-brand-500 cursor-pointer" />
                   </td>
                   <td className={TD}>
                     <p className="font-semibold text-white truncate">{nom}</p>
@@ -208,16 +293,16 @@ export default function AdminArtisansTable({ artisans, emailMap }: Props) {
                     <span className="text-gray-300 block truncate" title={metier}>{metier}</span>
                   </td>
                   <td className={TD}>
-                    <span className="text-gray-300 truncate block">{a.ville ?? "N/A"}</span>
+                    <span className="text-gray-300 block truncate" title={a.ville ?? ""}>{a.ville ?? "N/A"}</span>
                   </td>
                   <td className={TD}>
-                    <span className={`font-mono ${a.siret ? "text-green-400" : "text-red-400"}`}>
+                    <span className={`font-mono block truncate ${a.siret ? "text-green-400" : "text-red-400"}`} title={a.siret ?? ""}>
                       {a.siret ?? "Manquant"}
                     </span>
                   </td>
                   <td className={TD}>
                     {a.nombre_avis > 0
-                      ? <span className="text-yellow-400">★ {a.note_moyenne.toFixed(1)} ({a.nombre_avis})</span>
+                      ? <span className="text-yellow-400 whitespace-nowrap">★ {a.note_moyenne.toFixed(1)} ({a.nombre_avis})</span>
                       : <span className="text-gray-600">0</span>}
                   </td>
                   <td className={TD}>
@@ -245,7 +330,7 @@ export default function AdminArtisansTable({ artisans, emailMap }: Props) {
                         mode="docs"
                       />
                     ) : (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded border border-gray-800 text-gray-700 cursor-not-allowed">Docs</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded border border-gray-800 text-gray-700 cursor-not-allowed select-none">Docs</span>
                     )}
                   </td>
                   <td className={TD}>
@@ -258,10 +343,8 @@ export default function AdminArtisansTable({ artisans, emailMap }: Props) {
                     <AdminArtisanActions
                       artisanId={a.id} actif={a.actif}
                       verificationStatus={a.verification_status ?? "non_soumis"}
-                      verificationNote={a.verification_note ?? ""}
-                      assuranceRcNumero="" assuranceRcAssureur=""
-                      assuranceDecennaleNumero="" assuranceDecennaleAssureur=""
-                      qualificationCstbNumero=""
+                      verificationNote="" assuranceRcNumero="" assuranceRcAssureur=""
+                      assuranceDecennaleNumero="" assuranceDecennaleAssureur="" qualificationCstbNumero=""
                       mode="toggle"
                     />
                   </td>
@@ -269,10 +352,8 @@ export default function AdminArtisansTable({ artisans, emailMap }: Props) {
                     <AdminArtisanActions
                       artisanId={a.id} actif={a.actif}
                       verificationStatus={a.verification_status ?? "non_soumis"}
-                      verificationNote={a.verification_note ?? ""}
-                      assuranceRcNumero="" assuranceRcAssureur=""
-                      assuranceDecennaleNumero="" assuranceDecennaleAssureur=""
-                      qualificationCstbNumero=""
+                      verificationNote="" assuranceRcNumero="" assuranceRcAssureur=""
+                      assuranceDecennaleNumero="" assuranceDecennaleAssureur="" qualificationCstbNumero=""
                       mode="delete"
                     />
                   </td>
