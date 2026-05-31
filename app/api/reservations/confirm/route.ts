@@ -144,7 +144,7 @@ export async function POST(request: Request) {
   const reservationId = (reservation as { id: string }).id;
 
   // Créer la conversation associée à la réservation
-  await (admin.from("conversations") as any).insert({
+  await (admin as any).from("conversations").insert({
     reservation_id: reservationId,
     artisan_id: artisanId,
     client_id: user?.id ?? null,
