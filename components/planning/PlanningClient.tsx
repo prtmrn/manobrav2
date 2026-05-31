@@ -602,14 +602,14 @@ export default function PlanningClient({
     const jsDay = dateObj.getDay();
     const dbDay = jsDay === 0 ? 6 : jsDay - 1;
 
-    const { data, error } = await (supabase.from("disponibilites") as any).insert({
+    const { data, error } = await (supabase.from("disponibilites") as any).upsert({
       artisan_id: userId,
       jour_semaine: dbDay,
       heure_debut: heure + ":00",
       heure_fin: `${endH}:${endM}:00`,
       actif: true,
       type: "normal",
-    }).select().single();
+    }, { onConflict: "artisan_id,jour_semaine,heure_debut,heure_fin", ignoreDuplicates: true }).select().single();
 
     if (!error && data) {
       setDispos(prev => [...prev, data as Dispo]);
@@ -2036,7 +2036,7 @@ function DispoModal({
     setLoading(true);
     setError(null);
     const rows = form.jours.map(j => ({ artisan_id: userId, jour_semaine: j, heure_debut: form.debut + ":00", heure_fin: form.fin + ":00", actif: true, type: form.type }));
-    const { data, error: err } = await (supabase.from("disponibilites") as any).insert(rows).select();
+    const { data, error: err } = await (supabase.from("disponibilites") as any).upsert(rows, { onConflict: "artisan_id,jour_semaine,heure_debut,heure_fin", ignoreDuplicates: true }).select();
     if (err) { setError(err.message); }
     else if (data) {
       setDispos(prev => [...prev, ...(data as Dispo[])].sort((a, b) => a.jour_semaine - b.jour_semaine || a.heure_debut.localeCompare(b.heure_debut)));

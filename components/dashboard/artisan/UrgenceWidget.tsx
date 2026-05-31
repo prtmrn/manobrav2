@@ -53,10 +53,14 @@ export default function UrgenceWidget({
     if (actif) {
       setLoading(true);
       const supabase = createClient();
-      (supabase.from("profiles_artisans") as any)
+      await (supabase.from("profiles_artisans") as any)
         .update({ urgence_actif: false, urgence_fin: null })
-        .eq("id", artisanId)
-        .then(() => window.location.reload());
+        .eq("id", artisanId);
+      setActif(false);
+      setFin(null);
+      setLoading(false);
+      router.refresh();
+      return;
     } else {
       setShowConfig(true);
     }
@@ -71,7 +75,11 @@ export default function UrgenceWidget({
     await (supabase.from("profiles_artisans") as any)
       .update({ urgence_actif: true, urgence_fin: finISO })
       .eq("id", artisanId);
-    window.location.reload();
+    setActif(true);
+    setFin(finISO);
+    setShowConfig(false);
+    setLoading(false);
+    router.refresh();
   }
 
   async function saveDelai(val: number) {
