@@ -97,10 +97,10 @@ export default function AdminArtisansTable({ artisans, emailMap }: Props) {
   ];
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-4 space-y-3">
       <div>
-        <h1 className="text-2xl font-bold text-white">Artisans</h1>
-        <p className="text-xs text-gray-400 mt-1">
+        <h1 className="text-lg font-bold text-white">Artisans</h1>
+        <p className="text-xs text-gray-400 mt-0.5">
           {total} inscrits · {actifs} actifs · {inactifs} inactifs
           {enAttente > 0 && <span className="text-yellow-400"> · {enAttente} en attente</span>}
         </p>

@@ -85,7 +85,7 @@ export default function AdminArtisanActions({
         {(verificationStatus === "en_attente" || hasDocuments) && (
           <button
             onClick={() => { setShowVerifModal(true); setVerifyError(null); setRejectNote(verificationNote); }}
-            className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-yellow-800 text-yellow-400 hover:bg-yellow-900/30 transition-colors whitespace-nowrap"
+            className="text-[11px] font-semibold px-2 py-0.5 rounded border border-yellow-800 text-yellow-400 hover:bg-yellow-900/30 transition-colors whitespace-nowrap"
           >
             Docs
           </button>
@@ -93,7 +93,7 @@ export default function AdminArtisanActions({
         <button
           onClick={toggle}
           disabled={loading}
-          className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition-colors disabled:opacity-50 ${
+          className={`text-[11px] font-semibold px-2 py-0.5 rounded border transition-colors disabled:opacity-50 ${
             actif ? "border-red-800 text-red-400 hover:bg-red-900/30" : "border-green-800 text-green-400 hover:bg-green-900/30"
           }`}
         >
@@ -101,7 +101,7 @@ export default function AdminArtisanActions({
         </button>
         <button
           onClick={() => { setShowDeleteModal(true); setPassword(""); setDeleteError(null); }}
-          className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-gray-700 text-gray-400 hover:bg-gray-800 transition-colors"
+          className="text-[11px] font-semibold px-2 py-0.5 rounded border border-gray-700 text-gray-400 hover:bg-gray-800 transition-colors"
         >
           Supprimer
         </button>
