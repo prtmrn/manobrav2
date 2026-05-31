@@ -27,6 +27,7 @@ export default function UrgenceWidget({
   const [loading, setLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState("");
   const [showConfig, setShowConfig] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   const isSanctioned = urgenceSanctionFin ? new Date(urgenceSanctionFin) > new Date() : false;
   const sanctionEnd = urgenceSanctionFin
@@ -106,11 +107,53 @@ export default function UrgenceWidget({
             </svg>
           </div>
           <div>
-            <p className={`text-sm font-bold ${actif ? "text-red-700" : "text-gray-700"}`}>Mode urgence</p>
+            <div className="flex items-center gap-1.5">
+              <p className={`text-sm font-bold ${actif ? "text-red-700" : "text-gray-700"}`}>Mode urgence</p>
+              <button
+                type="button"
+                onClick={() => setShowHelp(true)}
+                className="w-4 h-4 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-500 text-[10px] font-bold flex items-center justify-center transition-colors flex-shrink-0"
+                aria-label="En savoir plus sur le mode urgence"
+              >
+                ?
+              </button>
+            </div>
             {actif && timeLeft && <p className="text-xs text-red-500">Disponible encore {timeLeft}</p>}
             {isSanctioned && <p className="text-xs text-gray-500">Suspendu jusqu&apos;à {sanctionEnd}</p>}
             {!actif && !isSanctioned && <p className="text-xs text-gray-400">Inactif</p>}
           </div>
+
+          {showHelp && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={() => setShowHelp(false)}>
+              <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-3" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-red-100 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-sm font-bold text-gray-900">Mode urgence</h3>
+                  </div>
+                  <button onClick={() => setShowHelp(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <div className="space-y-2 text-xs text-gray-600 leading-relaxed">
+                  <p>Le <span className="font-semibold text-gray-800">mode urgence</span> signale aux clients que vous êtes disponible immédiatement pour une intervention.</p>
+                  <p>Votre profil affiche alors un badge <span className="font-semibold text-red-600">« Disponible maintenant »</span> visible dans les résultats de recherche et sur votre fiche.</p>
+                  <p>Les clients peuvent vous contacter en priorité pour des demandes urgentes.</p>
+                  <p className="text-gray-400 pt-1 border-t border-gray-100">⚠️ Si vous ne répondez pas à une demande urgente, votre mode urgence peut être temporairement suspendu.</p>
+                </div>
+                <button onClick={() => setShowHelp(false)}
+                  className="w-full py-2 rounded-lg bg-gray-900 hover:bg-gray-700 text-white text-xs font-semibold transition-colors">
+                  Compris
+                </button>
+              </div>
+            </div>
+          )}
         </div>
         <button
           onClick={toggleUrgence}
