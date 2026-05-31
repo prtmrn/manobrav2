@@ -24,7 +24,7 @@ export default async function ArtisanMessagesPage() {
 
   // Pour chaque conversation, récupérer le dernier message et le nb non lus
   const enriched = await Promise.all(convs.map(async (conv: any) => {
-    const [lastMsgRes, unreadRes, clientRes, resaRes] = await Promise.all([
+    const [lastMsgRes, unreadRes, clientRes, clientAuthRes, resaRes] = await Promise.all([
       (admin as any).from("messages")
         .select("contenu, type, created_at, auteur_id")
         .eq("conversation_id", conv.id)
@@ -42,6 +42,9 @@ export default async function ArtisanMessagesPage() {
             .eq("id", conv.client_id)
             .maybeSingle()
         : Promise.resolve({ data: null }),
+      conv.client_id
+        ? admin.auth.admin.getUserById(conv.client_id)
+        : Promise.resolve({ data: { user: null } }),
       (admin as any).from("reservations")
         .select("date, statut, service_id")
         .eq("id", conv.reservation_id)
@@ -49,9 +52,10 @@ export default async function ArtisanMessagesPage() {
     ]);
 
     const client = clientRes.data;
-    const clientName = client
+    const clientEmail = (clientAuthRes as any)?.data?.user?.email ?? "";
+    const clientName = client && (client.prenom || client.nom)
       ? `${client.prenom ?? ""} ${client.nom ?? ""}`.trim()
-      : conv.guest_email ?? "Client";
+      : conv.guest_email || clientEmail || "Client";
 
     return {
       ...conv,

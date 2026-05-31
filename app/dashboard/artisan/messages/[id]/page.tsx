@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import ChatWindow from "@/components/chat/ChatWindow";
+import ArtisanChatActions from "@/components/chat/ArtisanChatActions";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -75,6 +76,12 @@ export default async function ArtisanConversationPage({ params }: Props) {
           </span>
         )}
       </div>
+
+      <ArtisanChatActions
+        reservationId={conv.reservation_id}
+        reservationStatut={resa?.statut ?? "en_attente"}
+        conversationId={conv.id}
+      />
 
       <ChatWindow
         conversationId={conv.id}
