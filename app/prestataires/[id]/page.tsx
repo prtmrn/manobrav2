@@ -336,7 +336,7 @@ function ReserveButton({
   if (!canReserve) {
     return (
       <div className={`flex flex-col items-center justify-center gap-1 bg-gray-100 border border-gray-200 text-gray-400 font-semibold text-sm py-3.5 px-6 rounded-xl cursor-not-allowed ${className}`}>
-        <span>⏳ Profil en cours de vérification</span>
+        <span>Profil en cours de vérification</span>
         <span className="text-xs font-normal text-gray-400">Réservation disponible après validation</span>
       </div>
     );
@@ -681,7 +681,6 @@ export default async function artisanPage({ params }: PageProps) {
             {/* ── Avis clients ──────────────────────────────────────────── */}
             <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="text-xl">⭐</span>
                 Avis clients
                 {artisan.nombre_avis > 0 && (
                   <span className="ml-auto text-xs font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">
@@ -811,7 +810,7 @@ export default async function artisanPage({ params }: PageProps) {
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Disponibilités</p>
                   <div className="space-y-1.5">
                     {disponibilites.map((d, i) => {
-                      const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+                      const jours = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
                       return (
                         <div key={i} className="flex items-center justify-between text-xs">
                           <span className="font-medium text-gray-700">{jours[d.jour_semaine]}</span>
@@ -850,7 +849,7 @@ export default async function artisanPage({ params }: PageProps) {
                     </svg>
                     <span>{location}</span>
                     <Link
-                      href={`/map`}
+                      href={`/recherche?vue=carte`}
                       className="ml-auto text-brand-600 hover:underline font-medium"
                     >
                       Voir sur la carte →
