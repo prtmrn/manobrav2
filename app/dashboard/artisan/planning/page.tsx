@@ -17,7 +17,7 @@ export default async function PlanningPage() {
 
   const admin = createAdminClient();
   const today = new Date().toISOString().split("T")[0];
-  const in60days = new Date(Date.now() + 60 * 86400000).toISOString().split("T")[0];
+  const in90days = new Date(Date.now() + 90 * 86400000).toISOString().split("T")[0];
 
   const [artisanRes, dispoRes, indispoRes, resaRes] = await Promise.all([
     admin.from("profiles_artisans").select("google_calendar_connected").eq("id", user.id).single(),
@@ -28,7 +28,7 @@ export default async function PlanningPage() {
       .eq("artisan_id", user.id)
       .in("statut", ["confirme", "en_cours", "en_attente"])
       .gte("date", today)
-      .lte("date", in60days)
+      .lte("date", in90days)
       .order("date").order("heure_debut"),
   ]);
 
