@@ -54,6 +54,7 @@ export default function ClientShell({ children, userEmail, userName }: ClientShe
     { href: "/", label: "Accueil", exact: true, external: true },
     { href: "/dashboard", label: "Dashboard", exact: true },
     { href: "/dashboard/reservations", label: "Mes réservations" },
+    { href: "/dashboard/messages", label: "Messages" },
     { href: "/dashboard/profil", label: "Mon profil" },
   ];
 

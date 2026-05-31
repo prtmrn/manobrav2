@@ -31,6 +31,11 @@ const navItems: NavItem[] = [
     icon: "clipboard",
   },
   {
+    href: "/dashboard/artisan/messages",
+    label: "Messages",
+    icon: "chat",
+  },
+  {
     href: "/dashboard/abonnement",
     label: "Mon abonnement",
     icon: "credit-card",
