@@ -794,25 +794,40 @@ export default async function artisanPage({ params }: PageProps) {
               {/* Disponibilités */}
               {disponibilites.length > 0 && (() => {
                 const jours = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
-                // Regrouper par jour
-                const parJour: Record<number, string[]> = {};
+                // Regrouper par jour puis fusionner les créneaux qui se chevauchent
+                const parJour: Record<number, {debut: number; fin: number}[]> = {};
                 disponibilites.forEach(d => {
                   if (!parJour[d.jour_semaine]) parJour[d.jour_semaine] = [];
-                  parJour[d.jour_semaine].push(`${d.heure_debut.slice(0,5)} – ${d.heure_fin.slice(0,5)}`);
+                  const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
+                  parJour[d.jour_semaine].push({ debut: toMin(d.heure_debut), fin: toMin(d.heure_fin) });
                 });
+                const toHHMM = (min: number) => `${String(Math.floor(min/60)).padStart(2,"0")}:${String(min%60).padStart(2,"0")}`;
+                const fusionner = (slots: {debut: number; fin: number}[]) => {
+                  const sorted = [...slots].sort((a, b) => a.debut - b.debut);
+                  const merged: {debut: number; fin: number}[] = [];
+                  for (const s of sorted) {
+                    if (merged.length === 0 || s.debut > merged[merged.length-1].fin) {
+                      merged.push({...s});
+                    } else {
+                      merged[merged.length-1].fin = Math.max(merged[merged.length-1].fin, s.fin);
+                    }
+                  }
+                  return merged;
+                };
                 const joursUniques = [0,1,2,3,4,5,6].filter(j => parJour[j]);
                 return (
                   <div className="hidden lg:block mt-4 pt-4 border-t border-gray-100">
                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Disponibilités</p>
                     <div className="space-y-1.5">
-                      {joursUniques.map(j => (
-                        <div key={j} className="flex items-start justify-between text-xs gap-2">
-                          <span className="font-medium text-gray-700 flex-shrink-0">{jours[j]}</span>
-                          <div className="text-right text-gray-500 space-y-0.5">
-                            {parJour[j].map((h, i) => <div key={i}>{h}</div>)}
+                      {joursUniques.map(j => {
+                        const merged = fusionner(parJour[j]);
+                        return (
+                          <div key={j} className="flex items-center justify-between text-xs">
+                            <span className="font-medium text-gray-700">{jours[j]}</span>
+                            <span className="text-gray-500">{merged.map(s => `${toHHMM(s.debut)} – ${toHHMM(s.fin)}`).join(", ")}</span>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 );
