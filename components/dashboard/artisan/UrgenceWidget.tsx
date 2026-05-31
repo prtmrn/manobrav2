@@ -85,10 +85,10 @@ export default function UrgenceWidget({
     const now = new Date();
     const totalNow = now.getHours() * 60 + now.getMinutes();
     const start = totalNow + 30 - (totalNow % 30);
-    const end = Math.min(23 * 60 + 30, Math.max(start + 60, 20 * 60));
-    for (let total = start; total <= end; total += 30) {
+    for (let total = start; total <= 23 * 60 + 30; total += 30) {
       const hh = Math.floor(total / 60);
       const mm = total % 60;
+      if (hh > 23) break;
       opts.push(`${hh.toString().padStart(2, "0")}:${mm.toString().padStart(2, "0")}`);
     }
     return opts;
@@ -124,21 +124,14 @@ export default function UrgenceWidget({
       {showConfig && !actif && (
         <div className="px-5 py-4 border-b border-gray-100 space-y-3">
           <p className="text-xs font-semibold text-gray-600">Jusqu&apos;à quelle heure êtes-vous disponible ?</p>
-          <div className="flex gap-2 flex-wrap">
-            {heuresDispos().slice(0, 8).map(h => (
-              <button key={h} onClick={() => setHeureChoix(h)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                  heureChoix === h ? "bg-red-600 text-white border-red-600" : "bg-white text-gray-600 border-gray-200 hover:border-red-300"
-                }`}>{h}</button>
-            ))}
-          </div>
-          {heuresDispos().length > 8 && (
-            <select value={heureChoix} onChange={e => setHeureChoix(e.target.value)}
-              className="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-red-400">
-              <option value="">Autre heure...</option>
-              {heuresDispos().map(h => <option key={h} value={h}>{h}</option>)}
-            </select>
-          )}
+          <select
+            value={heureChoix}
+            onChange={e => setHeureChoix(e.target.value)}
+            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-red-400 text-gray-700 bg-white"
+          >
+            <option value="">Choisir une heure...</option>
+            {heuresDispos().map(h => <option key={h} value={h}>{h}</option>)}
+          </select>
           <div className="flex gap-2">
             <button onClick={(e) => { e.stopPropagation(); setShowConfig(false); }}
               className="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50">
