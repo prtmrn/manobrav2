@@ -805,22 +805,31 @@ export default async function artisanPage({ params }: PageProps) {
                 )}
               </dl>
               {/* Disponibilités */}
-              {disponibilites.length > 0 && (
-                <div className="hidden lg:block mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Disponibilités</p>
-                  <div className="space-y-1.5">
-                    {disponibilites.map((d, i) => {
-                      const jours = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
-                      return (
-                        <div key={i} className="flex items-center justify-between text-xs">
-                          <span className="font-medium text-gray-700">{jours[d.jour_semaine]}</span>
-                          <span className="text-gray-500">{d.heure_debut.slice(0,5)} – {d.heure_fin.slice(0,5)}</span>
+              {disponibilites.length > 0 && (() => {
+                const jours = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+                // Regrouper par jour
+                const parJour: Record<number, string[]> = {};
+                disponibilites.forEach(d => {
+                  if (!parJour[d.jour_semaine]) parJour[d.jour_semaine] = [];
+                  parJour[d.jour_semaine].push(`${d.heure_debut.slice(0,5)} – ${d.heure_fin.slice(0,5)}`);
+                });
+                const joursUniques = [0,1,2,3,4,5,6].filter(j => parJour[j]);
+                return (
+                  <div className="hidden lg:block mt-4 pt-4 border-t border-gray-100">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Disponibilités</p>
+                    <div className="space-y-1.5">
+                      {joursUniques.map(j => (
+                        <div key={j} className="flex items-start justify-between text-xs gap-2">
+                          <span className="font-medium text-gray-700 flex-shrink-0">{jours[j]}</span>
+                          <div className="text-right text-gray-500 space-y-0.5">
+                            {parJour[j].map((h, i) => <div key={i}>{h}</div>)}
+                          </div>
                         </div>
-                      );
-                    })}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
 
             {/* ── Mini-carte ────────────────────────────────────────────── */}
