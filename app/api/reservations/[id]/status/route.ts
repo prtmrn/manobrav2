@@ -145,6 +145,39 @@ export async function PATCH(request: Request, context: RouteContext) {
       }
     }
 
+    // Email client pour laisser un avis si intervention terminée
+    if (newStatut === "termine") {
+      let clientEmail = resa.guest_email ?? "";
+      let clientPrenom = resa.guest_nom ?? "Client";
+
+      if (resa.client_id) {
+        const { data: clientAuth } = await admin.auth.admin.getUserById(resa.client_id);
+        clientEmail = clientAuth?.user?.email ?? clientEmail;
+        const { data: clientProfile } = await admin
+          .from("profiles_clients")
+          .select("prenom")
+          .eq("id", resa.client_id)
+          .maybeSingle();
+        clientPrenom = (clientProfile as any)?.prenom ?? clientPrenom;
+      }
+
+      if (clientEmail) {
+        await sendBrevoEmail({
+          to: [{ email: clientEmail, name: clientPrenom }],
+          subject: `Votre intervention est terminée — Laissez un avis`,
+          htmlContent: `
+            <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px">
+              <h1 style="font-size:22px;color:#111">Bonjour ${clientPrenom},</h1>
+              <p style="color:#444">Votre intervention <strong>${serviceTitre}</strong> est terminée. Nous espérons que tout s'est bien passé.</p>
+              <p style="color:#444">Votre avis aide les autres clients à choisir les meilleurs artisans. Cela ne prend que 30 secondes.</p>
+              <a href="${siteUrl}/avis/${id}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#16a34a;color:#fff;border-radius:8px;text-decoration:none;font-weight:bold">Laisser un avis</a>
+              <p style="margin-top:32px;color:#888;font-size:13px">L'équipe Manobra</p>
+            </div>
+          `,
+        });
+      }
+    }
+
     // Email artisan si client annule
     if (role === "client" && newStatut === "annule" && artisanEmail) {
       await sendBrevoEmail({
