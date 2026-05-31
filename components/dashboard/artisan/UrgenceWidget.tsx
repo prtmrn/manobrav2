@@ -48,7 +48,7 @@ export default function UrgenceWidget({
     return () => clearInterval(t);
   }, [actif, fin]);
 
-  function toggleUrgence() {
+  async function toggleUrgence() {
     if (isSanctioned) return;
     if (actif) {
       setLoading(true);
@@ -60,7 +60,6 @@ export default function UrgenceWidget({
       setFin(null);
       setLoading(false);
       router.refresh();
-      return;
     } else {
       setShowConfig(true);
     }
