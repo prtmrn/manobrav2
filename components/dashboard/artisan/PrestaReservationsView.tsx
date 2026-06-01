@@ -106,8 +106,8 @@ function ReservationCard({
               {resa.service_titre && (
                 <p className="text-sm text-gray-500">{resa.service_titre}</p>
               )}
-              {resa.message_initial && (
-                <p className="text-sm text-gray-600 mt-1 italic line-clamp-2">&ldquo;{resa.message_initial}&rdquo;</p>
+              {(resa as any).message_initial && (
+                <p className="text-sm text-gray-600 mt-1 italic line-clamp-2">&ldquo;{(resa as any).message_initial}&rdquo;</p>
               )}
             </div>
             <StatusBadge statut={resa.statut} />
