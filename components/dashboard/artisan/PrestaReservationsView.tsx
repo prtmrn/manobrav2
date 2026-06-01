@@ -78,9 +78,13 @@ function ReservationCard({
   onAction: (id: string, statut: ReservationStatut) => void;
   pendingId: string | null;
 }) {
-  const displayEmail = (resa as any).client_email ?? (resa as any).guest_email ?? null;
-  const pseudo = displayEmail ? displayEmail.split("@")[0] : null;
-  const fullName = `${resa.client_prenom ?? ""} ${resa.client_nom ?? ""}`.trim() || pseudo || "Client";
+  const guestNom = (resa as any).guest_nom ?? null;
+  const guestEmail = (resa as any).guest_email ?? null;
+  const pseudo = guestEmail ? guestEmail.split("@")[0] : null;
+  const fullName = `${resa.client_prenom ?? ""} ${resa.client_nom ?? ""}`.trim()
+    || guestNom
+    || pseudo
+    || "Client";
   const initials = fullName.slice(0, 2).toUpperCase();
   const actions = ACTIONS[resa.statut] ?? [];
   const isBusy = pendingId === resa.id;
