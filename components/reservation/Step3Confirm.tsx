@@ -238,8 +238,6 @@ export default function Step3Confirm({
   const [error, setError] = useState<string | null>(null);
   const [reservationId, setReservationId] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [guestNom, setGuestNom] = useState(clientProfile ? `${clientProfile.prenom ?? ""} ${clientProfile.nom ?? ""}`.trim() : "");
-  const [guestTelephone, setGuestTelephone] = useState(clientProfile?.telephone ?? "");
   const [guestEmail, setGuestEmail] = useState("");
   const [message, setMessage] = useState("");
   const [clientPrenom, setClientPrenom] = useState(clientProfile?.prenom ?? "");
@@ -258,8 +256,8 @@ export default function Step3Confirm({
       setError("Veuillez saisir l'adresse d'intervention.");
       return;
     }
-    if (isGuest && !guestTelephone.trim() && !guestEmail.trim()) {
-      setError("Veuillez saisir au moins un téléphone ou un email pour être contacté.");
+    if (isGuest && !guestEmail.trim()) {
+      setError("Veuillez saisir votre email pour recevoir votre confirmation.");
       return;
     }
 
@@ -327,6 +325,25 @@ export default function Step3Confirm({
         }, { onConflict: "id" });
       }
     }
+
+    // Si guest : créer compte via OTP avant la réservation
+    if (isGuest && guestEmail.trim()) {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      const { error: otpError } = await supabase.auth.signInWithOtp({
+        email: guestEmail.trim(),
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard/reservations`,
+          shouldCreateUser: true,
+        },
+      });
+      if (otpError) {
+        setError("Impossible de créer votre compte. Vérifiez votre email.");
+        setLoading(false);
+        return;
+      }
+    }
+
     try {
       const res = await fetch("/api/reservations/confirm", {
         method: "POST",
@@ -341,8 +358,6 @@ export default function Step3Confirm({
           message: message.trim() || undefined,
           montantTotal: service.prix,
           ...(isGuest && {
-            guestNom: guestNom.trim() || undefined,
-            guestTelephone: guestTelephone.trim() || undefined,
             guestEmail: guestEmail.trim() || undefined,
           }),
         }),
@@ -377,7 +392,7 @@ export default function Step3Confirm({
         date={date}
         slot={slot}
         wasPaid={hasPrix}
-        isGuest={isGuest}
+        isGuest={false}
         guestEmail={guestEmail}
       />
     );
@@ -458,56 +473,22 @@ export default function Step3Confirm({
         />
       </div>
 
-      {/* Adresse d'intervention */}
-      {/* Champs guest */}
+      {/* Email obligatoire si non connecté */}
       {isGuest && (
-        <div className="mb-5 space-y-3">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-              Votre nom
-            </label>
-            <input
-              type="text"
-              value={guestNom}
-              onChange={(e) => setGuestNom(e.target.value)}
-              placeholder="Jean Dupont"
-              className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent hover:border-gray-300"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-              Téléphone <span className="text-gray-400 font-normal text-xs">(recommandé)</span>
-            </label>
-            <input
-              type="tel"
-              value={guestTelephone}
-              onChange={(e) => setGuestTelephone(e.target.value)}
-              placeholder="06 12 34 56 78"
-              className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent hover:border-gray-300"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-              Email <span className="text-gray-400 font-normal text-xs">(recommandé)</span>
-            </label>
-            <input
-              type="email"
-              value={guestEmail}
-              onChange={(e) => setGuestEmail(e.target.value)}
-              placeholder="jean@exemple.com"
-              className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent hover:border-gray-300"
-            />
-          </div>
-          {guestTelephone.trim() && guestEmail.trim() && (
-            <p className="text-xs text-green-600">Parfait, vous serez joignable par téléphone et email.</p>
-          )}
-          {guestTelephone.trim() && !guestEmail.trim() && (
-            <p className="text-xs text-gray-500">Ajoutez votre email pour recevoir une confirmation écrite.</p>
-          )}
-          {!guestTelephone.trim() && guestEmail.trim() && (
-            <p className="text-xs text-gray-500">Ajoutez votre téléphone pour que l'artisan puisse vous contacter directement.</p>
-          )}
-          <p className="text-xs text-red-500">* Au moins un téléphone ou un email est requis.</p>
+        <div className="mb-5">
+          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            Votre email <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="email"
+            value={guestEmail}
+            onChange={(e) => setGuestEmail(e.target.value)}
+            placeholder="jean@exemple.com"
+            className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent hover:border-gray-300"
+          />
+          <p className="text-xs text-gray-400 mt-1.5">
+            Un lien de connexion vous sera envoyé pour accéder à votre espace et contacter l'artisan via le chat.
+          </p>
         </div>
       )}
 
