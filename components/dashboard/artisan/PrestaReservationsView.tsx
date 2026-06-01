@@ -78,7 +78,7 @@ function ReservationCard({
   onAction: (id: string, statut: ReservationStatut) => void;
   pendingId: string | null;
 }) {
-  const displayEmail = resa.client_email ?? resa.guest_email ?? null;
+  const displayEmail = (resa as any).client_email ?? (resa as any).guest_email ?? null;
   const pseudo = displayEmail ? displayEmail.split("@")[0] : null;
   const fullName = `${resa.client_prenom ?? ""} ${resa.client_nom ?? ""}`.trim() || pseudo || "Client";
   const initials = fullName.slice(0, 2).toUpperCase();
