@@ -143,13 +143,28 @@ export async function POST(request: Request) {
 
   const reservationId = (reservation as { id: string }).id;
 
+  // Résoudre le client_id depuis l'email si guest
+  let resolvedClientId = user?.id ?? null;
+  if (!resolvedClientId && guestEmail?.trim()) {
+    const { data: { users: authUsers } } = await admin.auth.admin.listUsers();
+    const match = authUsers.find((u: any) => u.email?.toLowerCase() === guestEmail.trim().toLowerCase());
+    if (match) resolvedClientId = match.id;
+  }
+
   // Créer la conversation associée à la réservation
   await (admin as any).from("conversations").insert({
     reservation_id: reservationId,
     artisan_id: artisanId,
-    client_id: user?.id ?? null,
-    guest_email: user ? null : (guestEmail?.trim() || null),
+    client_id: resolvedClientId,
+    guest_email: resolvedClientId ? null : (guestEmail?.trim() || null),
   });
+
+  // Mettre à jour la réservation avec le client_id résolu si trouvé
+  if (resolvedClientId && !user?.id) {
+    await (admin as any).from("reservations")
+      .update({ client_id: resolvedClientId })
+      .eq("id", reservationId);
+  }
 
   // Emails
   const artisanProfileRes = await admin
