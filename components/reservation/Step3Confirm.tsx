@@ -326,22 +326,18 @@ export default function Step3Confirm({
       }
     }
 
-    // Si guest : créer compte via OTP avant la réservation
+    // Si guest : envoyer magic link (ne bloque pas la réservation si échec)
     if (isGuest && guestEmail.trim()) {
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
-      const { error: otpError } = await supabase.auth.signInWithOtp({
+      await supabase.auth.signInWithOtp({
         email: guestEmail.trim(),
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard/reservations`,
           shouldCreateUser: true,
         },
       });
-      if (otpError) {
-        setError("Impossible de créer votre compte. Vérifiez votre email.");
-        setLoading(false);
-        return;
-      }
+      // On continue même si l'OTP échoue — la réservation est créée sans compte
     }
 
     try {
