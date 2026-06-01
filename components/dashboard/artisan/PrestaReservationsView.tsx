@@ -166,7 +166,7 @@ function ReservationCard({
           </button>
         ))}
         {(resa as any).conversation_id && (
-          
+          <a
             href={`/dashboard/artisan/messages/${(resa as any).conversation_id}`}
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold bg-white text-brand-600 border border-brand-200 hover:bg-brand-50 transition-colors ml-auto"
           >
