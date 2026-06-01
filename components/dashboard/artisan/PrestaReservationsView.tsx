@@ -148,26 +148,35 @@ function ReservationCard({
       </div>
 
       {/* Boutons d'action */}
-      {actions.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-gray-100 flex items-center gap-2 flex-wrap">
-          {actions.map((action) => (
-            <button
-              key={action.statut}
-              onClick={() => onAction(resa.id, action.statut)}
-              disabled={isBusy}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 ${
-                action.variant === "primary"
-                  ? "bg-brand-500 text-white hover:bg-brand-600"
-                  : action.variant === "danger"
-                  ? "bg-white text-red-600 border border-red-200 hover:bg-red-50"
-                  : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50"
-              }`}
-            >
-              {isBusy ? "…" : action.label}
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center gap-2 flex-wrap">
+        {actions.map((action) => (
+          <button
+            key={action.statut}
+            onClick={() => onAction(resa.id, action.statut)}
+            disabled={isBusy}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 ${
+              action.variant === "primary"
+                ? "bg-brand-500 text-white hover:bg-brand-600"
+                : action.variant === "danger"
+                ? "bg-white text-red-600 border border-red-200 hover:bg-red-50"
+                : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50"
+            }`}
+          >
+            {isBusy ? "…" : action.label}
+          </button>
+        ))}
+        {(resa as any).conversation_id && (
+          
+            href={`/dashboard/artisan/messages/${(resa as any).conversation_id}`}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold bg-white text-brand-600 border border-brand-200 hover:bg-brand-50 transition-colors ml-auto"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            Messagerie
+          </a>
+        )}
+      </div>
     </article>
   );
 }
