@@ -20,7 +20,10 @@ export type PrestaReservationItem = {
   client_nom: string | null;
   client_prenom: string | null;
   client_photo_url: string | null;
+  guest_email: string | null;
+  guest_nom: string | null;
   service_titre: string | null;
+  message_initial: string | null;
 };
 
 export default async function PrestaReservationsPage() {
@@ -46,7 +49,7 @@ export default async function PrestaReservationsPage() {
     .from("reservations_detail")
     .select(
       "id, date, heure_debut, heure_fin, statut, adresse_intervention, " +
-      "montant_total, created_at, client_id, client_nom, client_prenom, service_titre"
+      "montant_total, created_at, client_id, client_nom, client_prenom, guest_email, guest_nom, service_titre"
     )
     .eq("artisan_id", user.id)
     .order("date", { ascending: false });

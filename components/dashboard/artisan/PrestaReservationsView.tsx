@@ -78,8 +78,8 @@ function ReservationCard({
   onAction: (id: string, statut: ReservationStatut) => void;
   pendingId: string | null;
 }) {
-  const guestNom = (resa as any).guest_nom ?? null;
-  const guestEmail = (resa as any).guest_email ?? null;
+  const guestNom = resa.guest_nom ?? null;
+  const guestEmail = resa.guest_email ?? null;
   const pseudo = guestEmail ? guestEmail.split("@")[0] : null;
   const fullName = `${resa.client_prenom ?? ""} ${resa.client_nom ?? ""}`.trim()
     || guestNom
