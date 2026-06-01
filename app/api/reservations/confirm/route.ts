@@ -23,6 +23,7 @@ const ConfirmSchema = z.object({
   guestNom: z.string().max(100).optional(),
   guestTelephone: z.string().max(20).optional(),
   guestEmail: z.string().email("Email invalide.").optional().or(z.literal("")),
+  message: z.string().max(1000).optional(),
 });
 
 export async function POST(request: Request) {
@@ -164,6 +165,26 @@ export async function POST(request: Request) {
     await (admin as any).from("reservations")
       .update({ client_id: resolvedClientId })
       .eq("id", reservationId);
+  }
+
+  // Insérer le message initial dans la conversation si fourni
+  const { data: convData } = await (admin as any)
+    .from("conversations")
+    .select("id")
+    .eq("reservation_id", reservationId)
+    .single();
+
+  if (convData?.id && parsed.data.message?.trim()) {
+    await (admin as any).from("messages").insert({
+      conversation_id: convData.id,
+      auteur_id: resolvedClientId,
+      contenu: parsed.data.message.trim(),
+      type: "texte",
+      lu: false,
+    });
+    await (admin as any).from("conversations")
+      .update({ derniere_activite: new Date().toISOString() })
+      .eq("id", convData.id);
   }
 
   // Emails
