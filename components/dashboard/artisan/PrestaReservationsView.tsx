@@ -78,9 +78,10 @@ function ReservationCard({
   onAction: (id: string, statut: ReservationStatut) => void;
   pendingId: string | null;
 }) {
-  const initials =
-    ((resa.client_prenom?.[0] ?? "") + (resa.client_nom?.[0] ?? "")).toUpperCase() || "?";
-  const fullName = `${resa.client_prenom ?? ""} ${resa.client_nom ?? ""}`.trim() || "Client";
+  const displayEmail = resa.client_email ?? resa.guest_email ?? null;
+  const pseudo = displayEmail ? displayEmail.split("@")[0] : null;
+  const fullName = `${resa.client_prenom ?? ""} ${resa.client_nom ?? ""}`.trim() || pseudo || "Client";
+  const initials = fullName.slice(0, 2).toUpperCase();
   const actions = ACTIONS[resa.statut] ?? [];
   const isBusy = pendingId === resa.id;
 
@@ -104,6 +105,9 @@ function ReservationCard({
               <p className="font-semibold text-gray-900 leading-tight">{fullName}</p>
               {resa.service_titre && (
                 <p className="text-sm text-gray-500">{resa.service_titre}</p>
+              )}
+              {resa.message_initial && (
+                <p className="text-sm text-gray-600 mt-1 italic line-clamp-2">&ldquo;{resa.message_initial}&rdquo;</p>
               )}
             </div>
             <StatusBadge statut={resa.statut} />
