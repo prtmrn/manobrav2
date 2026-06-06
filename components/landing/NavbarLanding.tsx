@@ -224,10 +224,6 @@ export default function NavbarLanding() {
               className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
               Connexion
             </Link>
-            <a href="https://artisan.manobra.fr/auth/login"
-              className="text-sm font-medium text-gray-500 hover:text-brand-600 transition-colors">
-              Je suis artisan
-            </a>
             <Link href="/recherche"
               className="inline-flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors shadow-sm">
               Trouver un artisan →
