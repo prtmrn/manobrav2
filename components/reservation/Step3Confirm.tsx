@@ -239,6 +239,7 @@ export default function Step3Confirm({
   const [reservationId, setReservationId] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [guestEmail, setGuestEmail] = useState("");
+  const [guestPrenom, setGuestPrenom] = useState("");
   const [message, setMessage] = useState("");
   const [clientPrenom, setClientPrenom] = useState(clientProfile?.prenom ?? "");
   const [clientNom, setClientNom] = useState(clientProfile?.nom ?? "");
@@ -254,6 +255,10 @@ export default function Step3Confirm({
   async function handleContinue() {
     if (!adresse.trim()) {
       setError("Veuillez saisir l'adresse d'intervention.");
+      return;
+    }
+    if (isGuest && !guestPrenom.trim()) {
+      setError("Veuillez saisir votre prénom.");
       return;
     }
     if (isGuest && !guestEmail.trim()) {
@@ -354,6 +359,7 @@ export default function Step3Confirm({
           message: message.trim() || undefined,
           montantTotal: service.prix,
           ...(isGuest && {
+            guestNom: guestPrenom.trim() || undefined,
             guestEmail: guestEmail.trim() || undefined,
           }),
         }),
@@ -469,22 +475,36 @@ export default function Step3Confirm({
         />
       </div>
 
-      {/* Email obligatoire si non connecté */}
+      {/* Prénom et email obligatoires si non connecté */}
       {isGuest && (
-        <div className="mb-5">
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-            Votre email <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="email"
-            value={guestEmail}
-            onChange={(e) => setGuestEmail(e.target.value)}
-            placeholder="jean@exemple.com"
-            className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent hover:border-gray-300"
-          />
-          <p className="text-xs text-gray-400 mt-1.5">
-            Un lien de connexion vous sera envoyé pour accéder à votre espace et contacter l'artisan via le chat.
-          </p>
+        <div className="mb-5 space-y-3">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              Votre prénom <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={guestPrenom}
+              onChange={(e) => setGuestPrenom(e.target.value)}
+              placeholder="Jean"
+              className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent hover:border-gray-300"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              Votre email <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              value={guestEmail}
+              onChange={(e) => setGuestEmail(e.target.value)}
+              placeholder="jean@exemple.com"
+              className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent hover:border-gray-300"
+            />
+            <p className="text-xs text-gray-400 mt-1.5">
+              Un lien de connexion vous sera envoyé pour accéder à votre espace et contacter l'artisan via le chat.
+            </p>
+          </div>
         </div>
       )}
 
