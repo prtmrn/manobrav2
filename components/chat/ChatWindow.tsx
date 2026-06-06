@@ -239,7 +239,8 @@ export default function ChatWindow({ conversationId, currentUserId, otherName, i
                       <p className={`text-xs font-medium mb-2 ${isMe ? "text-brand-100" : "text-gray-500"}`}>
                         Appel vidéo — diagnostic
                       </p>
-                      
+
+                      <a
                         href={msg.contenu.match(/https:\/\/meet\.jit\.si\/\S+/)?.[0] ?? "#"}
                         target="_blank"
                         rel="noopener noreferrer"
