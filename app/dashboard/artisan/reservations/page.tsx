@@ -47,35 +47,45 @@ export default async function PrestaReservationsPage() {
     .order("date", { ascending: false });
 
   const rawResas = (data ?? []) as any[];
+  const resaIds = rawResas.map((r: any) => r.id);
 
-  const reservations: PrestaReservationItem[] = await Promise.all(
-    rawResas.map(async (r) => {
-      const { data: convData } = await (admin as any)
-        .from("conversations")
-        .select("id")
-        .eq("reservation_id", r.id)
-        .maybeSingle();
+  // Une seule requête pour toutes les conversations
+  const { data: allConvs } = resaIds.length > 0
+    ? await (admin as any).from("conversations").select("id, reservation_id").in("reservation_id", resaIds)
+    : { data: [] };
 
-      let messageInitial: string | null = null;
-      if (convData?.id) {
-        const { data: firstMsg } = await (admin as any)
-          .from("messages")
-          .select("contenu")
-          .eq("conversation_id", convData.id)
-          .eq("type", "texte")
-          .order("created_at", { ascending: true })
-          .limit(1)
-          .maybeSingle();
-        messageInitial = firstMsg?.contenu ?? null;
+  const convByResa: Record<string, string> = {};
+  for (const conv of (allConvs ?? [])) {
+    convByResa[conv.reservation_id] = conv.id;
+  }
+
+  const convIds = Object.values(convByResa);
+
+  // Une seule requête pour tous les premiers messages
+  const firstMsgByConv: Record<string, string> = {};
+  if (convIds.length > 0) {
+    const { data: allMsgs } = await (admin as any)
+      .from("messages")
+      .select("conversation_id, contenu")
+      .in("conversation_id", convIds)
+      .eq("type", "texte")
+      .order("created_at", { ascending: true });
+
+    for (const msg of (allMsgs ?? [])) {
+      if (!firstMsgByConv[msg.conversation_id]) {
+        firstMsgByConv[msg.conversation_id] = msg.contenu;
       }
+    }
+  }
 
-      return {
-        ...r,
-        conversation_id: convData?.id ?? null,
-        message_initial: messageInitial,
-      } as PrestaReservationItem;
-    })
-  );
+  const reservations: PrestaReservationItem[] = rawResas.map((r: any) => {
+    const convId = convByResa[r.id] ?? null;
+    return {
+      ...r,
+      conversation_id: convId,
+      message_initial: convId ? (firstMsgByConv[convId] ?? null) : null,
+    } as PrestaReservationItem;
+  });
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
