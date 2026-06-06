@@ -261,7 +261,7 @@ export default async function DashboardartisanPage() {
     profileComplete,
     hasService:       (servicesRes.count ?? 0) > 0,
     hasDisponibilite: (dispoRes.count ?? 0) > 0,
-    stripeConnected:  artisan?.stripe_onboarding_complete === true,
+    stripeConnected:  artisan?.stripe_onboarding_complete === true || (artisan?.plan_actif != null && artisan?.plan_actif !== "aucun"),
     hasSubscription:  !!(artisan?.plan_actif && artisan?.plan_actif !== "aucun"),
   };
 
