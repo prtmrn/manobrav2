@@ -206,18 +206,7 @@ export default function UrgenceWidget({
         </div>
       )}
 
-      <div className="px-5 py-3 flex items-center justify-between border-b border-gray-100">
-        <div>
-          <p className="text-xs font-medium text-gray-600">Accepter les demandes urgentes</p>
-          <p className="text-[11px] text-gray-400">Votre profil apparaît quand un client filtre par "Disponible pour les urgences"</p>
-        </div>
-        <button
-          onClick={() => saveDisponible(!disponible)}
-          className={`relative inline-flex h-6 w-10 items-center rounded-full transition-colors ${disponible ? "bg-red-500" : "bg-gray-200"}`}
-        >
-          <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${disponible ? "translate-x-5" : "translate-x-1"}`} />
-        </button>
-      </div>
+
       <div className="px-5 py-3 flex items-center justify-between">
         <div>
           <p className="text-xs font-medium text-gray-600">Délai entre interventions</p>
