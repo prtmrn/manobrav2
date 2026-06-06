@@ -31,8 +31,9 @@ export default function HeroCTA() {
           </Link>
         </div>
         <div className="mt-5 flex items-center justify-center">
-          <a href="https://artisan.manobra.fr/auth/login" className="text-sm text-gray-400 hover:text-brand-600 transition-colors">
-            Je suis artisan →
+          <a href="https://artisan.manobra.fr/auth/login" className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-brand-600 border border-gray-200 hover:border-brand-300 hover:bg-brand-50 px-5 py-2.5 rounded-xl transition-colors">
+            Je suis artisan
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
           </a>
         </div>
       </>
@@ -70,8 +71,9 @@ export default function HeroCTA() {
     </div>
     {role === null && (
       <div className="mt-5 flex items-center justify-center">
-        <a href="https://artisan.manobra.fr/auth/login" className="text-sm text-gray-400 hover:text-brand-600 transition-colors">
-          Je suis artisan →
+        <a href="https://artisan.manobra.fr/auth/login" className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-brand-600 border border-gray-200 hover:border-brand-300 hover:bg-brand-50 px-5 py-2.5 rounded-xl transition-colors">
+          Je suis artisan
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
         </a>
       </div>
     )}
