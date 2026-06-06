@@ -44,9 +44,6 @@ export default function MetiersPage() {
             const config = METIER_CONFIG[metier];
             const services = SERVICES_STANDARDISES.filter(s => s.metier === metier).slice(0, 5);
             const slug = slugify(metier);
-            const config = METIER_CONFIG[metier];
-            const services = SERVICES_STANDARDISES.filter(s => s.metier === metier).slice(0, 5);
-            const slug = slugify(metier);
 
             return (
               <Link
