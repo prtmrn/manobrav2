@@ -16,15 +16,15 @@ export const metadata: Metadata = {
     "Manobra | Artisans qualifiés à domicile | Serrurier, Plombier, Électricien",
   description:
     "Trouvez des artisans et artisans vérifiés près de chez vous : plombier, " +
-    "électricien, peintre, ménage, jardinage à Paris, Lyon, Marseille, Bordeaux, " +
+    "électricien, serrurier, plombier, vitrier, chauffagiste à Paris, Lyon, Marseille, Bordeaux, " +
     "Toulouse. Réservez en ligne, payez en sécurité.",
   keywords: [
     "artisan à domicile",
     "artisan de services",
     "plombier pas cher",
     "électricien certifié",
-    "peintre en bâtiment",
-    "service ménage",
+    "serrurier",
+    "vitrier",
     "jardinier professionnel",
     "réservation artisan en ligne",
     "artisan vérifié",
@@ -77,7 +77,7 @@ const jsonLdLocalBusiness = {
   name: "Manobra",
   description:
     "Plateforme de mise en relation entre particuliers et artisans / " +
-    "artisans de services à domicile : plombier, électricien, peintre, ménage, jardinage.",
+    "artisans qualifiés à domicile : plombier, électricien, serrurier, vitrier, chauffagiste.",
   url: siteUrl,
   logo: `${siteUrl}/logo.png`,
   image: `${siteUrl}/og-image.png`,
