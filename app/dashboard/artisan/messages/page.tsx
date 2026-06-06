@@ -21,50 +21,79 @@ export default async function ArtisanMessagesPage() {
     .order("derniere_activite", { ascending: false });
 
   const convs = conversations ?? [];
+  const convIds = convs.map((c: any) => c.id);
+  const resaIds = convs.map((c: any) => c.reservation_id);
+  const clientIds = convs.map((c: any) => c.client_id).filter(Boolean);
 
-  // Pour chaque conversation, récupérer le dernier message et le nb non lus
-  const enriched = await Promise.all(convs.map(async (conv: any) => {
-    const [lastMsgRes, unreadRes, clientRes, clientAuthRes, resaRes] = await Promise.all([
-      (admin as any).from("messages")
-        .select("contenu, type, created_at, auteur_id")
-        .eq("conversation_id", conv.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-      (admin as any).from("messages")
-        .select("id", { count: "exact", head: true })
-        .eq("conversation_id", conv.id)
-        .eq("lu", false)
-        .neq("auteur_id", user.id),
-      conv.client_id
-        ? (admin as any).from("profiles_clients")
-            .select("nom, prenom")
-            .eq("id", conv.client_id)
-            .maybeSingle()
-        : Promise.resolve({ data: null }),
-      conv.client_id
-        ? admin.auth.admin.getUserById(conv.client_id)
-        : Promise.resolve({ data: { user: null } }),
-      (admin as any).from("reservations")
-        .select("date, statut, service_id")
-        .eq("id", conv.reservation_id)
-        .maybeSingle(),
-    ]);
+  // Batch — 4 requêtes pour toutes les conversations
+  const [allMsgsRes, allUnreadRes, allClientsRes, allResasRes] = await Promise.all([
+    // Derniers messages (tous, on garde le plus récent par conv côté JS)
+    convIds.length > 0
+      ? (admin as any).from("messages")
+          .select("conversation_id, contenu, type, created_at, auteur_id")
+          .in("conversation_id", convIds)
+          .order("created_at", { ascending: false })
+      : Promise.resolve({ data: [] }),
 
-    const client = clientRes.data;
-    const clientEmail = (clientAuthRes as any)?.data?.user?.email ?? "";
+    // Nombre de non lus par conversation
+    convIds.length > 0
+      ? (admin as any).from("messages")
+          .select("conversation_id, id")
+          .in("conversation_id", convIds)
+          .eq("lu", false)
+          .neq("auteur_id", user.id)
+      : Promise.resolve({ data: [] }),
+
+    // Profils clients
+    clientIds.length > 0
+      ? (admin as any).from("profiles_clients")
+          .select("id, nom, prenom")
+          .in("id", clientIds)
+      : Promise.resolve({ data: [] }),
+
+    // Réservations
+    resaIds.length > 0
+      ? (admin as any).from("reservations")
+          .select("id, date, statut")
+          .in("id", resaIds)
+      : Promise.resolve({ data: [] }),
+  ]);
+
+  // Indexer par conversation_id / id
+  const lastMsgByConv: Record<string, any> = {};
+  for (const msg of (allMsgsRes.data ?? [])) {
+    if (!lastMsgByConv[msg.conversation_id]) lastMsgByConv[msg.conversation_id] = msg;
+  }
+
+  const unreadByConv: Record<string, number> = {};
+  for (const msg of (allUnreadRes.data ?? [])) {
+    unreadByConv[msg.conversation_id] = (unreadByConv[msg.conversation_id] ?? 0) + 1;
+  }
+
+  const clientById: Record<string, any> = {};
+  for (const client of (allClientsRes.data ?? [])) {
+    clientById[client.id] = client;
+  }
+
+  const resaById: Record<string, any> = {};
+  for (const resa of (allResasRes.data ?? [])) {
+    resaById[resa.id] = resa;
+  }
+
+  const enriched = convs.map((conv: any) => {
+    const client = clientById[conv.client_id];
     const clientName = client && (client.prenom || client.nom)
       ? `${client.prenom ?? ""} ${client.nom ?? ""}`.trim()
-      : conv.guest_email || clientEmail || "Client";
+      : conv.guest_email ?? "Client";
 
     return {
       ...conv,
       clientName,
-      lastMessage: lastMsgRes.data,
-      unreadCount: unreadRes.count ?? 0,
-      reservation: resaRes.data,
+      lastMessage: lastMsgByConv[conv.id] ?? null,
+      unreadCount: unreadByConv[conv.id] ?? 0,
+      reservation: resaById[conv.reservation_id] ?? null,
     };
-  }));
+  });
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
