@@ -158,7 +158,7 @@ function SidebarNavLink({ href, label, icon, exact = false, badge, disabled }: N
           className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
             isActive
               ? "bg-white/20 text-white"
-              : "bg-brand-100 text-brand-700"
+              : "bg-red-500 text-white"
           }`}
         >
           {badge}
