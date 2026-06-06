@@ -27,17 +27,22 @@ export default async function ArtisanConversationPage({ params }: Props) {
 
   if (!conv) notFound();
 
-  const [clientRes, resaRes] = await Promise.all([
+  const [clientRes, clientAuthRes, resaRes] = await Promise.all([
     conv.client_id
       ? (admin as any).from("profiles_clients").select("nom, prenom").eq("id", conv.client_id).maybeSingle()
       : Promise.resolve({ data: null }),
+    conv.client_id
+      ? admin.auth.admin.getUserById(conv.client_id)
+      : Promise.resolve({ data: { user: null } }),
     (admin as any).from("reservations").select("date, statut, heure_debut, heure_fin").eq("id", conv.reservation_id).maybeSingle(),
   ]);
 
   const client = clientRes.data;
-  const clientName = client
+  const clientEmail = (clientAuthRes as any)?.data?.user?.email ?? "";
+  const pseudo = clientEmail ? clientEmail.split("@")[0] : null;
+  const clientName = (client && (client.prenom || client.nom))
     ? `${client.prenom ?? ""} ${client.nom ?? ""}`.trim()
-    : conv.guest_email ?? "Client";
+    : conv.guest_email ?? pseudo ?? "Client";
 
   const resa = resaRes.data;
 
