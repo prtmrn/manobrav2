@@ -25,7 +25,7 @@ export default async function PlanningPage() {
     admin.from("disponibilites").select("*").eq("artisan_id", user.id).order("jour_semaine").order("heure_debut"),
     admin.from("indisponibilites").select("*").eq("artisan_id", user.id).gte("date_fin", today).order("date_debut"),
     admin.from("reservations_detail")
-      .select("id, date, heure_debut, heure_fin, statut, service_titre, client_nom, client_prenom, adresse_intervention")
+      .select("id, date, heure_debut, heure_fin, statut, service_titre, client_nom, client_prenom, guest_email, adresse_intervention")
       .eq("artisan_id", user.id)
       .in("statut", ["confirme", "en_cours", "en_attente"])
       .gte("date", today)

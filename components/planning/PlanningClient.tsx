@@ -326,7 +326,7 @@ export default function PlanningClient({
           date: r.date,
           heure_debut: r.heure_debut,
           heure_fin: r.heure_fin,
-          titre: r.client_prenom ? `${r.client_prenom} ${r.client_nom ?? ""}` : r.service_titre ?? "Réservation",
+          titre: r.client_prenom ? `${r.client_prenom} ${r.client_nom ?? ""}` : (r as any).guest_email?.split("@")[0] ?? r.service_titre ?? "Réservation",
           couleur: r.statut === "en_cours" ? "brand" : r.statut === "confirme" ? "blue" : "amber",
           type: "resa",
           raw: r,
@@ -1143,7 +1143,7 @@ export default function PlanningClient({
                         setSearchQuery("");
                       }}
                     >
-                      <div className="text-sm font-semibold text-gray-900">{r.client_prenom} {r.client_nom}</div>
+                      <div className="text-sm font-semibold text-gray-900">{r.client_prenom ? `${r.client_prenom} ${r.client_nom ?? ""}`.trim() : (r as any).guest_email?.split("@")[0] ?? "Client"}</div>
                       <div className="text-xs text-gray-500">{new Date(r.date + "T12:00:00").toLocaleDateString("fr-FR")} · {fmt(r.heure_debut)}</div>
                     </button>
                   ))}
