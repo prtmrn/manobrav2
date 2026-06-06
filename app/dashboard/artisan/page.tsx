@@ -185,7 +185,7 @@ export default async function DashboardartisanPage() {
     // 1. Profil + abonnement
     admin
       .from("profiles_artisans")
-      .select("nom, prenom, photo_url, bio, metier, ville, actif, note_moyenne, nombre_avis, plan_actif, subscription_status, subscription_end_date, stripe_onboarding_complete, urgence_actif, urgence_fin, urgence_sanction_fin, delai_entre_interventions_minutes")
+      .select("nom, prenom, photo_url, bio, metier, ville, actif, note_moyenne, nombre_avis, plan_actif, subscription_status, subscription_end_date, stripe_onboarding_complete, urgence_actif, urgence_fin, urgence_sanction_fin, delai_entre_interventions_minutes, disponible_urgence")
       .eq("id", user.id)
       .single(),
 
@@ -391,6 +391,7 @@ export default async function DashboardartisanPage() {
         urgenceFin={(artisan as any)?.urgence_fin ?? null}
         urgenceSanctionFin={(artisan as any)?.urgence_sanction_fin ?? null}
         delaiEntreInterventions={(artisan as any)?.delai_entre_interventions_minutes ?? 60}
+        disponibleUrgence={(artisan as any)?.disponible_urgence ?? false}
         artisanId={user.id}
       />
 

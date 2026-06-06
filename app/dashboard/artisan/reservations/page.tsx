@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import PrestaReservationsView from "@/components/dashboard/artisan/PrestaReservationsView";
+import UrgenceWidget from "@/components/dashboard/artisan/UrgenceWidget";
 import type { ReservationStatut } from "@/types";
 export const metadata: Metadata = { title: "Réservations reçues" };
 export const dynamic = "force-dynamic";
@@ -37,6 +38,12 @@ export default async function PrestaReservationsPage() {
   const profile = profileData as { role: string } | null;
   if (profile?.role !== "artisan") redirect("/dashboard");
   const admin = createAdminClient();
+  const { data: urgenceData } = await (admin as any)
+    .from("profiles_artisans")
+    .select("urgence_actif, urgence_fin, urgence_sanction_fin, delai_entre_interventions_minutes, disponible_urgence")
+    .eq("id", user.id)
+    .single();
+
   const { data } = await admin
     .from("reservations_detail")
     .select(
@@ -94,6 +101,16 @@ export default async function PrestaReservationsPage() {
         <p className="text-gray-500 text-sm mt-1">
           Gérez les demandes de vos clients et mettez à jour l&apos;avancement.
         </p>
+      </div>
+      <div className="mb-6">
+        <UrgenceWidget
+          urgenceActif={(urgenceData as any)?.urgence_actif ?? false}
+          urgenceFin={(urgenceData as any)?.urgence_fin ?? null}
+          urgenceSanctionFin={(urgenceData as any)?.urgence_sanction_fin ?? null}
+          delaiEntreInterventions={(urgenceData as any)?.delai_entre_interventions_minutes ?? 60}
+          disponibleUrgence={(urgenceData as any)?.disponible_urgence ?? false}
+          artisanId={user.id}
+        />
       </div>
       <PrestaReservationsView reservations={reservations} />
     </div>

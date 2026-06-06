@@ -33,8 +33,7 @@ interface Props {
     tarif_horaire_min?: number | null;
     tarif_horaire_max?: number | null;
     frais_deplacement?: string | null;
-    disponible_urgence?: boolean | null;
-    delai_urgence?: string | null;
+
     assurance_rc_numero?: string | null;
     assurance_rc_assureur?: string | null;
     assurance_decennale_numero?: string | null;
@@ -63,8 +62,7 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
     tarif_horaire_min: initialData.tarif_horaire_min?.toString() ?? "",
     tarif_horaire_max: initialData.tarif_horaire_max?.toString() ?? "",
     frais_deplacement: initialData.frais_deplacement ?? "inclus",
-    disponible_urgence: initialData.disponible_urgence ?? false,
-    delai_urgence: initialData.delai_urgence ?? "1h",
+
     assurance_rc_numero: initialData.assurance_rc_numero ?? "",
     assurance_rc_assureur: initialData.assurance_rc_assureur ?? "",
     assurance_decennale_numero: initialData.assurance_decennale_numero ?? "",
@@ -134,8 +132,7 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
         tarif_horaire_min: form.tarif_horaire_min ? parseFloat(form.tarif_horaire_min) : null,
         tarif_horaire_max: form.tarif_horaire_max ? parseFloat(form.tarif_horaire_max) : null,
         frais_deplacement: form.frais_deplacement || null,
-        disponible_urgence: form.disponible_urgence,
-        delai_urgence: form.disponible_urgence ? form.delai_urgence : null,
+
         assurance_rc_numero: form.assurance_rc_numero || null,
         assurance_rc_assureur: form.assurance_rc_assureur || null,
         assurance_decennale_numero: form.assurance_decennale_numero || null,
@@ -381,31 +378,7 @@ export default function ProfilArtisanClient({ userId, email, initialData }: Prop
           </div>
         </div>
 
-        {/* Urgences */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-4">
-          <h2 className="text-base font-semibold text-gray-900">Disponibilité urgence</h2>
 
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={form.disponible_urgence}
-              onChange={(e) => setForm({ ...form, disponible_urgence: e.target.checked })}
-              className="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
-            />
-            <span className="text-sm font-medium text-gray-700">Disponible pour des interventions urgentes</span>
-          </label>
-
-          {form.disponible_urgence && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Délai d'intervention garanti</label>
-              <select value={form.delai_urgence} onChange={(e) => setForm({ ...form, delai_urgence: e.target.value })} className={selectClass}>
-                <option value="30min">30 minutes</option>
-                <option value="1h">1 heure</option>
-                <option value="2h">2 heures</option>
-              </select>
-            </div>
-          )}
-        </div>
 
         {/* Documents & Assurances */}
         <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-5">
