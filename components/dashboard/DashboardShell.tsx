@@ -155,7 +155,7 @@ function SidebarNavLink({ href, label, icon, exact = false, badge, disabled }: N
       <span className="truncate flex-1">{label}</span>
       {badge && (
         <span
-          className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
+          className={`min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[11px] font-bold px-1 ${
             isActive
               ? "bg-white/20 text-white"
               : "bg-red-500 text-white"
