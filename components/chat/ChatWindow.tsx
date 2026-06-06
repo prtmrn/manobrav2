@@ -232,6 +232,29 @@ export default function ChatWindow({ conversationId, currentUserId, otherName, i
                         </span>
                       )}
                     </div>
+                  ) : msg.contenu?.includes("meet.jit.si") ? (
+                    <div className={`px-4 py-3 rounded-2xl ${
+                      isMe ? "bg-brand-600 rounded-tr-sm" : "bg-white border border-gray-200 rounded-tl-sm"
+                    }`}>
+                      <p className={`text-xs font-medium mb-2 ${isMe ? "text-brand-100" : "text-gray-500"}`}>
+                        Appel vidéo — diagnostic
+                      </p>
+                      
+                        href={msg.contenu.match(/https:\/\/meet\.jit\.si\/\S+/)?.[0] ?? "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                          isMe
+                            ? "bg-white/20 hover:bg-white/30 text-white"
+                            : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                        }`}
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        Rejoindre l&apos;appel
+                      </a>
+                    </div>
                   ) : (
                     <div className={`px-4 py-2.5 rounded-2xl text-sm ${
                       isMe
