@@ -209,7 +209,7 @@ export default function UrgenceWidget({
       <div className="px-5 py-3 flex items-center justify-between border-b border-gray-100">
         <div>
           <p className="text-xs font-medium text-gray-600">Accepter les demandes urgentes</p>
-          <p className="text-[11px] text-gray-400">Votre profil indique que vous êtes ouvert aux urgences</p>
+          <p className="text-[11px] text-gray-400">Votre profil apparaît quand un client filtre par "Disponible pour les urgences"</p>
         </div>
         <button
           onClick={() => saveDisponible(!disponible)}
