@@ -45,6 +45,7 @@ interface ReservationDetail {
   client_nom: string | null;
   client_prenom: string | null;
   client_photo_url: string | null;
+  guest_email: string | null;
   created_at: string;
 }
 
@@ -200,7 +201,7 @@ export default async function DashboardartisanPage() {
     // 3. Prochaines interventions (5 max) : confirme ou en_cours, à partir d'aujourd'hui
     admin
       .from("reservations_detail")
-      .select("id, date, heure_debut, heure_fin, statut, adresse_intervention, montant_artisan, service_titre, client_nom, client_prenom, client_photo_url, created_at")
+      .select("id, date, heure_debut, heure_fin, statut, adresse_intervention, montant_artisan, service_titre, client_nom, client_prenom, client_photo_url, guest_email, created_at")
       .eq("artisan_id", user.id)
       .in("statut", ["confirme", "en_cours"])
       .gte("date", today)
@@ -211,7 +212,7 @@ export default async function DashboardartisanPage() {
     // 4. Réservations en attente (toutes, ordre FIFO)
     admin
       .from("reservations_detail")
-      .select("id, date, heure_debut, heure_fin, statut, adresse_intervention, montant_total, service_titre, client_nom, client_prenom, client_photo_url, created_at")
+      .select("id, date, heure_debut, heure_fin, statut, adresse_intervention, montant_total, service_titre, client_nom, client_prenom, client_photo_url, guest_email, created_at")
       .eq("artisan_id", user.id)
       .eq("statut", "en_attente")
       .order("created_at", { ascending: true }),
@@ -509,7 +510,7 @@ export default async function DashboardartisanPage() {
                               photo={r.client_photo_url}
                             />
                             <span className="text-sm font-semibold text-gray-900">
-                              {`${r.client_prenom ?? ""} ${r.client_nom ?? ""}`.trim() || "Client"}
+                              {`${r.client_prenom ?? ""} ${r.client_nom ?? ""}`.trim() || (r as any).guest_email?.split("@")[0] || "Client"}
                             </span>
                           </div>
                         </div>
@@ -643,7 +644,7 @@ export default async function DashboardartisanPage() {
                               photo={r.client_photo_url}
                             />
                             <span className="text-sm font-semibold text-gray-900">
-                              {`${r.client_prenom ?? ""} ${r.client_nom ?? ""}`.trim() || "Client"}
+                              {`${r.client_prenom ?? ""} ${r.client_nom ?? ""}`.trim() || (r as any).guest_email?.split("@")[0] || "Client"}
                             </span>
                           </div>
 
