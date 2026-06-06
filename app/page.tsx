@@ -8,7 +8,7 @@ import NavbarLanding from "@/components/landing/NavbarLanding";
 import HeroCTA from "@/components/landing/HeroCTA";
 
 // ─── Cache 24 h (ISR) | les avis et stats changent peu ───────────────────────
-export const revalidate = 86400;
+export const revalidate = 60;
 
 // ─── SEO : Metadata ───────────────────────────────────────────────────────────
 export const metadata: Metadata = {
