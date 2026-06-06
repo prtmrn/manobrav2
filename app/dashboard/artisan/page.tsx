@@ -249,8 +249,8 @@ export default async function DashboardartisanPage() {
     .reduce((sum, r) => sum + (r.montant_artisan ?? 0), 0);
 
   // ── Listes ────────────────────────────────────────────────────────────────
-  const prochaines = (prochainesRes.data ?? []) as ReservationDetail[];
-  const attentes   = (attenteRes.data   ?? []) as ReservationDetail[];
+  const prochaines = (prochainesRes.data ?? []) as unknown as ReservationDetail[];
+  const attentes   = (attenteRes.data   ?? []) as unknown as ReservationDetail[];
 
   // -- Calcul de l'etat d'onboarding
   const profileComplete =
