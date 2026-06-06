@@ -26,7 +26,7 @@ export type Tartisan = {
   photo_url: string | null;
   ville: string | null;
   note_moyenne: number;
-  abonnement_pro: boolean;
+  plan_actif: string | null;
 };
 
 export type TSlot = {
@@ -181,7 +181,7 @@ export default function ReservationTunnel({ artisan, services, clientId, isGuest
           <p className="text-sm text-gray-500 truncate">{artisan.metier}</p>
         </div>
 
-        {artisan.abonnement_pro && (
+        {artisan.plan_actif && artisan.plan_actif !== "aucun" && (
           <span className="ml-auto shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
             Pro
           </span>

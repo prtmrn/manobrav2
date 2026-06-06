@@ -50,7 +50,7 @@ export default async function ReserverPage({ params }: PageProps) {
   const [artisanRes, servicesRes] = await Promise.all([
     supabase
       .from("profiles_artisans")
-      .select("id, nom, prenom, metier, photo_url, ville, note_moyenne, abonnement_pro")
+      .select("id, nom, prenom, metier, photo_url, ville, note_moyenne, plan_actif")
       .eq("id", artisan_id)
       .eq("actif", true)
       .maybeSingle(),
