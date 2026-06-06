@@ -325,7 +325,7 @@ export default async function DashboardartisanPage() {
         {/* Infos */}
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl font-bold text-gray-900 leading-tight">
-            {greeting}, {artisan?.prenom ?? fullName}
+            {greeting}{(artisan?.prenom ?? fullName) ? `, ${artisan?.prenom ?? fullName}` : ""}
           </h1>
           <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-2 flex-wrap">
             {artisan?.metier && (
