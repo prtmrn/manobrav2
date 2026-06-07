@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     .from("profiles_artisans")
     .select(
       "id, nom, prenom, metier, ville, photo_url, note_moyenne, nombre_avis, " +
-        "abonnement_pro, latitude, longitude"
+        "plan_actif, latitude, longitude"
     )
     .eq("actif", true)
     .order("note_moyenne", { ascending: false })
