@@ -153,10 +153,7 @@ export default function OnboardingProgressBar({ status }: OnboardingProgressBarP
     return (
       <div className="bg-gradient-to-r from-brand-600 to-brand-500 rounded-2xl p-6
                       text-white shadow-sm relative overflow-hidden">
-        {/* Confetti décoratif */}
-        <div className="absolute right-4 top-0 opacity-10 text-8xl select-none leading-none">
-          🎉
-        </div>
+
         <div className="relative">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center
@@ -168,7 +165,7 @@ export default function OnboardingProgressBar({ status }: OnboardingProgressBarP
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-bold leading-tight">
-                Félicitations, votre profil est prêt&nbsp;! 🎉
+                Félicitations, votre profil est prêt&nbsp;!
               </h2>
               <p className="text-brand-100 text-sm mt-1">
                 Toutes les étapes sont complétées. Votre profil est visible par les clients

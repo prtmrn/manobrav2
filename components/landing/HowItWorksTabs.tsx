@@ -72,7 +72,7 @@ export default function HowItWorksTabs() {
                   : "text-gray-500 hover:text-gray-700",
               ].join(" ")}
             >
-              {tab === "client" ? "👤 Je cherche un artisan" : "🔨 Je suis artisan"}
+              {tab === "client" ? "Je cherche un artisan" : "Je suis artisan"}
             </button>
           ))}
         </div>
