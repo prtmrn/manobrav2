@@ -317,7 +317,7 @@ export default async function HomePage() {
             </div>
 
             {/* Titre H1 */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight mb-6 leading-[1.1]">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight mb-6 leading-[1.2] sm:whitespace-nowrap">
               <Typewriter />
             </h1>
 

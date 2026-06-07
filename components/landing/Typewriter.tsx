@@ -1,26 +1,26 @@
 "use client";
 import { useEffect, useState } from "react";
 
-const TEXTS = [
-  "Trouvez le bon plombier en 2 minutes",
-  "Trouvez le bon serrurier en 2 minutes",
-  "Trouvez le bon électricien en 2 minutes",
-  "Trouvez le bon chauffagiste en 2 minutes",
-  "Trouvez le bon vitrier en 2 minutes",
+const METIERS = [
+  "plombier",
+  "serrurier",
+  "électricien",
+  "chauffagiste",
+  "vitrier",
 ];
 
-const SPEED = 45;
-const DELETE_SPEED = 25;
-const WAIT_TIME = 2200;
+const SPEED = 60;
+const DELETE_SPEED = 35;
+const WAIT_TIME = 2000;
 
 export default function Typewriter() {
-  const [displayText, setDisplayText] = useState("");
+  const [displayText, setDisplayText] = useState(METIERS[0]);
   const [index, setIndex] = useState(0);
-  const [charIndex, setCharIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(METIERS[0].length);
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const current = TEXTS[index];
+    const current = METIERS[index];
     let timeout: NodeJS.Timeout;
 
     if (!isDeleting) {
@@ -40,7 +40,7 @@ export default function Typewriter() {
         }, DELETE_SPEED);
       } else {
         setIsDeleting(false);
-        setIndex(i => (i + 1) % TEXTS.length);
+        setIndex(i => (i + 1) % METIERS.length);
       }
     }
 
@@ -48,9 +48,26 @@ export default function Typewriter() {
   }, [charIndex, isDeleting, index]);
 
   return (
-    <span className="inline-block">
-      {displayText}
-      <span className="animate-blink ml-0.5 inline-block w-0.5 h-[0.9em] bg-brand-600 align-middle" />
+    <span className="whitespace-nowrap sm:whitespace-nowrap">
+      Trouvez le bon{" "}
+      <span className="text-brand-600 relative inline-block min-w-[8ch]">
+        {displayText}
+        <span className="animate-blink ml-0.5 inline-block w-0.5 h-[0.85em] bg-brand-600 align-middle" />
+        <svg
+          className="absolute -bottom-2 left-0 w-full"
+          viewBox="0 0 300 12"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M2 9.5C50 3.5 150 1 298 9.5"
+            stroke="#16a34a"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        </svg>
+      </span>
+      {" "}en 2 minutes
     </span>
   );
 }
