@@ -48,26 +48,16 @@ export default function Typewriter() {
   }, [charIndex, isDeleting, index]);
 
   return (
-    <span className="whitespace-nowrap sm:whitespace-nowrap">
-      Trouvez le bon{" "}
-      <span className="text-brand-600 relative inline-block min-w-[8ch]">
-        {displayText}
-        <span className="animate-blink ml-0.5 inline-block w-0.5 h-[0.85em] bg-brand-600 align-middle" />
-        <svg
-          className="absolute -bottom-2 left-0 w-full"
-          viewBox="0 0 300 12"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M2 9.5C50 3.5 150 1 298 9.5"
-            stroke="#16a34a"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-        </svg>
+    <span className="block sm:whitespace-nowrap text-center">
+      <span className="block sm:inline">Trouvez le bon </span>
+      <span className="block sm:inline">
+        <span className="text-brand-600">
+          {displayText}
+        </span>
+        <span className="animate-blink inline-block w-0.5 h-[0.8em] bg-brand-600 align-middle ml-0.5" />
+        {" "}
       </span>
-      {" "}en 2 minutes
+      <span className="block sm:inline">en 2 minutes</span>
     </span>
   );
 }
