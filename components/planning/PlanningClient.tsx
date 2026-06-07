@@ -279,7 +279,6 @@ export default function PlanningClient({
     // Disponibilités
     dispos.filter(d => d.actif).forEach(d => {
       dateRange.forEach(date => {
-        if (d.jour_semaine !== date.getDay() - 1 && !(date.getDay() === 0 && d.jour_semaine === 6)) return;
         const iso = toISO(date);
         // Corriger index: lundi=0 en DB, lundi=1 en JS
         const jsDay = date.getDay(); // 0=dim,1=lun,...,6=sam
