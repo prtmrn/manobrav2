@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { METIER_CONFIG, METIER_LIST } from "@/components/map/metier-config";
 import MetiersGrid from "@/components/landing/MetiersGrid";
+import Typewriter from "@/components/landing/Typewriter";
 import HowItWorksTabs from "@/components/landing/HowItWorksTabs";
 import NavbarLanding from "@/components/landing/NavbarLanding";
 import HeroCTA from "@/components/landing/HeroCTA";
@@ -316,25 +317,8 @@ export default async function HomePage() {
             </div>
 
             {/* Titre H1 */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight text-balance mb-6 leading-[1.1]">
-              Trouvez le bon artisan,{" "}
-              <span className="text-brand-600 relative">
-                en 2 minutes
-                {/* Trait soulignement décoratif */}
-                <svg
-                  className="absolute -bottom-2 left-0 w-full"
-                  viewBox="0 0 300 12"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M2 9.5C50 3.5 150 1 298 9.5"
-                    stroke="#16a34a"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight mb-6 leading-[1.1]">
+              <Typewriter />
             </h1>
 
             {/* Sous-titre */}
