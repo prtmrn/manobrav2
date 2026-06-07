@@ -1,16 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Raleway } from "next/font/google";
 import "./globals.css";
 
 // ─── Polices ──────────────────────────────────────────────────────────────────
 // next/font/google gère automatiquement le self-hosting, le preload
 // et le display:swap → aucun FOIT, aucune requête réseau externe
-const inter = Inter({
+const raleway = Raleway({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-raleway",
   // Préchargement uniquement des poids utilisés
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 // ─── Viewport ─────────────────────────────────────────────────────────────────
@@ -76,7 +76,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={inter.variable}>
+    <html lang="fr" className={raleway.variable}>
       <head>
         {/* Preconnect aux services tiers pour réduire la latence (LCP) */}
         <link rel="preconnect" href="https://maps.googleapis.com" />

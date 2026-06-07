@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-raleway)", "system-ui", "sans-serif"],
+      },
       animation: {
         blink: "blink 1s step-start infinite",
       },
