@@ -249,8 +249,19 @@ export default async function DashboardartisanPage() {
     .reduce((sum, r) => sum + (r.montant_artisan ?? 0), 0);
 
   // ── Listes ────────────────────────────────────────────────────────────────
-  const prochaines = (prochainesRes.data ?? []) as unknown as ReservationDetail[];
-  const attentes   = (attenteRes.data   ?? []) as unknown as ReservationDetail[];
+  const prochainesRaw = (prochainesRes.data ?? []) as unknown as ReservationDetail[];
+  const attentesRaw   = (attenteRes.data   ?? []) as unknown as ReservationDetail[];
+
+  // Enrichir avec conversation_id en batch
+  const allResaIds = [...prochainesRaw, ...attentesRaw].map(r => r.id);
+  const { data: convRows } = allResaIds.length > 0
+    ? await (admin as any).from("conversations").select("id, reservation_id").in("reservation_id", allResaIds)
+    : { data: [] };
+  const convByResa: Record<string, string> = {};
+  for (const conv of (convRows ?? [])) convByResa[conv.reservation_id] = conv.id;
+
+  const prochaines = prochainesRaw.map(r => ({ ...r, conversation_id: convByResa[r.id] ?? null }));
+  const attentes   = attentesRaw.map(r => ({ ...r, conversation_id: convByResa[r.id] ?? null }));
 
   // -- Calcul de l'etat d'onboarding
   const profileComplete =
@@ -552,18 +563,31 @@ export default async function DashboardartisanPage() {
                       </div>
 
                       {/* Actions */}
-                      <ReservationStatusButtons
-                        reservationId={r.id}
-                        options={[
-                          { label: "✓ Accepter", statut: "confirme", variant: "success" },
-                          {
-                            label: "✗ Refuser",
-                            statut: "annule",
-                            variant: "danger",
-                            confirm: "Refuser cette demande de réservation ?",
-                          },
-                        ]}
-                      />
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <ReservationStatusButtons
+                          reservationId={r.id}
+                          options={[
+                            { label: "✓ Accepter", statut: "confirme", variant: "success" },
+                            {
+                              label: "✗ Refuser",
+                              statut: "annule",
+                              variant: "danger",
+                              confirm: "Refuser cette demande de réservation ?",
+                            },
+                          ]}
+                        />
+                        {(r as any).conversation_id && (
+                          <Link
+                            href={`/dashboard/artisan/messages/${(r as any).conversation_id}`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-brand-600 border border-brand-200 hover:bg-brand-50 transition-colors"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            Messagerie
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
