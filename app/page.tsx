@@ -323,9 +323,8 @@ export default async function HomePage() {
 
             {/* Sous-titre */}
             <p className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed text-balance">
-              Serrurier, plombier, électricien, chauffagiste, vitrier…{" "}
-              <strong className="text-gray-700 font-semibold">des professionnels vérifiés</strong>{" "}
-              près de chez vous. Réservez en ligne, payez en sécurité.
+              Des artisans qualifiés près de chez vous, disponibles quand vous en avez besoin{" "}
+              <strong className="text-gray-700 font-semibold">et sans mauvaise surprise.</strong>
             </p>
 
             {/* Double CTA */}
