@@ -44,7 +44,7 @@ function MetierCard({ metier }: { metier: string }) {
   return (
     <Link
       href={`/metiers/${slug}`}
-      className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-brand-200 hover:-translate-y-0.5 transition-all duration-200 p-5 flex flex-col gap-3"
+      className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:scale-[1.02] hover:shadow-md hover:border-brand-200 transition-all duration-200 p-5 flex flex-col gap-3"
     >
       <div className="flex items-center gap-3">
         <div

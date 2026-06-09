@@ -503,7 +503,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                           <Link
                             key={p.id}
                             href={`/prestataires/${p.id}`}
-                            className="group bg-white rounded-2xl border border-brand-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden ring-1 ring-brand-100"
+                            className="group bg-white rounded-2xl border border-brand-100 shadow-sm hover:scale-[1.02] hover:shadow-md transition-all duration-200 overflow-hidden ring-1 ring-brand-100"
                           >
                             {/* Photo */}
                             <div className="relative h-40 bg-gray-100 overflow-hidden">
@@ -563,7 +563,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                           <Link
                             key={p.id}
                             href={`/prestataires/${p.id}`}
-                            className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
+                            className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:scale-[1.02] hover:shadow-md transition-all duration-200 overflow-hidden"
                           >
                             <div className="relative h-40 bg-gray-100 overflow-hidden">
                               {p.photo_url ? (
@@ -613,7 +613,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                     <Link
                       key={p.id}
                       href={`/prestataires/${p.id}`}
-                      className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
+                      className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:scale-[1.02] hover:shadow-md transition-all duration-200 overflow-hidden"
                     >
                       {/* Photo */}
                       <div className="relative h-40 bg-gray-100 overflow-hidden">

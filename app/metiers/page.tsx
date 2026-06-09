@@ -49,7 +49,7 @@ export default function MetiersPage() {
               <Link
                 key={metier}
                 href={`/metiers/${slug}`}
-                className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-brand-200 hover:-translate-y-0.5 transition-all duration-200 p-6 flex flex-col gap-4"
+                className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:scale-[1.02] hover:shadow-md hover:border-brand-200 transition-all duration-200 p-6 flex flex-col gap-4"
               >
                 <div className="flex items-center gap-4">
                   <div
