@@ -44,8 +44,12 @@ export default function LoginForm({ mode = "client" }: { mode?: "client" | "arti
       setLoading(false);
       return;
     }
-    router.push("/dashboard");
-    router.refresh();
+    if (role === "artisan") {
+      window.location.href = "https://artisan.manobra.fr/dashboard";
+    } else {
+      router.push("/dashboard");
+      router.refresh();
+    }
   }
   return (
     <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-2xl p-8 space-y-5 shadow-sm">

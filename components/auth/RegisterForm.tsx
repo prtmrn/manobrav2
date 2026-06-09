@@ -28,7 +28,15 @@ export default function RegisterForm({ defaultRole }: { defaultRole?: "client" |
       },
     });
     if (error) {
-      setError(error.message);
+      if (error.message.includes("already registered") || error.message.includes("already exists")) {
+        setError("Un compte existe déjà avec cet email.");
+      } else if (error.message.includes("password")) {
+        setError("Le mot de passe doit contenir au moins 8 caractères.");
+      } else if (error.message.includes("email")) {
+        setError("Adresse email invalide.");
+      } else {
+        setError("Une erreur est survenue. Veuillez réessayer.");
+      }
       setLoading(false);
       return;
     }

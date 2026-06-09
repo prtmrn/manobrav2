@@ -145,8 +145,7 @@ export default function ResetPasswordForm() {
   if (success) {
     return (
       <div className="bg-green-50 border border-green-200 rounded-2xl p-8 text-center space-y-2">
-        <p className="text-2xl">📧</p>
-        <p className="font-semibold text-green-800">Email envoyé !</p>
+          <p className="font-semibold text-green-800">Email envoyé !</p>
         <p className="text-sm text-green-700">
           Un lien de réinitialisation a été envoyé à{" "}
           <span className="font-medium">{email}</span>.

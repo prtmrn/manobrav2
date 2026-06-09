@@ -4,7 +4,9 @@ export default function AuthErrorPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 max-w-md w-full text-center">
-        
+        <Link href="/" className="inline-block font-bold text-gray-900 text-3xl tracking-tight mb-6">
+          Man<span className="text-brand-600">obra</span>
+        </Link>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
           Lien expiré
         </h1>
