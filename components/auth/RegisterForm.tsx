@@ -27,7 +27,7 @@ export default function RegisterForm({ defaultRole }: { defaultRole?: "client" |
         data: { role },
       },
     });
-    if (error) {
+    if (error) { console.log("[Supabase error]", error.message);
       if (error.message.includes("already registered") || error.message.includes("already exists")) {
         setError("Un compte existe déjà avec cet email.");
       } else if (error.message.includes("password")) {
