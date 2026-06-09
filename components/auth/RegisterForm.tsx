@@ -27,12 +27,14 @@ export default function RegisterForm({ defaultRole }: { defaultRole?: "client" |
         data: { role },
       },
     });
-    if (error) { console.log("[Supabase error]", error.message);
-      if (error.message.includes("already registered") || error.message.includes("already exists")) {
+    if (error) {
+      if (error.message.includes("already registered") || error.message.includes("already exists") || error.message.includes("User already registered")) {
         setError("Un compte existe déjà avec cet email.");
-      } else if (error.message.includes("password")) {
+      } else if (error.message.includes("sending confirmation") || error.message.includes("confirmation email")) {
+        setError("Impossible d'envoyer l'email de confirmation. Veuillez réessayer.");
+      } else if (error.message.includes("password") || error.message.includes("Password")) {
         setError("Le mot de passe doit contenir au moins 8 caractères.");
-      } else if (error.message.includes("email")) {
+      } else if (error.message.includes("Invalid email") || error.message.includes("invalid email")) {
         setError("Adresse email invalide.");
       } else {
         setError("Une erreur est survenue. Veuillez réessayer.");
