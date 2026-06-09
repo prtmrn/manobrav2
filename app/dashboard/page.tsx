@@ -321,7 +321,7 @@ export default async function DashboardClientPage() {
           id="cta-top"
           className="flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700
                      text-white font-bold text-base px-6 py-4 rounded-2xl shadow-md
-                     transition-all duration-150 hover:-translate-y-0.5 w-full"
+                     transition-all duration-200 hover:-translate-y-0.5 w-full"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}

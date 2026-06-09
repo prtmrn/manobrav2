@@ -192,7 +192,7 @@ function ServiceCard({ service, artisanId, canReserve }: { service: Service; art
     );
   }
   return (
-    <Link href={`/reserver/${artisanId}?service=${service.id}`} className="group relative bg-white border border-gray-100 rounded-xl p-5 hover:shadow-md hover:border-brand-200 transition-all block">
+    <Link href={`/reserver/${artisanId}?service=${service.id}`} className="group relative bg-white border border-gray-100 rounded-xl p-5 hover:scale-[1.02] hover:shadow-md hover:border-brand-200 transition-all duration-200 block">
       {service.categorie && (
         <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full mb-2">
           {service.categorie}
