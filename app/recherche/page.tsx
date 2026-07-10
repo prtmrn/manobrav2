@@ -337,6 +337,10 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   // Sort selon le critere choisi
   console.log("[SORT] tri=", tri, "ordre=", ordre, "artisans avant sort=", filtered.map(x => x.nom + "/" + x.note_moyenne));
   filtered.sort((a, b) => {
+    // Inscrits toujours avant vitrines
+    const typeA = a.type === "vitrine" ? 1 : 0;
+    const typeB = b.type === "vitrine" ? 1 : 0;
+    if (typeA !== typeB) return typeA - typeB;
     let diff = 0;
     if (tri === "pertinence") diff = (b.relevance ?? 0) - (a.relevance ?? 0);
     else if (tri === "note") diff = (b.note_moyenne ?? 0) - (a.note_moyenne ?? 0);
