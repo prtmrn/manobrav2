@@ -402,6 +402,8 @@ export default async function artisanPage({ params }: PageProps) {
   const isVerifie =
     (artisan as any).bypass_verification === true ||
     (artisan as any).verification_status === "verifie";
+  const isVitrine = (artisan as any).type === "vitrine";
+  const telephone = (artisan as any).telephone as string | null;
 
   const urgenceActif = (artisan as any).urgence_actif === true &&
     (artisan as any).urgence_fin &&
@@ -458,7 +460,11 @@ export default async function artisanPage({ params }: PageProps) {
           </Link>
 
           {/* CTA mobile sticky */}
-          {isVerifie ? (
+          {isVitrine ? (
+            <span className="sm:hidden inline-flex items-center gap-1 bg-brand-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-brand-700 transition-colors cursor-pointer">
+              Afficher le numéro
+            </span>
+          ) : isVerifie ? (
             <Link
               href={`/reserver/${id}`}
               className="sm:hidden inline-flex items-center gap-1 bg-brand-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-brand-700 transition-colors"
@@ -729,7 +735,13 @@ export default async function artisanPage({ params }: PageProps) {
                 </div>
               )}
 
-              <ReserveButton artisan_id={id} className="w-full hidden lg:block" canReserve={isVerifie} />
+              {isVitrine ? (
+                <button className="w-full hidden lg:flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm py-3 px-6 rounded-xl transition-all shadow-lg">
+                  Afficher le numéro
+                </button>
+              ) : (
+                <ReserveButton artisan_id={id} className="w-full hidden lg:block" canReserve={isVerifie} />
+              )}
 
 
 
@@ -890,7 +902,13 @@ export default async function artisanPage({ params }: PageProps) {
 
       {/* ── Bouton Réserver flottant (mobile uniquement) ──────────────────────── */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 p-4 safe-area-bottom">
-        <ReserveButton artisan_id={id} className="w-full" canReserve={isVerifie} />
+        {isVitrine ? (
+          <button className="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm py-3 px-6 rounded-xl transition-all shadow-lg">
+            Afficher le numéro
+          </button>
+        ) : (
+          <ReserveButton artisan_id={id} className="w-full" canReserve={isVerifie} />
+        )}
       </div>
       {/* Espace pour le bouton flottant mobile */}
       <div className="lg:hidden h-24" />
