@@ -83,7 +83,9 @@ export default function PopupAfficherNumero({ artisanId, artisanNom }: Props) {
                   </div>
                 )}
                 <div className="space-y-1">
-                  <label className="block text-sm font-medium text-gray-700">Email <span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Email <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="email"
                     required
