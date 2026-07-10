@@ -462,9 +462,12 @@ export default async function artisanPage({ params }: PageProps) {
 
           {/* CTA mobile sticky */}
           {isVitrine ? (
-            <span className="sm:hidden inline-flex items-center gap-1 bg-brand-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-brand-700 transition-colors cursor-pointer">
+            <button
+              onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })}
+              className="sm:hidden inline-flex items-center gap-1 bg-brand-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-brand-700 transition-colors"
+            >
               Afficher le numéro
-            </span>
+            </button>
           ) : isVerifie ? (
             <Link
               href={`/reserver/${id}`}
