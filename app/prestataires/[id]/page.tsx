@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getMetierConfig } from "@/components/map/metier-config";
 import type { Tables } from "@/types";
+import PopupAfficherNumero from "@/components/prestataires/PopupAfficherNumero";
 import MiniMap from "@/components/map/MiniMap";
 
 // Revalider le profil toutes les 10 minutes (ISR)
@@ -736,9 +737,9 @@ export default async function artisanPage({ params }: PageProps) {
               )}
 
               {isVitrine ? (
-                <button className="w-full hidden lg:flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm py-3 px-6 rounded-xl transition-all shadow-lg">
-                  Afficher le numéro
-                </button>
+                <div className="hidden lg:block">
+                  <PopupAfficherNumero artisanId={id} artisanNom={artisan.nom ?? "l'artisan"} />
+                </div>
               ) : (
                 <ReserveButton artisan_id={id} className="w-full hidden lg:block" canReserve={isVerifie} />
               )}
@@ -903,9 +904,7 @@ export default async function artisanPage({ params }: PageProps) {
       {/* ── Bouton Réserver flottant (mobile uniquement) ──────────────────────── */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 p-4 safe-area-bottom">
         {isVitrine ? (
-          <button className="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm py-3 px-6 rounded-xl transition-all shadow-lg">
-            Afficher le numéro
-          </button>
+          <PopupAfficherNumero artisanId={id} artisanNom={artisan.nom ?? "l'artisan"} />
         ) : (
           <ReserveButton artisan_id={id} className="w-full" canReserve={isVerifie} />
         )}
