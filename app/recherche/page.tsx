@@ -79,6 +79,8 @@ type Rawartisan = {
   siret?: string | null;
   bio?: string | null;
   disponible_urgence?: boolean;
+  type?: string | null;
+  telephone?: string | null;
 };
 
 type Enrichedartisan = Rawartisan & {
@@ -259,7 +261,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
   const queryParams = new URLSearchParams({
-    select: "id,nom,prenom,metier,ville,code_postal,photo_url,note_moyenne,nombre_avis,plan_actif,latitude,longitude,zone_intervention_km,temps_reponse_minutes,urgence_actif,urgence_fin,services(prix,titre,tags)",
+    select: "id,nom,prenom,metier,ville,code_postal,photo_url,note_moyenne,nombre_avis,plan_actif,latitude,longitude,zone_intervention_km,temps_reponse_minutes,urgence_actif,urgence_fin,type,telephone,services(prix,titre,tags)",
     actif: "eq.true",
     order: "id.asc",
   });
@@ -539,7 +541,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                               </div>
                             </div>
                             <div className="px-4 pb-4">
-                              <span className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors">Demander une intervention</span>
+                              {p.type === "vitrine" ? (<span className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors">Afficher le numéro</span>) : (<span className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors">Demander une intervention</span>)}
                             </div>
                           </Link>
                         );
@@ -595,7 +597,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                               </div>
                             </div>
                             <div className="px-4 pb-4">
-                              <span className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors">Demander une intervention</span>
+                              {p.type === "vitrine" ? (<span className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors">Afficher le numéro</span>) : (<span className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors">Demander une intervention</span>)}
                             </div>
                           </Link>
                         );
