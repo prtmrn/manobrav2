@@ -27,7 +27,7 @@ export default function PopupAfficherNumero({ artisanId, artisanNom }: Props) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setNumero(data.telephone ?? "Numéro non disponible");
-    } catch {
+    } catch (_e) {
       setError("Une erreur est survenue. Veuillez réessayer.");
     } finally {
       setLoading(false);
