@@ -26,9 +26,9 @@ export default function PopupAfficherNumero({ artisanId, artisanNom }: Props) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      setNumero(data.telephone ?? "Numero non disponible");
+      setNumero(data.telephone ?? "Numéro non disponible");
     } catch (_e) {
-      setError("Une erreur est survenue. Veuillez reessayer.");
+      setError("Une erreur est survenue. Veuillez réessayer.");
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,7 @@ export default function PopupAfficherNumero({ artisanId, artisanNom }: Props) {
         onClick={() => setOpen(true)}
         className="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm py-3 px-6 rounded-xl transition-all shadow-lg"
       >
-        Afficher le numero
+        Afficher le numéro
       </button>
 
       {open && (
@@ -49,7 +49,7 @@ export default function PopupAfficherNumero({ artisanId, artisanNom }: Props) {
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h2 className="text-lg font-bold text-gray-900">Contacter {artisanNom}</h2>
-                <p className="text-sm text-gray-500 mt-0.5">Renseignez votre email pour voir le numero</p>
+                <p className="text-sm text-gray-500 mt-0.5">Renseignez votre email pour voir le numéro</p>
               </div>
               <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors ml-4">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,14 +60,14 @@ export default function PopupAfficherNumero({ artisanId, artisanNom }: Props) {
 
             {numero ? (
               <div className="text-center py-4">
-                <p className="text-sm text-gray-500 mb-3">Numero de {artisanNom}</p>
-                
+                <p className="text-sm text-gray-500 mb-3">Numéro de {artisanNom}</p>
+                <a
                   href={"tel:" + numero}
                   className="inline-flex items-center gap-2 text-2xl font-bold text-brand-600 hover:text-brand-700 transition-colors"
                 >
                   {numero}
                 </a>
-                <p className="text-xs text-gray-400 mt-3">Un lien de connexion a ete envoye a {email}</p>
+                <p className="text-xs text-gray-400 mt-3">Un lien de connexion a été envoyé à {email}</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -88,7 +88,7 @@ export default function PopupAfficherNumero({ artisanId, artisanNom }: Props) {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="block text-sm font-medium text-gray-700">Telephone (optionnel)</label>
+                  <label className="block text-sm font-medium text-gray-700">Téléphone (optionnel)</label>
                   <input
                     type="tel"
                     value={tel}
@@ -102,7 +102,7 @@ export default function PopupAfficherNumero({ artisanId, artisanNom }: Props) {
                   disabled={loading}
                   className="w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-semibold py-2.5 rounded-xl transition-colors"
                 >
-                  {loading ? "Chargement..." : "Afficher le numero"}
+                  {loading ? "Chargement..." : "Afficher le numéro"}
                 </button>
                 <p className="text-xs text-gray-400 text-center">
                   En continuant, vous acceptez de recevoir des communications de Manobra.

@@ -462,12 +462,12 @@ export default async function artisanPage({ params }: PageProps) {
 
           {/* CTA mobile sticky */}
           {isVitrine ? (
-            <button
-              onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })}
+            <a
+              href="#cta-mobile"
               className="sm:hidden inline-flex items-center gap-1 bg-brand-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-brand-700 transition-colors"
             >
               Afficher le numéro
-            </button>
+            </a>
           ) : isVerifie ? (
             <Link
               href={`/reserver/${id}`}
@@ -905,7 +905,7 @@ export default async function artisanPage({ params }: PageProps) {
       </div>
 
       {/* ── Bouton Réserver flottant (mobile uniquement) ──────────────────────── */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 p-4 safe-area-bottom">
+      <div id="cta-mobile" className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 p-4 safe-area-bottom">
         {isVitrine ? (
           <PopupAfficherNumero artisanId={id} artisanNom={artisan.nom ?? "l'artisan"} />
         ) : (
