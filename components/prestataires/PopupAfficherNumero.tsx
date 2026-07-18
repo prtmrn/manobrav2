@@ -16,10 +16,16 @@ export default function PopupAfficherNumero({ artisanId, artisanNom, compact = f
   const [numero, setNumero] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError(null);
+    if (!EMAIL_REGEX.test(email.trim())) {
+      setError("Format d'email invalide. Vérifiez votre adresse.");
+      return;
+    }
+    setLoading(true);
     try {
       const res = await fetch("/api/leads", {
         method: "POST",
@@ -27,7 +33,7 @@ export default function PopupAfficherNumero({ artisanId, artisanNom, compact = f
         body: JSON.stringify({ email, telephone: tel, artisan_id: artisanId }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok && !data.telephone) throw new Error(data.error);
       setNumero(data.telephone ?? "Numéro non disponible");
     } catch (_e) {
       setError("Une erreur est survenue. Veuillez réessayer.");
@@ -49,7 +55,7 @@ export default function PopupAfficherNumero({ artisanId, artisanNom, compact = f
       </button>
 
       {open && createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div onClick={(e) => e.stopPropagation()} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
             <div className="flex items-start justify-between mb-4">
               <div>
@@ -75,7 +81,7 @@ export default function PopupAfficherNumero({ artisanId, artisanNom, compact = f
                 <p className="text-xs text-gray-400 mt-3">Un lien de connexion a été envoyé à {email}</p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} noValidate className="space-y-4">
                 {error && (
                   <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                     {error}
