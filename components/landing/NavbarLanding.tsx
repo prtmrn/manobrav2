@@ -286,9 +286,9 @@ export default function NavbarLanding() {
               className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
               Connexion
             </Link>
-            <Link href="/recherche"
+            <Link href="/commencer"
               className="inline-flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors shadow-sm">
-              Trouver un artisan →
+              Commencer →
             </Link>
           </>
         )}
