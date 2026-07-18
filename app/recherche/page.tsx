@@ -383,6 +383,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
       disponible_urgence: p.urgenceActif ?? false,
       siret: (p as any).siret ?? null,
       bio: (p as any).bio ?? null,
+      type: p.type ?? null,
     }));
 
   // ── Render ─────────────────────────────────────────────────────────────────

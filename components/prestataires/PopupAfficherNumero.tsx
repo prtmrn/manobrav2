@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 
 interface Props {
   artisanId: string;
@@ -47,7 +48,7 @@ export default function PopupAfficherNumero({ artisanId, artisanNom, compact = f
         Afficher le numéro
       </button>
 
-      {open && (
+      {open && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
             <div className="flex items-start justify-between mb-4">
@@ -114,7 +115,8 @@ export default function PopupAfficherNumero({ artisanId, artisanNom, compact = f
               </form>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

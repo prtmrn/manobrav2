@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { getMetierConfig } from "@/components/map/metier-config";
+import PopupAfficherNumero from "@/components/prestataires/PopupAfficherNumero";
 
 export interface ArtisanCard {
   id: string;
@@ -20,6 +21,7 @@ export interface ArtisanCard {
   disponible_urgence?: boolean;
   siret?: string | null;
   bio?: string | null;
+  type?: string | null;
 }
 
 interface SearchMapViewProps {
@@ -171,10 +173,16 @@ function ArtisanDetail({ artisan, onBack }: { artisan: ArtisanCard; onBack: () =
             className="flex-1 text-center text-sm border border-brand-600 text-brand-600 hover:bg-brand-50 font-semibold py-2.5 rounded-xl transition-colors">
             Voir le profil
           </Link>
-          <Link href={`/prestataires/${artisan.id}#reserver`}
-            className="flex-1 text-center text-sm bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-xl transition-colors">
-            Demander
-          </Link>
+          {artisan.type === "vitrine" ? (
+            <div className="flex-1">
+              <PopupAfficherNumero artisanId={artisan.id} artisanNom={nom} />
+            </div>
+          ) : (
+            <Link href={`/prestataires/${artisan.id}#reserver`}
+              className="flex-1 text-center text-sm bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-xl transition-colors">
+              Demander une intervention
+            </Link>
+          )}
         </div>
       </div>
     </div>
