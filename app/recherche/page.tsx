@@ -5,6 +5,7 @@ import { SERVICES_STANDARDISES, serviceTitleMatchesStandard } from "@/lib/servic
 import { createAdminClient } from "@/lib/supabase/admin";
 import { METIER_LIST, getMetierConfig } from "@/components/map/metier-config";
 import SearchFilters from "@/components/recherche/SearchFilters";
+import PopupAfficherNumero from "@/components/prestataires/PopupAfficherNumero";
 import nextDynamic from "next/dynamic";
 const SearchMapView = nextDynamic(() => import("@/components/recherche/SearchMapView"), { ssr: false });
 
@@ -545,7 +546,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                               </div>
                             </div>
                             <div className="px-4 pb-4">
-                              {p.type === "vitrine" ? (<span className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors">Afficher le numéro</span>) : (<span className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors">Demander une intervention</span>)}
+                              {p.type === "vitrine" ? (<PopupAfficherNumero artisanId={p.id} artisanNom={((p.prenom ?? "") + " " + (p.nom ?? "")).trim() || "cet artisan"} compact />) : (<span className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors">Demander une intervention</span>)}
                             </div>
                           </Link>
                         );
@@ -601,7 +602,7 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                               </div>
                             </div>
                             <div className="px-4 pb-4">
-                              {p.type === "vitrine" ? (<span className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors">Afficher le numéro</span>) : (<span className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors">Demander une intervention</span>)}
+                              {p.type === "vitrine" ? (<PopupAfficherNumero artisanId={p.id} artisanNom={((p.prenom ?? "") + " " + (p.nom ?? "")).trim() || "cet artisan"} compact />) : (<span className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors">Demander une intervention</span>)}
                             </div>
                           </Link>
                         );
@@ -725,12 +726,16 @@ export default async function RecherchePage({ searchParams }: PageProps) {
                         </div>
                       </div>
                       <div className="px-4 pb-4">
-                        <Link
-                          href={`/reserver/${p.id}`}
-                          className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors"
-                        >
-                          Demander une intervention
-                        </Link>
+                        {p.type === "vitrine" ? (
+                          <PopupAfficherNumero artisanId={p.id} artisanNom={((p.prenom ?? "") + " " + (p.nom ?? "")).trim() || "cet artisan"} compact />
+                        ) : (
+                          <Link
+                            href={`/reserver/${p.id}`}
+                            className="block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors"
+                          >
+                            Demander une intervention
+                          </Link>
+                        )}
                       </div>
                     </Link>
                   );

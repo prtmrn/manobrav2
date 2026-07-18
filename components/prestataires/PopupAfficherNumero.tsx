@@ -4,9 +4,10 @@ import { useState } from "react";
 interface Props {
   artisanId: string;
   artisanNom: string;
+  compact?: boolean;
 }
 
-export default function PopupAfficherNumero({ artisanId, artisanNom }: Props) {
+export default function PopupAfficherNumero({ artisanId, artisanNom, compact = false }: Props) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [tel, setTel] = useState("");
@@ -37,8 +38,11 @@ export default function PopupAfficherNumero({ artisanId, artisanNom }: Props) {
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
-        className="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm py-3 px-6 rounded-xl transition-all shadow-lg"
+        type="button"
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(true); }}
+        className={compact
+          ? "block w-full text-center text-xs font-semibold text-brand-600 border border-brand-200 rounded-lg py-2 hover:bg-brand-50 transition-colors"
+          : "w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm py-3 px-6 rounded-xl transition-all shadow-lg"}
       >
         Afficher le numéro
       </button>
