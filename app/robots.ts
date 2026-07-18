@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 // Génère automatiquement /robots.txt via l'API Metadata de Next.js
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://Manobra.fr";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://manobra.fr";
 
   return {
     rules: [
@@ -13,7 +13,8 @@ export default function robots(): MetadataRoute.Robots {
           "/",
           "/recherche",
           "/map",
-          "/artisans/",
+          "/prestataires/",
+          "/metiers/",
         ],
         disallow: [
           // Pages privées | dashboard, réservations, avis, onboarding

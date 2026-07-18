@@ -1,11 +1,13 @@
 import type { MetadataRoute } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { slugify } from "@/lib/metier-slug";
+import { METIER_LIST } from "@/components/map/metier-config";
 
 // Revalider le sitemap toutes les heures
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://Manobra.fr";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://manobra.fr";
 
   // ── Pages statiques ────────────────────────────────────────────────────────
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -29,6 +31,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
+  // ── Pages métiers (SEO) ──────────────────────────────────────────────────
+  const metiersRoutes: MetadataRoute.Sitemap = METIER_LIST
+    .filter((m) => m !== "Autre")
+    .map((m) => ({
+      url: `${baseUrl}/metiers/${slugify(m)}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
+    }));
+
   // ── Pages dynamiques : profils artisans publics ────────────────────────
   let artisansRoutes: MetadataRoute.Sitemap = [];
 
@@ -42,7 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .limit(5000); // Limite raisonnable pour un sitemap
 
     artisansRoutes = (data ?? []).map((p) => ({
-      url: `${baseUrl}/artisans/${p.id}`,
+      url: `${baseUrl}/prestataires/${p.id}`,
       lastModified: p.created_at ? new Date(p.created_at) : new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.7,
@@ -52,5 +64,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("[sitemap] Failed to fetch artisans");
   }
 
-  return [...staticRoutes, ...artisansRoutes];
+  return [...staticRoutes, ...metiersRoutes, ...artisansRoutes];
 }
