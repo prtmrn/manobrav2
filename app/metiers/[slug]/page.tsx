@@ -38,7 +38,7 @@ export default async function MetierPage({ params }: { params: Promise<{ slug: s
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40 h-16">
         <div className="max-w-7xl mx-auto px-4 h-full flex items-center gap-4">
-          <Link href="/" className="flex items-center flex-shrink-0"><Image src="/manobra-logo.png" alt="Manobra" width={315} height={128} className="h-9 w-auto" priority /></Link>
+          <Link href="/" className="flex items-center flex-shrink-0"><Image src="/manobra-logo-v2.png" alt="Manobra" width={315} height={78} className="h-9 w-auto" priority /></Link>
           <NavbarLanding />
         </div>
       </header>

@@ -235,7 +235,7 @@ export default async function HomePage() {
           <nav className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center group">
-              <Image src="/manobra-logo.png" alt="Manobra" width={315} height={128} className="h-12 w-auto" priority />
+              <Image src="/manobra-logo-v2.png" alt="Manobra" width={315} height={78} className="h-12 w-auto" priority />
             </Link>
 
             {/* Links */}
@@ -583,7 +583,7 @@ export default async function HomePage() {
             <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
               {/* Logo footer */}
               <div className="flex flex-col items-center sm:items-start gap-2">
-                <Image src="/manobra-logo.png" alt="Manobra" width={315} height={128} className="h-10 w-auto" />
+                <Image src="/manobra-logo-v2.png" alt="Manobra" width={315} height={78} className="h-10 w-auto" />
                 <span className="text-xs text-gray-500">Artisans qualifiés à domicile</span>
               </div>
 
