@@ -457,7 +457,7 @@ export default async function artisanPage({ params }: PageProps) {
             href="/"
             className="flex items-center hover:opacity-80 transition-opacity"
           >
-            <Image src="/logo-manobra.png" alt="Manobra" width={315} height={128} className="h-7 w-auto" priority />
+            <Image src="/logo-manobra.png" alt="Manobra" width={315} height={128} className="h-8 w-auto" priority />
           </Link>
 
           {/* CTA mobile sticky */}
