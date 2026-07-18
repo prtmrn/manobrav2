@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { METIER_LIST } from "@/components/map/metier-config";
 
 export default function CommencerPage() {
@@ -31,6 +32,7 @@ export default function CommencerPage() {
           {!choix && (
             <div className="space-y-6">
               <div className="text-center">
+                <Image src="/logo-manobra.png" alt="Manobra" width={315} height={128} className="h-12 w-auto mx-auto mb-6" priority />
                 <h1 className="text-3xl font-bold text-gray-900">Bienvenue sur Manobra</h1>
                 <p className="text-gray-500 mt-2">Comment pouvons-nous vous aider ?</p>
               </div>

@@ -234,12 +234,8 @@ export default async function HomePage() {
         <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 relative">
           <nav className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white text-lg shadow-sm group-hover:bg-brand-700 transition-colors">
-              </div>
-              <span className="font-bold text-gray-900 text-lg tracking-tight">
-                Man<span className="text-brand-600">obra</span>
-              </span>
+            <Link href="/" className="flex items-center group">
+              <Image src="/logo-manobra.png" alt="Manobra" width={315} height={128} className="h-9 w-auto" priority />
             </Link>
 
             {/* Links */}
@@ -587,10 +583,7 @@ export default async function HomePage() {
             <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
               {/* Logo footer */}
               <div className="flex items-center gap-2">
-                <span className="text-xl"></span>
-                <span className="font-bold text-white text-lg tracking-tight">
-                  Man<span className="text-brand-400">obra</span>
-                </span>
+                <Image src="/logo-manobra.png" alt="Manobra" width={315} height={128} className="h-8 w-auto" />
               </div>
 
               {/* Liens légaux */}

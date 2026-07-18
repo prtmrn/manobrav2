@@ -409,8 +409,8 @@ export default async function RecherchePage({ searchParams }: PageProps) {
       {/* ── Navigation ─────────────────────────────────────────────────────── */}
       <nav className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-gray-100 h-14">
         <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
-          <Link href="/" className="text-brand-600 font-bold text-lg">
-            Manobra
+          <Link href="/" className="flex items-center">
+            <Image src="/logo-manobra.png" alt="Manobra" width={315} height={128} className="h-7 w-auto" priority />
           </Link>
           <div className="flex items-center gap-4">
             <Link

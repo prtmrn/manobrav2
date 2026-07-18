@@ -59,6 +59,7 @@ export const metadata: Metadata = {
     title: "Manobra — Artisans qualifiés à domicile",
     description:
       "Trouvez des professionnels vérifiés près de chez vous et réservez en ligne.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Manobra — Artisans qualifiés à domicile" }],
   },
   twitter: {
     card: "summary_large_image",
