@@ -127,8 +127,8 @@ export default function CommencerPage() {
                   {[
                     { icon: "✓", text: "Profil professionnel visible par des milliers de clients" },
                     { icon: "✓", text: "Gestion de vos interventions simplifiée" },
-                    { icon: "✓", text: "Paiement sécurisé garanti" },
-                    { icon: "✓", text: "Support dédié 7j/7" },
+                    { icon: "✓", text: "0 % de commission : vous gardez 100 % de vos revenus" },
+                    { icon: "✓", text: "Sans engagement, résiliable à tout moment" },
                   ].map(({ icon, text }) => (
                     <div key={text} className="flex items-center gap-3">
                       <span className="w-5 h-5 rounded-full bg-brand-100 text-brand-600 text-xs flex items-center justify-center font-bold flex-shrink-0">{icon}</span>

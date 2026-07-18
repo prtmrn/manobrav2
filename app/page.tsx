@@ -180,57 +180,10 @@ async function fetchTopAvis(): Promise<AvisWithartisan[]> {
         artisan_photo_url: a.profiles_artisans?.photo_url ?? null,
       }));
   } catch {
-    // Si la BD n'est pas accessible (env de dev), on retourne des avis fictifs
-    return FALLBACK_AVIS;
+    // Si la BD n'est pas accessible, on n'affiche pas d'avis (jamais de faux avis)
+    return [];
   }
 }
-
-// ─── Avis de secours (affichés si BD vide ou inaccessible) ───────────────────
-
-const FALLBACK_AVIS: AvisWithartisan[] = [
-  {
-    id: "1",
-    note: 5,
-    commentaire:
-      "Plombier exceptionnel ! Intervention rapide, travail propre et soigné. " +
-      "Je recommande Manobra les yeux fermés.",
-    nom_client: "Marie L.",
-    created_at: new Date().toISOString(),
-    artisan_id: "",
-    artisan_nom: "Dupont",
-    artisan_prenom: "Jean",
-    artisan_metier: "Plombier",
-    artisan_photo_url: null,
-  },
-  {
-    id: "2",
-    note: 5,
-    commentaire:
-      "Électricien très professionnel. A réglé mon problème en moins d'une heure. " +
-      "Tarif honnête, devis respecté. Merci !",
-    nom_client: "Thomas R.",
-    created_at: new Date().toISOString(),
-    artisan_id: "",
-    artisan_nom: "Martin",
-    artisan_prenom: "Sophie",
-    artisan_metier: "Électricien",
-    artisan_photo_url: null,
-  },
-  {
-    id: "3",
-    note: 5,
-    commentaire:
-      "Service de ménage impeccable, ponctuelle et très consciencieuse. " +
-      "Mon appartement n'a jamais été aussi propre !",
-    nom_client: "Isabelle M.",
-    created_at: new Date().toISOString(),
-    artisan_id: "",
-    artisan_nom: "Bernard",
-    artisan_prenom: "Clara",
-    artisan_metier: "Chauffagiste",
-    artisan_photo_url: null,
-  },
-];
 
 // ─── Sous-composants ──────────────────────────────────────────────────────────
 

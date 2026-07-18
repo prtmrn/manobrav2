@@ -30,16 +30,14 @@ export const metadata: Metadata = {
     template: "%s | Manobra",
   },
   description:
-    "Trouvez un artisan vérifié près de chez vous en quelques minutes. Plombier, électricien, serrurier, chauffagiste : disponibilités en temps réel, réservation instantanée, intervention possible en 30 minutes. " +
-    "vérifiés près de chez vous. Réservez en ligne en quelques clics.",
+    "Trouvez un artisan vérifié près de chez vous. Plombier, électricien, serrurier, vitrier, chauffagiste : disponibilités en temps réel, réservation en ligne, intervention rapide partout en France.",
   keywords: [
     "artisan",
     "chauffagiste",
     "plombier",
     "électricien",
-    "peintre",
-    "ménage",
-    "jardinage",
+    "vitrier",
+    "serrurier",
     "réservation en ligne",
   ],
   authors: [{ name: "Manobra" }],
