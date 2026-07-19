@@ -115,7 +115,7 @@ export default function MapView({ artisans }: MapViewProps) {
             <a href="/prestataires/${artisan.id}"
               style="
                 display: block; text-align: center;
-                background: #16a34a; color: white;
+                background: #00CC5D; color: white;
                 padding: 8px 12px; border-radius: 8px;
                 text-decoration: none; font-size: 13px; font-weight: 600;
               ">

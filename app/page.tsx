@@ -338,10 +338,10 @@ export default async function HomePage() {
                   </svg>
                   {/* Marqueurs simulés */}
                   {[
-                    { top: "30%", left: "25%", color: "#16a34a", label: "Plombier" },
+                    { top: "30%", left: "25%", color: "#00CC5D", label: "Plombier" },
                     { top: "50%", left: "55%", color: "#2563eb", label: "Électricien" },
                     { top: "65%", left: "35%", color: "#dc2626", label: "Serrurier" },
-                    { top: "25%", left: "65%", color: "#16a34a", label: "Chauffagiste" },
+                    { top: "25%", left: "65%", color: "#00CC5D", label: "Chauffagiste" },
                     { top: "70%", left: "70%", color: "#2563eb", label: "Plombier" },
                   ].map((m, i) => (
                     <div key={i} className="absolute flex flex-col items-center" style={{ top: m.top, left: m.left, transform: "translate(-50%,-100%)" }}>

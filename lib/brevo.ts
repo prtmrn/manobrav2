@@ -135,7 +135,7 @@ function sliceHM(time: string): string {
 // ─── Template HTML partagé ───────────────────────────────────────────────────
 
 function wrapHtml(title: string, body: string): string {
-  const brand = "#22c55e";
+  const brand = "#1FD473";
   return `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -179,7 +179,7 @@ function detailRow(label: string, value: string): string {
 function ctaButton(text: string, url: string): string {
   return `
     <div style="text-align:center;margin:28px 0 8px">
-      <a href="${url}" style="display:inline-block;padding:13px 28px;background:#22c55e;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;border-radius:8px">
+      <a href="${url}" style="display:inline-block;padding:13px 28px;background:#1FD473;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;border-radius:8px">
         ${text}
       </a>
     </div>`;
@@ -416,7 +416,7 @@ export async function sendEmailAbonnementActif(
       Votre abonnement <strong>${planLabel}</strong> est maintenant actif.
       Votre profil est visible sur Manobra.
     </p>
-    <div style="background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;padding:20px 20px 12px;margin-bottom:24px">
+    <div style="background:#EDFDF4;border-radius:12px;border:1px solid #ABF2CB;padding:20px 20px 12px;margin-bottom:24px">
       <ul style="margin:0;padding-left:20px">${featureRows}</ul>
     </div>
     ${ctaButton("Acceder a mon tableau de bord", dashUrl)}`;

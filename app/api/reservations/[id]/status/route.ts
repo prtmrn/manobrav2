@@ -127,7 +127,7 @@ export async function PATCH(request: Request, context: RouteContext) {
           ? `Votre réservation est confirmée - ${serviceTitre}`
           : `Votre réservation a été refusée - ${serviceTitre}`;
         const statusLabel = newStatut === "confirme" ? "confirmée" : "refusée";
-        const color = newStatut === "confirme" ? "#16a34a" : "#dc2626";
+        const color = newStatut === "confirme" ? "#00CC5D" : "#dc2626";
 
         await sendBrevoEmail({
           to: [{ email: clientEmail, name: clientPrenom }],
@@ -137,7 +137,7 @@ export async function PATCH(request: Request, context: RouteContext) {
               <h1 style="font-size:22px;color:#111">Bonjour ${clientPrenom},</h1>
               <p style="color:#444">Votre demande de réservation pour <strong>${serviceTitre}</strong> a été <strong style="color:${color}">${statusLabel}</strong> par ${artisan?.prenom ?? ""} ${artisan?.nom ?? ""}.</p>
               <p style="color:#444">Date : <strong>${resa.date}</strong> de ${resa.heure_debut?.slice(0,5)} à ${resa.heure_fin?.slice(0,5)}</p>
-              ${newStatut === "confirme" ? `<a href="${siteUrl}/dashboard/reservations" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#16a34a;color:#fff;border-radius:8px;text-decoration:none;font-weight:bold">Voir ma réservation</a>` : ""}
+              ${newStatut === "confirme" ? `<a href="${siteUrl}/dashboard/reservations" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#00CC5D;color:#fff;border-radius:8px;text-decoration:none;font-weight:bold">Voir ma réservation</a>` : ""}
               <p style="margin-top:32px;color:#888;font-size:13px">L'équipe Manobra</p>
             </div>
           `,
@@ -170,7 +170,7 @@ export async function PATCH(request: Request, context: RouteContext) {
               <h1 style="font-size:22px;color:#111">Bonjour ${clientPrenom},</h1>
               <p style="color:#444">Votre intervention <strong>${serviceTitre}</strong> est terminée. Nous espérons que tout s'est bien passé.</p>
               <p style="color:#444">Votre avis aide les autres clients à choisir les meilleurs artisans. Cela ne prend que 30 secondes.</p>
-              <a href="${siteUrl}/avis/${id}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#16a34a;color:#fff;border-radius:8px;text-decoration:none;font-weight:bold">Laisser un avis</a>
+              <a href="${siteUrl}/avis/${id}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#00CC5D;color:#fff;border-radius:8px;text-decoration:none;font-weight:bold">Laisser un avis</a>
               <p style="margin-top:32px;color:#888;font-size:13px">L'équipe Manobra</p>
             </div>
           `,
@@ -188,7 +188,7 @@ export async function PATCH(request: Request, context: RouteContext) {
             <h1 style="font-size:22px;color:#111">Bonjour ${artisan?.prenom ?? ""},</h1>
             <p style="color:#444">Une réservation pour <strong>${serviceTitre}</strong> a été annulée par le client.</p>
             <p style="color:#444">Date : <strong>${resa.date}</strong> de ${resa.heure_debut?.slice(0,5)} à ${resa.heure_fin?.slice(0,5)}</p>
-            <a href="https://artisan.manobra.fr/dashboard/reservations" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#16a34a;color:#fff;border-radius:8px;text-decoration:none;font-weight:bold">Voir mes réservations</a>
+            <a href="https://artisan.manobra.fr/dashboard/reservations" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#00CC5D;color:#fff;border-radius:8px;text-decoration:none;font-weight:bold">Voir mes réservations</a>
             <p style="margin-top:32px;color:#888;font-size:13px">L'équipe Manobra</p>
           </div>
         `,

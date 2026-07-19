@@ -176,7 +176,7 @@ export default function PlanningClient({
     confirme: "#3b82f6",
     en_cours: "#1d4ed8",
     en_attente: "#f59e0b",
-    dispo: "#22c55e",
+    dispo: "#1FD473",
     urgence: "#ef4444",
     indispo: "#f97316",
   };
