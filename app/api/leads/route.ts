@@ -30,11 +30,12 @@ export async function POST(request: Request) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      await admin.auth.admin.generateLink({
-        type: "magiclink",
+      // Envoie réellement l'email avec le lien magique (crée le compte si besoin)
+      await admin.auth.signInWithOtp({
         email,
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=/dashboard`,
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=/dashboard`,
+          shouldCreateUser: true,
         },
       });
     }

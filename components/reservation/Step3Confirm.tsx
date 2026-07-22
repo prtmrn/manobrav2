@@ -394,7 +394,7 @@ export default function Step3Confirm({
         date={date}
         slot={slot}
         wasPaid={hasPrix}
-        isGuest={false}
+        isGuest={isGuest}
         guestEmail={guestEmail}
       />
     );

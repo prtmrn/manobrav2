@@ -50,7 +50,7 @@ export default async function ReserverPage({ params }: PageProps) {
   const [artisanRes, servicesRes] = await Promise.all([
     supabase
       .from("profiles_artisans")
-      .select("id, nom, prenom, metier, photo_url, ville, note_moyenne, plan_actif")
+      .select("id, nom, prenom, metier, photo_url, ville, note_moyenne, plan_actif, type")
       .eq("id", artisan_id)
       .eq("actif", true)
       .maybeSingle(),
@@ -63,6 +63,11 @@ export default async function ReserverPage({ params }: PageProps) {
   ]);
 
   if (!artisanRes.data) notFound();
+
+  // Les artisans vitrines ne prennent pas de réservation : renvoyer vers leur profil
+  if ((artisanRes.data as { type?: string }).type === "vitrine") {
+    redirect(`/prestataires/${artisan_id}`);
+  }
 
   let clientProfile: { prenom: string | null; nom: string | null; telephone: string | null } | null = null;
   if (user) {
