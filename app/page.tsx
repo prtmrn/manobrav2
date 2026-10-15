@@ -1,15 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { METIER_CONFIG, METIER_LIST } from "@/components/map/metier-config";
-import MetiersGrid from "@/components/landing/MetiersGrid";
 import Typewriter from "@/components/landing/Typewriter";
-import HowItWorksTabs from "@/components/landing/HowItWorksTabs";
 import NavbarLanding from "@/components/landing/NavbarLanding";
-import HeroCTA from "@/components/landing/HeroCTA";
+import HeroSearchDoctolib from "@/components/landing/HeroSearchDoctolib";
+import MarqueeConfiance from "@/components/landing/MarqueeConfiance";
 
-// ─── Cache 24 h (ISR) | les avis et stats changent peu ───────────────────────
+// ─── Cache 60 s (ISR) ────────────────────────────────────────────────────────
 export const revalidate = 60;
 
 // ─── SEO : Metadata ───────────────────────────────────────────────────────────
@@ -17,17 +15,16 @@ export const metadata: Metadata = {
   title:
     "Manobra | Artisans qualifiés à domicile | Serrurier, Plombier, Électricien",
   description:
-    "Trouvez des artisans et artisans vérifiés près de chez vous : plombier, " +
-    "électricien, serrurier, plombier, vitrier, chauffagiste à Paris, Lyon, Marseille, Bordeaux, " +
-    "Toulouse. Réservez en ligne, payez en sécurité.",
+    "Trouvez des artisans vérifiés près de chez vous : plombier, " +
+    "électricien, serrurier, vitrier, chauffagiste. " +
+    "Réservez en ligne, intervention rapide partout en France.",
   keywords: [
     "artisan à domicile",
-    "artisan de services",
-    "plombier pas cher",
+    "plombier",
     "électricien certifié",
     "serrurier",
     "vitrier",
-    "jardinier professionnel",
+    "chauffagiste",
     "réservation artisan en ligne",
     "artisan vérifié",
     "Paris",
@@ -65,12 +62,12 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
   },
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_SITE_URL ?? "https://Manobra.fr",
+    canonical: process.env.NEXT_PUBLIC_SITE_URL ?? "https://manobra.fr",
   },
 };
 
 // ─── JSON-LD : LocalBusiness + WebSite ───────────────────────────────────────
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://Manobra.fr";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://manobra.fr";
 
 const jsonLdLocalBusiness = {
   "@context": "https://schema.org",
@@ -78,13 +75,12 @@ const jsonLdLocalBusiness = {
   "@id": siteUrl,
   name: "Manobra",
   description:
-    "Plateforme de mise en relation entre particuliers et artisans / " +
-    "artisans qualifiés à domicile : plombier, électricien, serrurier, vitrier, chauffagiste.",
+    "Plateforme de mise en relation entre particuliers et artisans " +
+    "qualifiés à domicile : plombier, électricien, serrurier, vitrier, chauffagiste.",
   url: siteUrl,
   logo: `${siteUrl}/logo.png`,
   image: `${siteUrl}/og-image.png`,
-  telephone: "",
-  email: "contact@Manobra.fr",
+  email: "contact@manobra.fr",
   address: {
     "@type": "PostalAddress",
     addressCountry: "FR",
@@ -130,74 +126,21 @@ const jsonLdWebSite = {
   },
 };
 
-// ─── Fetch des meilleurs avis depuis Supabase ─────────────────────────────────
-
-type AvisWithartisan = {
-  id: string;
-  note: number;
-  commentaire: string | null;
-  nom_client: string | null;
-  created_at: string;
-  artisan_id: string;
-  artisan_nom: string | null;
-  artisan_prenom: string | null;
-  artisan_metier: string | null;
-  artisan_photo_url: string | null;
-};
-
-async function fetchTopAvis(): Promise<AvisWithartisan[]> {
-  try {
-    const admin = createAdminClient();
-    const { data } = await admin
-      .from("avis")
-      .select(
-        "id, note, commentaire, nom_client, created_at, artisan_id, " +
-          "profiles_artisans!artisan_id(nom, prenom, metier, photo_url)"
-      )
-      .eq("note", 5)
-      .not("commentaire", "is", null)
-      .not("commentaire", "eq", "")
-      .order("created_at", { ascending: false })
-      .limit(6);
-
-    if (!data) return [];
-
-    // Aplatit le résultat joint + filtre les commentaires trop courts
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (data as any[])
-      .filter((a) => a.commentaire && a.commentaire.length >= 30)
-      .slice(0, 3)
-      .map((a) => ({
-        id: a.id,
-        note: a.note,
-        commentaire: a.commentaire,
-        nom_client: a.nom_client,
-        created_at: a.created_at,
-        artisan_id: a.artisan_id,
-        artisan_nom: a.profiles_artisans?.nom ?? null,
-        artisan_prenom: a.profiles_artisans?.prenom ?? null,
-        artisan_metier: a.profiles_artisans?.metier ?? null,
-        artisan_photo_url: a.profiles_artisans?.photo_url ?? null,
-      }));
-  } catch {
-    // Si la BD n'est pas accessible, on n'affiche pas d'avis (jamais de faux avis)
-    return [];
-  }
-}
+// ─── Données footer SEO ───────────────────────────────────────────────────────
+const METIERS_SEO = METIER_LIST.filter((m) => m !== "Autre");
+const VILLES_SEO = ["Paris", "Lyon", "Marseille", "Bordeaux", "Toulouse", "Lille", "Nantes", "Strasbourg"];
+const RECHERCHES_FREQUENTES = [
+  { metier: "Plombier", ville: "Paris" },
+  { metier: "Électricien", ville: "Paris" },
+  { metier: "Serrurier", ville: "Paris" },
+  { metier: "Vitrier", ville: "Paris" },
+  { metier: "Chauffagiste", ville: "Paris" },
+  { metier: "Serrurier", ville: "Lyon" },
+  { metier: "Plombier", ville: "Marseille" },
+  { metier: "Électricien", ville: "Bordeaux" },
+];
 
 // ─── Sous-composants ──────────────────────────────────────────────────────────
-
-function StarsFull({ count = 5 }: { count?: number }) {
-  return (
-    <div className="flex items-center gap-0.5">
-      {Array.from({ length: count }).map((_, i) => (
-        <svg key={i} className="w-4 h-4 text-amber-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-      ))}
-    </div>
-  );
-}
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -211,9 +154,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default async function HomePage() {
-  const topAvis = await fetchTopAvis();
-
+export default function HomePage() {
   return (
     <>
       {/* ── JSON-LD Structured Data ─────────────────────────────────────────── */}
@@ -233,17 +174,9 @@ export default async function HomePage() {
         {/* ══════════════════════════════════════════════════════════════════ */}
         <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 relative">
           <nav className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            {/* Logo */}
             <Link href="/" className="flex items-center group">
               <Image src="/manobra-logo-v2.png" alt="Manobra" width={315} height={78} className="h-9 w-auto" priority />
             </Link>
-
-            {/* Links */}
-            <div className="hidden sm:flex items-center gap-6 text-sm text-gray-600">
-
-            </div>
-
-            {/* Auth */}
             <NavbarLanding />
           </nav>
         </header>
@@ -251,17 +184,10 @@ export default async function HomePage() {
         {/* ══════════════════════════════════════════════════════════════════ */}
         {/*  HERO                                                             */}
         {/* ══════════════════════════════════════════════════════════════════ */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-brand-50 via-white to-white pt-20 pb-24 sm:pt-28 sm:pb-32">
-          {/* Fond décoratif */}
-          <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-            <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-brand-100/40 blur-3xl" />
-            <div className="absolute top-20 -left-20 w-[400px] h-[400px] rounded-full bg-emerald-50 blur-2xl" />
-          </div>
-
+        <section className="relative overflow-hidden bg-gradient-to-b from-brand-50 via-white to-white pt-20 pb-16 sm:pt-24 sm:pb-20">
           <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-white border border-brand-100 rounded-full px-4 py-1.5 text-xs font-semibold text-brand-700 shadow-sm mb-8">
-              <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
+            <div className="inline-flex items-center bg-white border border-brand-100 rounded-full px-4 py-1.5 text-xs font-semibold text-brand-700 shadow-sm mb-8">
               Des professionnels vérifiés, disponibles maintenant
             </div>
 
@@ -276,26 +202,15 @@ export default async function HomePage() {
               <strong className="text-gray-700 font-semibold">et sans mauvaise surprise.</strong>
             </p>
 
-            {/* Double CTA */}
-            <HeroCTA />
-            {/* Reassurance */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-              <span className="flex items-center gap-2 text-sm text-gray-500"><svg className="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Sans engagement</span>
-              <span className="flex items-center gap-2 text-sm text-gray-500"><svg className="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>Artisans vérifiés</span>
-              <span className="flex items-center gap-2 text-sm text-gray-500"><svg className="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12" /></svg>Devis avant intervention</span>
-              <span className="flex items-center gap-2 text-sm text-gray-500"><svg className="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>Avis certifiés</span>
-            </div>
-
-
-
+            {/* Recherche : métier + ville */}
+            <HeroSearchDoctolib />
           </div>
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════ */}
-        {/*  AVIS CLIENTS                                                     */}
+        {/*  BARRE DE CONFIANCE QUI CIRCULE                                   */}
         {/* ══════════════════════════════════════════════════════════════════ */}
-        
-
+        <MarqueeConfiance />
 
         {/* ══════════════════════════════════════════════════════════════════ */}
         {/*  EXPLOREZ LA CARTE                                                */}
@@ -386,9 +301,9 @@ export default async function HomePage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 text-base mb-1.5">Artisans vérifiés</h3>
+                  <h3 className="font-bold text-gray-900 text-base mb-1.5">Des artisans vraiment vérifiés</h3>
                   <p className="text-sm text-gray-500 leading-relaxed">
-                    SIRET contrôlé, identité vérifiée, avis certifiés par des clients ayant réellement fait appel à l&apos;artisan.
+                    SIRET contrôlé, identité vérifiée. Et seuls les clients ayant réellement fait intervenir l&apos;artisan peuvent laisser un avis.
                   </p>
                 </div>
               </div>
@@ -400,9 +315,9 @@ export default async function HomePage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 text-base mb-1.5">Réservation en ligne</h3>
+                  <h3 className="font-bold text-gray-900 text-base mb-1.5">Une réservation en 2 minutes</h3>
                   <p className="text-sm text-gray-500 leading-relaxed">
-                    Choisissez votre créneau directement dans l&apos;agenda de l&apos;artisan, sans appel téléphonique ni attente.
+                    Choisissez votre créneau directement dans l&apos;agenda de l&apos;artisan. Sans appel téléphonique, sans attente, sans relance.
                   </p>
                 </div>
               </div>
@@ -414,7 +329,7 @@ export default async function HomePage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 text-base mb-1.5">Prix transparents</h3>
+                  <h3 className="font-bold text-gray-900 text-base mb-1.5">Des prix transparents</h3>
                   <p className="text-sm text-gray-500 leading-relaxed">
                     Les tarifs indicatifs sont visibles sur chaque profil. Le devis définitif est établi sur place, avant toute intervention.
                   </p>
@@ -465,8 +380,8 @@ export default async function HomePage() {
                   <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-brand-600 text-white text-xs font-bold flex items-center justify-center shadow">2</span>
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 text-base mb-2">Choisissez un artisan</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">Consultez les profils, les avis certifiés et les tarifs indicatifs. Comparez en un coup d&apos;œil.</p>
+                  <h3 className="font-bold text-gray-900 text-base mb-2">Choisissez votre artisan</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">Comparez les profils vérifiés : avis certifiés, tarifs, disponibilités en temps réel.</p>
                 </div>
               </div>
               {/* Étape 3 */}
@@ -480,8 +395,8 @@ export default async function HomePage() {
                   <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-brand-600 text-white text-xs font-bold flex items-center justify-center shadow">3</span>
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 text-base mb-2">Réservez en ligne</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">Sélectionnez un créneau dans l&apos;agenda de l&apos;artisan. Confirmation instantanée, sans appel.</p>
+                  <h3 className="font-bold text-gray-900 text-base mb-2">Réservez votre créneau</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">Confirmation immédiate. L&apos;artisan intervient, vous notez la prestation une fois terminée.</p>
                 </div>
               </div>
             </div>
@@ -489,86 +404,66 @@ export default async function HomePage() {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════ */}
-        {/*  NOS MÉTIERS                                                      */}
+        {/*  CONFIANCE — VOS ARTISANS. VÉRIFIÉS.                              */}
         {/* ══════════════════════════════════════════════════════════════════ */}
         <section className="py-20 bg-gray-50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-3">
-                Nos métiers
-              </h2>
-              <p className="text-gray-500 text-base max-w-xl mx-auto">
-                Des professionnels vérifiés pour tous vos besoins à domicile.
-              </p>
-            </div>
-            <MetiersGrid />
-          </div>
-        </section>
-
-        {/* ══════════════════════════════════════════════════════════════════ */}
-        {/*  CTA FINAL                                                        */}
-        {/* ══════════════════════════════════════════════════════════════════ */}
-        <section className="py-24 bg-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <div className="relative overflow-hidden bg-gradient-to-br from-brand-600 via-brand-700 to-emerald-800 rounded-3xl px-8 py-16 sm:px-16 text-center shadow-2xl">
-              {/* Décoration */}
-              <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-                <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/5 blur-2xl" />
-                <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-white/5 blur-2xl" />
-                {/* Points décoratifs */}
-                <div className="absolute top-6 left-6 grid grid-cols-3 gap-2 opacity-20">
-                  {Array.from({ length: 9 }).map((_, i) => (
-                    <div key={i} className="w-1.5 h-1.5 rounded-full bg-white" />
-                  ))}
-                </div>
-                <div className="absolute bottom-6 right-6 grid grid-cols-3 gap-2 opacity-20">
-                  {Array.from({ length: 9 }).map((_, i) => (
-                    <div key={i} className="w-1.5 h-1.5 rounded-full bg-white" />
-                  ))}
-                </div>
-              </div>
-
-              <div className="relative">
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 text-balance">
-                  Prêt à trouver votre artisan idéal ?
+            <div className="flex flex-col lg:flex-row items-center gap-12">
+              {/* Texte */}
+              <div className="flex-1 text-center lg:text-left">
+                <SectionLabel>Confiance</SectionLabel>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4">
+                  Vos artisans. Vérifiés.
                 </h2>
-                <p className="text-brand-100 text-base sm:text-lg mb-10 max-w-xl mx-auto leading-relaxed">
-                  Trouvez le bon artisan en quelques clics. La première réservation prend moins de 2 minutes.
+                <p className="text-gray-500 text-base leading-relaxed mb-8 max-w-md mx-auto lg:mx-0">
+                  Chez Manobra, la confiance n&apos;est pas un slogan : elle est vérifiable sur chaque profil, avant même de réserver.
                 </p>
-
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <Link
-                    href="/recherche"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-white text-brand-700 hover:bg-brand-50 font-bold px-8 py-4 rounded-2xl text-base transition-all duration-200 shadow-lg hover:-translate-y-0.5"
-                  >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    Trouver un artisan
-                  </Link>
-                  <Link
-                    href="https://artisan.manobra.fr/auth/login"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold px-8 py-4 rounded-2xl text-base transition-all duration-200 hover:-translate-y-0.5"
-                  >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    Je suis artisan
-                  </Link>
-                </div>
-
-                {/* Micro-reassurances */}
-                <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8 text-xs text-brand-200">
-                  {["Gratuit pour les clients", "Aucun engagement", "Annulation facile"].map(
-                    (item) => (
-                      <span key={item} className="flex items-center gap-1.5">
-                        <svg className="w-3.5 h-3.5 text-brand-300" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                <ul className="space-y-4 text-left max-w-md mx-auto lg:mx-0">
+                  {[
+                    { titre: "SIRET contrôlé", detail: "l'entreprise existe et est active, vérifié en base officielle" },
+                    { titre: "Avis impossibles à falsifier", detail: "seul un client ayant une intervention terminée peut noter" },
+                    { titre: "Devis avant intervention", detail: "le prix est confirmé sur place avant le début des travaux" },
+                  ].map((item) => (
+                    <li key={item.titre} className="flex items-start gap-3">
+                      <span className="mt-0.5 w-5 h-5 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
-                        {item}
                       </span>
-                    )
-                  )}
+                      <div>
+                        <p className="text-sm font-bold text-gray-900">{item.titre}</p>
+                        <p className="text-sm text-gray-500">{item.detail}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {/* Visuel */}
+              <div className="hidden lg:block flex-1 w-full">
+                <div className="relative rounded-2xl border border-gray-200 shadow-xl bg-white p-8 space-y-5">
+                  {[
+                    { titre: "Profil vérifié", detail: "SIRET + identité", icon: (
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                    )},
+                    { titre: "Avis certifiés", detail: "interventions réelles uniquement", icon: (
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                    )},
+                    { titre: "Devis validé", detail: "avant le début de l'intervention", icon: (
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12" />
+                    )},
+                  ].map((card) => (
+                    <div key={card.titre} className="flex items-center gap-4 bg-gray-50 rounded-xl border border-gray-100 px-5 py-4">
+                      <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-5 h-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                          {card.icon}
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-gray-900">{card.titre}</p>
+                        <p className="text-xs text-gray-500">{card.detail}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -576,35 +471,111 @@ export default async function HomePage() {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════ */}
-        {/*  FOOTER                                                           */}
+        {/*  BANDE ARTISAN — pleine largeur                                   */}
         {/* ══════════════════════════════════════════════════════════════════ */}
-        <footer className="bg-gray-900 text-gray-400 py-12">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-              {/* Logo footer */}
-              <div className="flex flex-col items-center sm:items-start gap-2">
-                <Image src="/manobra-logo-v2.png" alt="Manobra" width={315} height={78} className="h-10 w-auto" />
-                <span className="text-xs text-gray-500">Artisans qualifiés à domicile</span>
-              </div>
+        <section className="bg-gradient-to-br from-brand-600 via-brand-700 to-emerald-800 py-20">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 text-balance">
+              Vous êtes artisan ?
+            </h2>
+            <p className="text-brand-100 text-base sm:text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+              Développez votre activité avec Manobra : profil professionnel, gestion simplifiée de vos interventions, et 0 % de commission — vous gardez 100 % de vos revenus.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a
+                href="https://artisan.manobra.fr/auth/login"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-white text-brand-700 hover:bg-brand-50 font-bold px-8 py-4 rounded-2xl text-base transition-all duration-200 shadow-lg hover:-translate-y-0.5"
+              >
+                Créer mon profil gratuitement
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </a>
+            </div>
+            {/* Micro-reassurances */}
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8 text-xs text-brand-200">
+              {["Sans engagement", "Résiliable à tout moment", "Inscription en 5 minutes"].map(
+                (item) => (
+                  <span key={item} className="flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 text-brand-300" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    {item}
+                  </span>
+                )
+              )}
+            </div>
+          </div>
+        </section>
 
-              {/* Liens légaux */}
+        {/* ══════════════════════════════════════════════════════════════════ */}
+        {/*  FOOTER SEO                                                       */}
+        {/* ══════════════════════════════════════════════════════════════════ */}
+        <footer className="bg-gray-900 text-gray-400 py-14">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            {/* Colonnes */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+              {/* Marque */}
+              <div className="col-span-2 md:col-span-1">
+                <Image src="/manobra-logo-v2.png" alt="Manobra" width={315} height={78} className="h-10 w-auto mb-3" />
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Artisans qualifiés à domicile. Réservation en ligne, avis certifiés, 0 % de commission.
+                </p>
+              </div>
+              {/* Manobra */}
+              <nav aria-label="Manobra">
+                <p className="text-xs font-bold text-gray-300 uppercase tracking-wider mb-4">Manobra</p>
+                <ul className="space-y-2.5 text-sm">
+                  <li><Link href="/metiers" className="hover:text-white transition-colors">Nos métiers</Link></li>
+                  <li><Link href="/commencer" className="hover:text-white transition-colors">Commencer</Link></li>
+                  <li><a href="https://artisan.manobra.fr/auth/login" className="hover:text-white transition-colors">Vous êtes artisan ?</a></li>
+                  <li><a href="mailto:contact@manobra.fr" className="hover:text-white transition-colors">Contact</a></li>
+                </ul>
+              </nav>
+              {/* Trouvez votre artisan */}
+              <nav aria-label="Trouvez votre artisan">
+                <p className="text-xs font-bold text-gray-300 uppercase tracking-wider mb-4">Trouvez votre artisan</p>
+                <ul className="space-y-2.5 text-sm">
+                  {METIERS_SEO.map((m) => (
+                    <li key={m}>
+                      <Link href={`/recherche?metier=${encodeURIComponent(m)}`} className="hover:text-white transition-colors">
+                        {METIER_CONFIG[m].label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+              {/* Recherches fréquentes */}
+              <nav aria-label="Recherches fréquentes">
+                <p className="text-xs font-bold text-gray-300 uppercase tracking-wider mb-4">Recherches fréquentes</p>
+                <ul className="space-y-2.5 text-sm">
+                  {RECHERCHES_FREQUENTES.map(({ metier, ville }) => (
+                    <li key={`${metier}-${ville}`}>
+                      <Link
+                        href={`/recherche?metier=${encodeURIComponent(metier)}&ville=${encodeURIComponent(ville)}`}
+                        className="hover:text-white transition-colors"
+                      >
+                        {METIER_CONFIG[metier]?.label ?? metier} {ville}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </div>
+
+            {/* Liens légaux */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-gray-800">
               <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs">
                 {[
                   { label: "Mentions légales", href: "#" },
                   { label: "CGU", href: "#" },
                   { label: "Confidentialité", href: "#" },
-                  { label: "Contact", href: "mailto:contact@Manobra.fr" },
                 ].map(({ label, href }) => (
-                  <Link
-                    key={label}
-                    href={href}
-                    className="hover:text-white transition-colors"
-                  >
+                  <Link key={label} href={href} className="hover:text-white transition-colors">
                     {label}
                   </Link>
                 ))}
               </nav>
-
               <p className="text-xs text-gray-600">
                 © {new Date().getFullYear()} Manobra. Tous droits réservés.
               </p>

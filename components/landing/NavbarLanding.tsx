@@ -8,8 +8,6 @@ import { SERVICES_STANDARDISES, normalizeStr } from "@/lib/services-standardises
 
 const NAV_LINKS = [
   { href: "/metiers", label: "Nos métiers" },
-  { href: "/qui-sommes-nous", label: "Qui sommes-nous" },
-  { href: "/blog", label: "Blog" },
 ];
 
 type Suggestion =
@@ -220,6 +218,10 @@ export default function NavbarLanding() {
             {label}
           </Link>
         ))}
+        <a href="https://artisan.manobra.fr/auth/login"
+          className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap">
+          Vous êtes artisan ?
+        </a>
       </nav>
 
       {/* Auth buttons desktop */}
