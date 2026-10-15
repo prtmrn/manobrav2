@@ -170,7 +170,7 @@ export default function NavbarLanding() {
             onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
             onClick={e => e.stopPropagation()}
             placeholder="Plombier, débouchage, Paris..."
-            className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-500/10 transition-all"
+            className="w-full pl-9 pr-4 py-2 rounded-full border border-gray-200 bg-gray-50 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-500/10 transition-all"
             autoComplete="off"
           />
           {showSuggestions && suggestions.length > 0 && (
@@ -278,7 +278,7 @@ export default function NavbarLanding() {
               <span className="text-xs bg-brand-50 text-brand-600 px-1.5 py-0.5 rounded-full font-medium">Artisan</span>
             </div>
             <a href="https://artisan.manobra.fr/dashboard"
-              className="inline-flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors shadow-sm">
+              className="inline-flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors shadow-sm">
               Mon espace →
             </a>
           </div>
@@ -289,7 +289,7 @@ export default function NavbarLanding() {
               Connexion
             </Link>
             <Link href="/commencer"
-              className="inline-flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors shadow-sm">
+              className="inline-flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors shadow-sm">
               Commencer →
             </Link>
           </>
@@ -340,7 +340,7 @@ export default function NavbarLanding() {
               onChange={e => { setQuery(e.target.value); setActiveIndex(-1); setShowSuggestions(true); }}
               onKeyDown={handleKeyDown}
               placeholder="Plombier, débouchage, Paris..."
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10"
+              className="w-full pl-9 pr-4 py-2.5 rounded-full border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10"
               autoComplete="off"
             />
           </div>

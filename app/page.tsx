@@ -229,7 +229,7 @@ export default function HomePage() {
                 </p>
                 <Link
                   href="/recherche?vue=carte"
-                  className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all duration-200 shadow-md hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-bold px-6 py-3 rounded-full text-sm transition-all duration-200 shadow-md hover:-translate-y-0.5"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
@@ -239,7 +239,7 @@ export default function HomePage() {
               </div>
               {/* Aperçu carte — masqué sur mobile */}
               <div className="hidden lg:block flex-1 w-full">
-                <div className="relative rounded-2xl overflow-hidden border border-gray-200 shadow-xl aspect-video bg-gray-100">
+                <div className="relative rounded-3xl overflow-hidden border border-gray-200 shadow-xl aspect-video bg-gray-100">
                   {/* Fond carte stylisé */}
                   <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-blue-50 to-gray-100" />
                   {/* Grille simulant une carte */}
@@ -294,7 +294,7 @@ export default function HomePage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Argument 1 */}
-              <div className="bg-white rounded-2xl p-7 border border-gray-100 shadow-sm flex flex-col gap-4">
+              <div className="flex flex-col gap-4 px-2">
                 <div className="w-11 h-11 rounded-xl bg-brand-50 flex items-center justify-center">
                   <svg className="w-6 h-6 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
@@ -308,7 +308,7 @@ export default function HomePage() {
                 </div>
               </div>
               {/* Argument 2 */}
-              <div className="bg-white rounded-2xl p-7 border border-gray-100 shadow-sm flex flex-col gap-4">
+              <div className="flex flex-col gap-4 px-2">
                 <div className="w-11 h-11 rounded-xl bg-brand-50 flex items-center justify-center">
                   <svg className="w-6 h-6 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
@@ -322,7 +322,7 @@ export default function HomePage() {
                 </div>
               </div>
               {/* Argument 3 */}
-              <div className="bg-white rounded-2xl p-7 border border-gray-100 shadow-sm flex flex-col gap-4">
+              <div className="flex flex-col gap-4 px-2">
                 <div className="w-11 h-11 rounded-xl bg-brand-50 flex items-center justify-center">
                   <svg className="w-6 h-6 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
@@ -440,7 +440,7 @@ export default function HomePage() {
               </div>
               {/* Visuel */}
               <div className="hidden lg:block flex-1 w-full">
-                <div className="relative rounded-2xl border border-gray-200 shadow-xl bg-white p-8 space-y-5">
+                <div className="relative rounded-3xl border border-gray-200 shadow-xl bg-white p-8 space-y-5">
                   {[
                     { titre: "Profil vérifié", detail: "SIRET + identité", icon: (
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
@@ -479,12 +479,12 @@ export default function HomePage() {
               Vous êtes artisan ?
             </h2>
             <p className="text-brand-100 text-base sm:text-lg mb-10 max-w-xl mx-auto leading-relaxed">
-              Développez votre activité avec Manobra : profil professionnel, gestion simplifiée de vos interventions, et 0 % de commission — vous gardez 100 % de vos revenus.
+              Développez votre activité avec Manobra : profil professionnel, gestion simplifiée de vos interventions, et 0 % de commission : vous gardez 100 % de vos revenus.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
                 href="https://artisan.manobra.fr/auth/login"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-white text-brand-700 hover:bg-brand-50 font-bold px-8 py-4 rounded-2xl text-base transition-all duration-200 shadow-lg hover:-translate-y-0.5"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-white text-brand-700 hover:bg-brand-50 font-bold px-8 py-4 rounded-full text-base transition-all duration-200 shadow-lg hover:-translate-y-0.5"
               >
                 Créer mon profil gratuitement
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

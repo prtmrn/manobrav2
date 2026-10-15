@@ -101,7 +101,7 @@ export default function HeroSearchDoctolib() {
     <div className="w-full max-w-2xl mx-auto">
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col sm:flex-row bg-white rounded-2xl border-2 border-gray-200 shadow-sm focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/10 transition-all overflow-visible"
+        className="flex flex-col sm:flex-row bg-white rounded-2xl sm:rounded-full border-2 border-gray-200 shadow-sm focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/10 transition-all overflow-visible"
       >
         {/* Sélecteur métier */}
         <div className="relative flex-1 flex items-center border-b sm:border-b-0 sm:border-r border-gray-200">
@@ -175,7 +175,7 @@ export default function HeroSearchDoctolib() {
         <div className="p-2">
           <button
             type="submit"
-            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-bold px-8 py-3 rounded-xl text-base transition-all duration-200 shadow-md hover:-translate-y-0.5"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-bold px-8 py-3 rounded-full text-base transition-all duration-200 shadow-md hover:-translate-y-0.5"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
