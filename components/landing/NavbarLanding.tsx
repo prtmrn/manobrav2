@@ -218,10 +218,6 @@ export default function NavbarLanding() {
             {label}
           </Link>
         ))}
-        <a href="https://artisan.manobra.fr/auth/login"
-          className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap">
-          Vous êtes artisan ?
-        </a>
       </nav>
 
       {/* Auth buttons desktop */}
@@ -292,6 +288,10 @@ export default function NavbarLanding() {
               className="inline-flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors shadow-sm">
               Commencer →
             </Link>
+            <a href="https://artisan.manobra.fr/auth/login"
+              className="text-sm font-bold text-gray-900 hover:text-brand-700 transition-colors whitespace-nowrap">
+              Vous êtes artisan ?
+            </a>
           </>
         )}
       </div>

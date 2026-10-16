@@ -101,7 +101,7 @@ export default function HeroSearchDoctolib() {
     <div className="w-full max-w-2xl mx-auto">
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col sm:flex-row bg-white rounded-2xl sm:rounded-full border-2 border-gray-200 shadow-sm focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/10 transition-all overflow-visible"
+        className="flex flex-col sm:flex-row bg-white rounded-2xl sm:rounded-full border-2 border-gray-900 shadow-sm focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/10 transition-all overflow-visible"
       >
         {/* Sélecteur métier */}
         <div className="relative flex-1 flex items-center border-b sm:border-b-0 sm:border-r border-gray-200">

@@ -186,11 +186,6 @@ export default function HomePage() {
         {/* ══════════════════════════════════════════════════════════════════ */}
         <section className="relative overflow-hidden bg-gradient-to-b from-brand-50 via-white to-white pt-20 pb-16 sm:pt-24 sm:pb-20">
           <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center bg-white border border-brand-100 rounded-full px-4 py-1.5 text-xs font-semibold text-brand-700 shadow-sm mb-8">
-              Des professionnels vérifiés, disponibles maintenant
-            </div>
-
             {/* Titre H1 */}
             <h1 className="text-2xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight mb-6 leading-[1.3]">
               <Typewriter />
